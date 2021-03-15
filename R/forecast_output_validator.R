@@ -1,11 +1,12 @@
 #' forecast_output_validator
 #'
-#' @param file_in 
-#' @param grouping_variables 
-#' @param target_variables 
+#' @param forecast_file Your forecast csv or nc file
+#' @param grouping_variables Grouping variables
+#' @param target_variables  Possible target variables
+#' @param theme_names valid EFI theme names
 #' @export
 #'
-forecast_output_validator <- function(file_in, 
+forecast_output_validator <- function(forecast_file, 
                                grouping_variables = c("siteID", "time"),
                                target_variables = c("oxygen", 
                                                     "temperature", 
@@ -18,7 +19,7 @@ forecast_output_validator <- function(file_in,
                                theme_names = c("aquatics", "beetles",
                                                "phenology", "terrestrial_30min",
                                                "terrestrial_daily","ticks")){
-  
+  file_in <- forecast_file
   lexists <- function(list,name){
     sum(name %in% names(list))
   }

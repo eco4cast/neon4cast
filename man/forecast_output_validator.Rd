@@ -5,7 +5,7 @@
 \title{forecast_output_validator}
 \usage{
 forecast_output_validator(
-  file_in,
+  forecast_file,
   grouping_variables = c("siteID", "time"),
   target_variables = c("oxygen", "temperature", "richness", "abundance", "nee", "le",
     "vswc", "gcc_90"),
@@ -14,11 +14,13 @@ forecast_output_validator(
 )
 }
 \arguments{
-\item{file_in}{}
+\item{forecast_file}{Your forecast csv or nc file}
 
-\item{grouping_variables}{}
+\item{grouping_variables}{Grouping variables}
 
-\item{target_variables}{}
+\item{target_variables}{Possible target variables}
+
+\item{theme_names}{valid EFI theme names}
 }
 \description{
 forecast_output_validator

@@ -7,7 +7,7 @@ submit <- function(forecast_file, metadata = NULL){
                   "Consider renaming these so that automated upload will work"))
   }
   
-  validate(forecast_file)
+  forecast_output_validator(forecast_file)
   aws.s3::put_object(object = forecast_file, 
                      bucket = "submissions", region="data", base_url = "ecoforecast.org")
   

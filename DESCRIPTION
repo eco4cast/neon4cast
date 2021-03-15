@@ -9,7 +9,8 @@ Authors@R: c(person(
             person("Quinn", "Thomas", role = "aut",
                    comment = c(ORCID = "0000-0003-1282-7825"))
             )
-Description: Helper utilities for the NEON forecast challenge
+Description: Helper utilities for the NEON forecast challenge.  Convience
+  utilities only, this package is not intended for more general use. 
 License: MIT + file LICENSE
 Encoding: UTF-8
 LazyData: true
@@ -21,7 +22,11 @@ Imports:
     EFIstandards,
     tidync,
     usethis,
-    ncdf4
+    ncdf4,
+    lubridate,
+    purrr,
+    readr,
+    stringr
 RoxygenNote: 7.1.1
 Language: en-US
 Remotes: eco4cast/EFIstandards
