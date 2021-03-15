@@ -1,10 +1,11 @@
 
 
 
-submit(forecast_file, metadata = NULL){
-  if(file.exists("~/.aws"))
+submit <- function(forecast_file, metadata = NULL){
+  if(file.exists("~/.aws")){
     warning(paste("Detected existing AWS credentials file in ~/.aws,",
                   "Consider renaming these so that automated upload will work"))
+  }
   
   validate(forecast_file)
   aws.s3::put_object(object = forecast_file, 

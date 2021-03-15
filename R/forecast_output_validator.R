@@ -3,11 +3,8 @@
 #' @param file_in 
 #' @param grouping_variables 
 #' @param target_variables 
-#'
-#' @return
 #' @export
 #'
-#' @examples
 forecast_output_validator <- function(file_in, 
                                grouping_variables = c("siteID", "time"),
                                target_variables = c("oxygen", 
@@ -18,7 +15,9 @@ forecast_output_validator <- function(file_in,
                                                     "le", 
                                                     "vswc",
                                                     "gcc_90"),
-                               theme_names = c("aquatics", "beetles", "phenology", "terrestrial_30min","terrestrial_daily","ticks")){
+                               theme_names = c("aquatics", "beetles",
+                                               "phenology", "terrestrial_30min",
+                                               "terrestrial_daily","ticks")){
   
   lexists <- function(list,name){
     sum(name %in% names(list))
@@ -29,8 +28,6 @@ forecast_output_validator <- function(file_in,
   message(file_in)
   
   usethis::ui_todo("Checking validity of file name...")
-  
-  file_in <- file.path(submissions_directory,object[[i]]$Key)
   file_basename <- basename(file_in)
   parsed_basename <- unlist(stringr::str_split(file_basename, "-"))
   file_name_parsable <- TRUE
