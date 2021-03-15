@@ -1,0 +1,25 @@
+Package: neon4cast
+Title: Helper Utilities for the EFI NEON Forecast Challenge
+Version: 0.1.0
+Authors@R: c(person(
+              "Carl", "Boettiger", 
+              email = "cboettig@gmail.com", 
+              role = c("aut", "cre"),
+              comment = c(ORCID = "0000-0002-1642-628X")),
+            person("Quinn", "Thomas", role = "aut",
+                   comment = c(ORCID = "0000-0003-1282-7825"))
+            )
+Description: Helper utilities for the NEON forecast challenge
+License: MIT + file LICENSE
+Encoding: UTF-8
+LazyData: true
+Roxygen: list(markdown = TRUE)
+Imports: 
+    aws.s3,
+    neonstore,
+    EML,
+    EFIstandards,
+    tidync
+RoxygenNote: 7.1.1
+Language: en-US
+Remotes: eco4cast/EFIstandards
