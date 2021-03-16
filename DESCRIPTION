@@ -31,7 +31,8 @@ Imports:
     stats,
     dplyr,
     tidyr,
-    tidyselect
+    tidyselect,
+    jsonlite
 RoxygenNote: 7.1.1
 Language: en-US
 Remotes: eco4cast/EFIstandards

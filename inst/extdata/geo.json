@@ -1,0 +1,1413 @@
+[{"id":"POSE","geographicDescription":"POSE, D02","boundingCoordinates":{"westBoundingCoordinate":"-78.147258","eastBoundingCoordinate":"-78.147258","northBoundingCoordinate":"38.89431","southBoundingCoordinate":"38.89431","boundingAltitudes":{"altitudeMinimum":276,"altitudeMaximum":2763,"altitudeUnits":"meter"}}},
+{"id":"BARC","geographicDescription":"BARC, D03","boundingCoordinates":{"westBoundingCoordinate":"-82.008414","eastBoundingCoordinate":"-82.008414","northBoundingCoordinate":"29.675982","southBoundingCoordinate":"29.675982","boundingAltitudes":{"altitudeMinimum":27,"altitudeMaximum":27,"altitudeUnits":"meter"}}},
+  {
+    "geographicDescription": [
+      "BART, D01"
+    ],
+    "boundingCoordinates": {
+      "westBoundingCoordinate": [
+        -71.2874
+      ],
+      "eastBoundingCoordinate": [
+        -71.2874
+      ],
+      "northBoundingCoordinate": [
+        44.0639
+      ],
+      "southBoundingCoordinate": [
+        44.0639
+      ],
+      "boundingAltitudes": {
+        "altitudeMinimum": [
+          274.0493
+        ],
+        "altitudeMaximum": [
+          274.0493
+        ],
+        "altitudeUnits": [
+          "meter"
+        ]
+      }
+    }
+  },
+  {
+    "geographicDescription": [
+      "HARV, D01"
+    ],
+    "boundingCoordinates": {
+      "westBoundingCoordinate": [
+        -72.1727
+      ],
+      "eastBoundingCoordinate": [
+        -72.1727
+      ],
+      "northBoundingCoordinate": [
+        42.5369
+      ],
+      "southBoundingCoordinate": [
+        42.5369
+      ],
+      "boundingAltitudes": {
+        "altitudeMinimum": [
+          348.1278
+        ],
+        "altitudeMaximum": [
+          348.1278
+        ],
+        "altitudeUnits": [
+          "meter"
+        ]
+      }
+    }
+  },
+  {
+    "geographicDescription": [
+      "BLAN, D02"
+    ],
+    "boundingCoordinates": {
+      "westBoundingCoordinate": [
+        -78.0418
+      ],
+      "eastBoundingCoordinate": [
+        -78.0418
+      ],
+      "northBoundingCoordinate": [
+        39.0337
+      ],
+      "southBoundingCoordinate": [
+        39.0337
+      ],
+      "boundingAltitudes": {
+        "altitudeMinimum": [
+          182.7139
+        ],
+        "altitudeMaximum": [
+          182.7139
+        ],
+        "altitudeUnits": [
+          "meter"
+        ]
+      }
+    }
+  },
+  {
+    "geographicDescription": [
+      "SCBI, D02"
+    ],
+    "boundingCoordinates": {
+      "westBoundingCoordinate": [
+        -78.1395
+      ],
+      "eastBoundingCoordinate": [
+        -78.1395
+      ],
+      "northBoundingCoordinate": [
+        38.8929
+      ],
+      "southBoundingCoordinate": [
+        38.8929
+      ],
+      "boundingAltitudes": {
+        "altitudeMinimum": [
+          352.4316
+        ],
+        "altitudeMaximum": [
+          352.4316
+        ],
+        "altitudeUnits": [
+          "meter"
+        ]
+      }
+    }
+  },
+  {
+    "geographicDescription": [
+      "SERC, D02"
+    ],
+    "boundingCoordinates": {
+      "westBoundingCoordinate": [
+        -76.56
+      ],
+      "eastBoundingCoordinate": [
+        -76.56
+      ],
+      "northBoundingCoordinate": [
+        38.8901
+      ],
+      "southBoundingCoordinate": [
+        38.8901
+      ],
+      "boundingAltitudes": {
+        "altitudeMinimum": [
+          32.5315
+        ],
+        "altitudeMaximum": [
+          32.5315
+        ],
+        "altitudeUnits": [
+          "meter"
+        ]
+      }
+    }
+  },
+  {
+    "geographicDescription": [
+      "DSNY, D03"
+    ],
+    "boundingCoordinates": {
+      "westBoundingCoordinate": [
+        -81.4362
+      ],
+      "eastBoundingCoordinate": [
+        -81.4362
+      ],
+      "northBoundingCoordinate": [
+        28.1251
+      ],
+      "southBoundingCoordinate": [
+        28.1251
+      ],
+      "boundingAltitudes": {
+        "altitudeMinimum": [
+          20.3344
+        ],
+        "altitudeMaximum": [
+          20.3344
+        ],
+        "altitudeUnits": [
+          "meter"
+        ]
+      }
+    }
+  },
+  {
+    "geographicDescription": [
+      "JERC, D03"
+    ],
+    "boundingCoordinates": {
+      "westBoundingCoordinate": [
+        -84.4686
+      ],
+      "eastBoundingCoordinate": [
+        -84.4686
+      ],
+      "northBoundingCoordinate": [
+        31.1948
+      ],
+      "southBoundingCoordinate": [
+        31.1948
+      ],
+      "boundingAltitudes": {
+        "altitudeMinimum": [
+          46.6537
+        ],
+        "altitudeMaximum": [
+          46.6537
+        ],
+        "altitudeUnits": [
+          "meter"
+        ]
+      }
+    }
+  },
+  {
+    "geographicDescription": [
+      "OSBS, D03"
+    ],
+    "boundingCoordinates": {
+      "westBoundingCoordinate": [
+        -81.9934
+      ],
+      "eastBoundingCoordinate": [
+        -81.9934
+      ],
+      "northBoundingCoordinate": [
+        29.6893
+      ],
+      "southBoundingCoordinate": [
+        29.6893
+      ],
+      "boundingAltitudes": {
+        "altitudeMinimum": [
+          46.0339
+        ],
+        "altitudeMaximum": [
+          46.0339
+        ],
+        "altitudeUnits": [
+          "meter"
+        ]
+      }
+    }
+  },
+  {
+    "geographicDescription": [
+      "GUAN, D04"
+    ],
+    "boundingCoordinates": {
+      "westBoundingCoordinate": [
+        -66.8687
+      ],
+      "eastBoundingCoordinate": [
+        -66.8687
+      ],
+      "northBoundingCoordinate": [
+        17.9696
+      ],
+      "southBoundingCoordinate": [
+        17.9696
+      ],
+      "boundingAltitudes": {
+        "altitudeMinimum": [
+          125.3233
+        ],
+        "altitudeMaximum": [
+          125.3233
+        ],
+        "altitudeUnits": [
+          "meter"
+        ]
+      }
+    }
+  },
+  {
+    "geographicDescription": [
+      "LAJA, D04"
+    ],
+    "boundingCoordinates": {
+      "westBoundingCoordinate": [
+        -67.0769
+      ],
+      "eastBoundingCoordinate": [
+        -67.0769
+      ],
+      "northBoundingCoordinate": [
+        18.0213
+      ],
+      "southBoundingCoordinate": [
+        18.0213
+      ],
+      "boundingAltitudes": {
+        "altitudeMinimum": [
+          16.443
+        ],
+        "altitudeMaximum": [
+          16.443
+        ],
+        "altitudeUnits": [
+          "meter"
+        ]
+      }
+    }
+  },
+  {
+    "geographicDescription": [
+      "STEI, D05"
+    ],
+    "boundingCoordinates": {
+      "westBoundingCoordinate": [
+        -89.5864
+      ],
+      "eastBoundingCoordinate": [
+        -89.5864
+      ],
+      "northBoundingCoordinate": [
+        45.5089
+      ],
+      "southBoundingCoordinate": [
+        45.5089
+      ],
+      "boundingAltitudes": {
+        "altitudeMinimum": [
+          475.7317
+        ],
+        "altitudeMaximum": [
+          475.7317
+        ],
+        "altitudeUnits": [
+          "meter"
+        ]
+      }
+    }
+  },
+  {
+    "geographicDescription": [
+      "TREE, D05"
+    ],
+    "boundingCoordinates": {
+      "westBoundingCoordinate": [
+        -89.5857
+      ],
+      "eastBoundingCoordinate": [
+        -89.5857
+      ],
+      "northBoundingCoordinate": [
+        45.4937
+      ],
+      "southBoundingCoordinate": [
+        45.4937
+      ],
+      "boundingAltitudes": {
+        "altitudeMinimum": [
+          466.57
+        ],
+        "altitudeMaximum": [
+          466.57
+        ],
+        "altitudeUnits": [
+          "meter"
+        ]
+      }
+    }
+  },
+  {
+    "geographicDescription": [
+      "UNDE, D05"
+    ],
+    "boundingCoordinates": {
+      "westBoundingCoordinate": [
+        -89.5373
+      ],
+      "eastBoundingCoordinate": [
+        -89.5373
+      ],
+      "northBoundingCoordinate": [
+        46.2339
+      ],
+      "southBoundingCoordinate": [
+        46.2339
+      ],
+      "boundingAltitudes": {
+        "altitudeMinimum": [
+          520.9712
+        ],
+        "altitudeMaximum": [
+          520.9712
+        ],
+        "altitudeUnits": [
+          "meter"
+        ]
+      }
+    }
+  },
+  {
+    "geographicDescription": [
+      "KONA, D06"
+    ],
+    "boundingCoordinates": {
+      "westBoundingCoordinate": [
+        -96.6129
+      ],
+      "eastBoundingCoordinate": [
+        -96.6129
+      ],
+      "northBoundingCoordinate": [
+        39.1104
+      ],
+      "southBoundingCoordinate": [
+        39.1104
+      ],
+      "boundingAltitudes": {
+        "altitudeMinimum": [
+          323.2928
+        ],
+        "altitudeMaximum": [
+          323.2928
+        ],
+        "altitudeUnits": [
+          "meter"
+        ]
+      }
+    }
+  },
+  {
+    "geographicDescription": [
+      "KONZ, D06"
+    ],
+    "boundingCoordinates": {
+      "westBoundingCoordinate": [
+        -96.5631
+      ],
+      "eastBoundingCoordinate": [
+        -96.5631
+      ],
+      "northBoundingCoordinate": [
+        39.1008
+      ],
+      "southBoundingCoordinate": [
+        39.1008
+      ],
+      "boundingAltitudes": {
+        "altitudeMinimum": [
+          414.4253
+        ],
+        "altitudeMaximum": [
+          414.4253
+        ],
+        "altitudeUnits": [
+          "meter"
+        ]
+      }
+    }
+  },
+  {
+    "geographicDescription": [
+      "UKFS, D06"
+    ],
+    "boundingCoordinates": {
+      "westBoundingCoordinate": [
+        -95.1921
+      ],
+      "eastBoundingCoordinate": [
+        -95.1921
+      ],
+      "northBoundingCoordinate": [
+        39.0404
+      ],
+      "southBoundingCoordinate": [
+        39.0404
+      ],
+      "boundingAltitudes": {
+        "altitudeMinimum": [
+          321.5761
+        ],
+        "altitudeMaximum": [
+          321.5761
+        ],
+        "altitudeUnits": [
+          "meter"
+        ]
+      }
+    }
+  },
+  {
+    "geographicDescription": [
+      "GRSM, D07"
+    ],
+    "boundingCoordinates": {
+      "westBoundingCoordinate": [
+        -83.5019
+      ],
+      "eastBoundingCoordinate": [
+        -83.5019
+      ],
+      "northBoundingCoordinate": [
+        35.689
+      ],
+      "southBoundingCoordinate": [
+        35.689
+      ],
+      "boundingAltitudes": {
+        "altitudeMinimum": [
+          575.3967
+        ],
+        "altitudeMaximum": [
+          575.3967
+        ],
+        "altitudeUnits": [
+          "meter"
+        ]
+      }
+    }
+  },
+  {
+    "geographicDescription": [
+      "MLBS, D07"
+    ],
+    "boundingCoordinates": {
+      "westBoundingCoordinate": [
+        -80.5248
+      ],
+      "eastBoundingCoordinate": [
+        -80.5248
+      ],
+      "northBoundingCoordinate": [
+        37.3783
+      ],
+      "southBoundingCoordinate": [
+        37.3783
+      ],
+      "boundingAltitudes": {
+        "altitudeMinimum": [
+          1169.668
+        ],
+        "altitudeMaximum": [
+          1169.668
+        ],
+        "altitudeUnits": [
+          "meter"
+        ]
+      }
+    }
+  },
+  {
+    "geographicDescription": [
+      "ORNL, D07"
+    ],
+    "boundingCoordinates": {
+      "westBoundingCoordinate": [
+        -84.2826
+      ],
+      "eastBoundingCoordinate": [
+        -84.2826
+      ],
+      "northBoundingCoordinate": [
+        35.9641
+      ],
+      "southBoundingCoordinate": [
+        35.9641
+      ],
+      "boundingAltitudes": {
+        "altitudeMinimum": [
+          343.7875
+        ],
+        "altitudeMaximum": [
+          343.7875
+        ],
+        "altitudeUnits": [
+          "meter"
+        ]
+      }
+    }
+  },
+  {
+    "geographicDescription": [
+      "DELA, D08"
+    ],
+    "boundingCoordinates": {
+      "westBoundingCoordinate": [
+        -87.8039
+      ],
+      "eastBoundingCoordinate": [
+        -87.8039
+      ],
+      "northBoundingCoordinate": [
+        32.5417
+      ],
+      "southBoundingCoordinate": [
+        32.5417
+      ],
+      "boundingAltitudes": {
+        "altitudeMinimum": [
+          25.0097
+        ],
+        "altitudeMaximum": [
+          25.0097
+        ],
+        "altitudeUnits": [
+          "meter"
+        ]
+      }
+    }
+  },
+  {
+    "geographicDescription": [
+      "LENO, D08"
+    ],
+    "boundingCoordinates": {
+      "westBoundingCoordinate": [
+        -88.1612
+      ],
+      "eastBoundingCoordinate": [
+        -88.1612
+      ],
+      "northBoundingCoordinate": [
+        31.8539
+      ],
+      "southBoundingCoordinate": [
+        31.8539
+      ],
+      "boundingAltitudes": {
+        "altitudeMinimum": [
+          13.2496
+        ],
+        "altitudeMaximum": [
+          13.2496
+        ],
+        "altitudeUnits": [
+          "meter"
+        ]
+      }
+    }
+  },
+  {
+    "geographicDescription": [
+      "TALL, D08"
+    ],
+    "boundingCoordinates": {
+      "westBoundingCoordinate": [
+        -87.3933
+      ],
+      "eastBoundingCoordinate": [
+        -87.3933
+      ],
+      "northBoundingCoordinate": [
+        32.9505
+      ],
+      "southBoundingCoordinate": [
+        32.9505
+      ],
+      "boundingAltitudes": {
+        "altitudeMinimum": [
+          166.1869
+        ],
+        "altitudeMaximum": [
+          166.1869
+        ],
+        "altitudeUnits": [
+          "meter"
+        ]
+      }
+    }
+  },
+  {
+    "geographicDescription": [
+      "DCFS, D09"
+    ],
+    "boundingCoordinates": {
+      "westBoundingCoordinate": [
+        -99.1066
+      ],
+      "eastBoundingCoordinate": [
+        -99.1066
+      ],
+      "northBoundingCoordinate": [
+        47.1617
+      ],
+      "southBoundingCoordinate": [
+        47.1617
+      ],
+      "boundingAltitudes": {
+        "altitudeMinimum": [
+          575.3036
+        ],
+        "altitudeMaximum": [
+          575.3036
+        ],
+        "altitudeUnits": [
+          "meter"
+        ]
+      }
+    }
+  },
+  {
+    "geographicDescription": [
+      "NOGP, D09"
+    ],
+    "boundingCoordinates": {
+      "westBoundingCoordinate": [
+        -100.9154
+      ],
+      "eastBoundingCoordinate": [
+        -100.9154
+      ],
+      "northBoundingCoordinate": [
+        46.7697
+      ],
+      "southBoundingCoordinate": [
+        46.7697
+      ],
+      "boundingAltitudes": {
+        "altitudeMinimum": [
+          588.63
+        ],
+        "altitudeMaximum": [
+          588.63
+        ],
+        "altitudeUnits": [
+          "meter"
+        ]
+      }
+    }
+  },
+  {
+    "geographicDescription": [
+      "WOOD, D09"
+    ],
+    "boundingCoordinates": {
+      "westBoundingCoordinate": [
+        -99.2413
+      ],
+      "eastBoundingCoordinate": [
+        -99.2413
+      ],
+      "northBoundingCoordinate": [
+        47.1282
+      ],
+      "southBoundingCoordinate": [
+        47.1282
+      ],
+      "boundingAltitudes": {
+        "altitudeMinimum": [
+          590.869
+        ],
+        "altitudeMaximum": [
+          590.869
+        ],
+        "altitudeUnits": [
+          "meter"
+        ]
+      }
+    }
+  },
+  {
+    "geographicDescription": [
+      "CPER, D10"
+    ],
+    "boundingCoordinates": {
+      "westBoundingCoordinate": [
+        -104.7456
+      ],
+      "eastBoundingCoordinate": [
+        -104.7456
+      ],
+      "northBoundingCoordinate": [
+        40.8155
+      ],
+      "southBoundingCoordinate": [
+        40.8155
+      ],
+      "boundingAltitudes": {
+        "altitudeMinimum": [
+          1653.9151
+        ],
+        "altitudeMaximum": [
+          1653.9151
+        ],
+        "altitudeUnits": [
+          "meter"
+        ]
+      }
+    }
+  },
+  {
+    "geographicDescription": [
+      "RMNP, D10"
+    ],
+    "boundingCoordinates": {
+      "westBoundingCoordinate": [
+        -105.546
+      ],
+      "eastBoundingCoordinate": [
+        -105.546
+      ],
+      "northBoundingCoordinate": [
+        40.2759
+      ],
+      "southBoundingCoordinate": [
+        40.2759
+      ],
+      "boundingAltitudes": {
+        "altitudeMinimum": [
+          2741.5741
+        ],
+        "altitudeMaximum": [
+          2741.5741
+        ],
+        "altitudeUnits": [
+          "meter"
+        ]
+      }
+    }
+  },
+  {
+    "geographicDescription": [
+      "STER, D10"
+    ],
+    "boundingCoordinates": {
+      "westBoundingCoordinate": [
+        -103.0293
+      ],
+      "eastBoundingCoordinate": [
+        -103.0293
+      ],
+      "northBoundingCoordinate": [
+        40.4619
+      ],
+      "southBoundingCoordinate": [
+        40.4619
+      ],
+      "boundingAltitudes": {
+        "altitudeMinimum": [
+          1364.6306
+        ],
+        "altitudeMaximum": [
+          1364.6306
+        ],
+        "altitudeUnits": [
+          "meter"
+        ]
+      }
+    }
+  },
+  {
+    "geographicDescription": [
+      "CLBJ, D11"
+    ],
+    "boundingCoordinates": {
+      "westBoundingCoordinate": [
+        -97.57
+      ],
+      "eastBoundingCoordinate": [
+        -97.57
+      ],
+      "northBoundingCoordinate": [
+        33.4012
+      ],
+      "southBoundingCoordinate": [
+        33.4012
+      ],
+      "boundingAltitudes": {
+        "altitudeMinimum": [
+          272.27
+        ],
+        "altitudeMaximum": [
+          272.27
+        ],
+        "altitudeUnits": [
+          "meter"
+        ]
+      }
+    }
+  },
+  {
+    "geographicDescription": [
+      "OAES, D11"
+    ],
+    "boundingCoordinates": {
+      "westBoundingCoordinate": [
+        -99.0588
+      ],
+      "eastBoundingCoordinate": [
+        -99.0588
+      ],
+      "northBoundingCoordinate": [
+        35.4106
+      ],
+      "southBoundingCoordinate": [
+        35.4106
+      ],
+      "boundingAltitudes": {
+        "altitudeMinimum": [
+          518.9354
+        ],
+        "altitudeMaximum": [
+          518.9354
+        ],
+        "altitudeUnits": [
+          "meter"
+        ]
+      }
+    }
+  },
+  {
+    "geographicDescription": [
+      "YELL, D12"
+    ],
+    "boundingCoordinates": {
+      "westBoundingCoordinate": [
+        -110.5391
+      ],
+      "eastBoundingCoordinate": [
+        -110.5391
+      ],
+      "northBoundingCoordinate": [
+        44.9535
+      ],
+      "southBoundingCoordinate": [
+        44.9535
+      ],
+      "boundingAltitudes": {
+        "altitudeMinimum": [
+          2132.566
+        ],
+        "altitudeMaximum": [
+          2132.566
+        ],
+        "altitudeUnits": [
+          "meter"
+        ]
+      }
+    }
+  },
+  {
+    "geographicDescription": [
+      "MOAB, D13"
+    ],
+    "boundingCoordinates": {
+      "westBoundingCoordinate": [
+        -109.3883
+      ],
+      "eastBoundingCoordinate": [
+        -109.3883
+      ],
+      "northBoundingCoordinate": [
+        38.2483
+      ],
+      "southBoundingCoordinate": [
+        38.2483
+      ],
+      "boundingAltitudes": {
+        "altitudeMinimum": [
+          1798.8379
+        ],
+        "altitudeMaximum": [
+          1798.8379
+        ],
+        "altitudeUnits": [
+          "meter"
+        ]
+      }
+    }
+  },
+  {
+    "geographicDescription": [
+      "NIWO, D13"
+    ],
+    "boundingCoordinates": {
+      "westBoundingCoordinate": [
+        -105.5824
+      ],
+      "eastBoundingCoordinate": [
+        -105.5824
+      ],
+      "northBoundingCoordinate": [
+        40.0543
+      ],
+      "southBoundingCoordinate": [
+        40.0543
+      ],
+      "boundingAltitudes": {
+        "altitudeMinimum": [
+          3489.988
+        ],
+        "altitudeMaximum": [
+          3489.988
+        ],
+        "altitudeUnits": [
+          "meter"
+        ]
+      }
+    }
+  },
+  {
+    "geographicDescription": [
+      "JORN, D14"
+    ],
+    "boundingCoordinates": {
+      "westBoundingCoordinate": [
+        -106.8425
+      ],
+      "eastBoundingCoordinate": [
+        -106.8425
+      ],
+      "northBoundingCoordinate": [
+        32.5907
+      ],
+      "southBoundingCoordinate": [
+        32.5907
+      ],
+      "boundingAltitudes": {
+        "altitudeMinimum": [
+          1323.548
+        ],
+        "altitudeMaximum": [
+          1323.548
+        ],
+        "altitudeUnits": [
+          "meter"
+        ]
+      }
+    }
+  },
+  {
+    "geographicDescription": [
+      "SRER, D14"
+    ],
+    "boundingCoordinates": {
+      "westBoundingCoordinate": [
+        -110.8355
+      ],
+      "eastBoundingCoordinate": [
+        -110.8355
+      ],
+      "northBoundingCoordinate": [
+        31.9107
+      ],
+      "southBoundingCoordinate": [
+        31.9107
+      ],
+      "boundingAltitudes": {
+        "altitudeMinimum": [
+          997.476
+        ],
+        "altitudeMaximum": [
+          997.476
+        ],
+        "altitudeUnits": [
+          "meter"
+        ]
+      }
+    }
+  },
+  {
+    "geographicDescription": [
+      "ONAQ, D15"
+    ],
+    "boundingCoordinates": {
+      "westBoundingCoordinate": [
+        -112.4525
+      ],
+      "eastBoundingCoordinate": [
+        -112.4525
+      ],
+      "northBoundingCoordinate": [
+        40.1776
+      ],
+      "southBoundingCoordinate": [
+        40.1776
+      ],
+      "boundingAltitudes": {
+        "altitudeMinimum": [
+          1662.3947
+        ],
+        "altitudeMaximum": [
+          1662.3947
+        ],
+        "altitudeUnits": [
+          "meter"
+        ]
+      }
+    }
+  },
+  {
+    "geographicDescription": [
+      "ABBY, D16"
+    ],
+    "boundingCoordinates": {
+      "westBoundingCoordinate": [
+        -122.3303
+      ],
+      "eastBoundingCoordinate": [
+        -122.3303
+      ],
+      "northBoundingCoordinate": [
+        45.7624
+      ],
+      "southBoundingCoordinate": [
+        45.7624
+      ],
+      "boundingAltitudes": {
+        "altitudeMinimum": [
+          364.5523
+        ],
+        "altitudeMaximum": [
+          364.5523
+        ],
+        "altitudeUnits": [
+          "meter"
+        ]
+      }
+    }
+  },
+  {
+    "geographicDescription": [
+      "WREF, D16"
+    ],
+    "boundingCoordinates": {
+      "westBoundingCoordinate": [
+        -121.9519
+      ],
+      "eastBoundingCoordinate": [
+        -121.9519
+      ],
+      "northBoundingCoordinate": [
+        45.8205
+      ],
+      "southBoundingCoordinate": [
+        45.8205
+      ],
+      "boundingAltitudes": {
+        "altitudeMinimum": [
+          351.26
+        ],
+        "altitudeMaximum": [
+          351.26
+        ],
+        "altitudeUnits": [
+          "meter"
+        ]
+      }
+    }
+  },
+  {
+    "geographicDescription": [
+      "SJER, D17"
+    ],
+    "boundingCoordinates": {
+      "westBoundingCoordinate": [
+        -119.7323
+      ],
+      "eastBoundingCoordinate": [
+        -119.7323
+      ],
+      "northBoundingCoordinate": [
+        37.1088
+      ],
+      "southBoundingCoordinate": [
+        37.1088
+      ],
+      "boundingAltitudes": {
+        "altitudeMinimum": [
+          399.8378
+        ],
+        "altitudeMaximum": [
+          399.8378
+        ],
+        "altitudeUnits": [
+          "meter"
+        ]
+      }
+    }
+  },
+  {
+    "geographicDescription": [
+      "SOAP, D17"
+    ],
+    "boundingCoordinates": {
+      "westBoundingCoordinate": [
+        -119.2622
+      ],
+      "eastBoundingCoordinate": [
+        -119.2622
+      ],
+      "northBoundingCoordinate": [
+        37.0334
+      ],
+      "southBoundingCoordinate": [
+        37.0334
+      ],
+      "boundingAltitudes": {
+        "altitudeMinimum": [
+          1209.8888
+        ],
+        "altitudeMaximum": [
+          1209.8888
+        ],
+        "altitudeUnits": [
+          "meter"
+        ]
+      }
+    }
+  },
+  {
+    "geographicDescription": [
+      "TEAK, D17"
+    ],
+    "boundingCoordinates": {
+      "westBoundingCoordinate": [
+        -119.006
+      ],
+      "eastBoundingCoordinate": [
+        -119.006
+      ],
+      "northBoundingCoordinate": [
+        37.0058
+      ],
+      "southBoundingCoordinate": [
+        37.0058
+      ],
+      "boundingAltitudes": {
+        "altitudeMinimum": [
+          2149.2571
+        ],
+        "altitudeMaximum": [
+          2149.2571
+        ],
+        "altitudeUnits": [
+          "meter"
+        ]
+      }
+    }
+  },
+  {
+    "geographicDescription": [
+      "BARR, D18"
+    ],
+    "boundingCoordinates": {
+      "westBoundingCoordinate": [
+        -156.6194
+      ],
+      "eastBoundingCoordinate": [
+        -156.6194
+      ],
+      "northBoundingCoordinate": [
+        71.2824
+      ],
+      "southBoundingCoordinate": [
+        71.2824
+      ],
+      "boundingAltitudes": {
+        "altitudeMinimum": [
+          4.4653
+        ],
+        "altitudeMaximum": [
+          4.4653
+        ],
+        "altitudeUnits": [
+          "meter"
+        ]
+      }
+    }
+  },
+  {
+    "geographicDescription": [
+      "TOOL, D18"
+    ],
+    "boundingCoordinates": {
+      "westBoundingCoordinate": [
+        -149.3705
+      ],
+      "eastBoundingCoordinate": [
+        -149.3705
+      ],
+      "northBoundingCoordinate": [
+        68.6611
+      ],
+      "southBoundingCoordinate": [
+        68.6611
+      ],
+      "boundingAltitudes": {
+        "altitudeMinimum": [
+          832.06
+        ],
+        "altitudeMaximum": [
+          832.06
+        ],
+        "altitudeUnits": [
+          "meter"
+        ]
+      }
+    }
+  },
+  {
+    "geographicDescription": [
+      "BONA, D19"
+    ],
+    "boundingCoordinates": {
+      "westBoundingCoordinate": [
+        -147.5026
+      ],
+      "eastBoundingCoordinate": [
+        -147.5026
+      ],
+      "northBoundingCoordinate": [
+        65.154
+      ],
+      "southBoundingCoordinate": [
+        65.154
+      ],
+      "boundingAltitudes": {
+        "altitudeMinimum": [
+          230.496
+        ],
+        "altitudeMaximum": [
+          230.496
+        ],
+        "altitudeUnits": [
+          "meter"
+        ]
+      }
+    }
+  },
+  {
+    "geographicDescription": [
+      "DEJU, D19"
+    ],
+    "boundingCoordinates": {
+      "westBoundingCoordinate": [
+        -145.7514
+      ],
+      "eastBoundingCoordinate": [
+        -145.7514
+      ],
+      "northBoundingCoordinate": [
+        63.8811
+      ],
+      "southBoundingCoordinate": [
+        63.8811
+      ],
+      "boundingAltitudes": {
+        "altitudeMinimum": [
+          517.3972
+        ],
+        "altitudeMaximum": [
+          517.3972
+        ],
+        "altitudeUnits": [
+          "meter"
+        ]
+      }
+    }
+  },
+  {
+    "geographicDescription": [
+      "HEAL, D19"
+    ],
+    "boundingCoordinates": {
+      "westBoundingCoordinate": [
+        -149.2133
+      ],
+      "eastBoundingCoordinate": [
+        -149.2133
+      ],
+      "northBoundingCoordinate": [
+        63.8758
+      ],
+      "southBoundingCoordinate": [
+        63.8758
+      ],
+      "boundingAltitudes": {
+        "altitudeMinimum": [
+          677.1235
+        ],
+        "altitudeMaximum": [
+          677.1235
+        ],
+        "altitudeUnits": [
+          "meter"
+        ]
+      }
+    }
+  },
+  {
+    "geographicDescription": [
+      "PUUM, D20"
+    ],
+    "boundingCoordinates": {
+      "westBoundingCoordinate": [
+        -155.3173
+      ],
+      "eastBoundingCoordinate": [
+        -155.3173
+      ],
+      "northBoundingCoordinate": [
+        19.5531
+      ],
+      "southBoundingCoordinate": [
+        19.5531
+      ],
+      "boundingAltitudes": {
+        "altitudeMinimum": [
+          1685
+        ],
+        "altitudeMaximum": [
+          1685
+        ],
+        "altitudeUnits": [
+          "meter"
+        ]
+      }
+    }
+  }
+]
