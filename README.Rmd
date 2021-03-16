@@ -1,5 +1,7 @@
 ---
-output: github_document
+output: 
+  github_document:
+    df_print: tibble
 ---
 
 <!-- README.md is generated from README.Rmd. Please edit that file -->
@@ -39,22 +41,35 @@ library(neon4cast)
 ### Validate a forecast file
 
 ```{r}
-example <- "https://data.ecoforecast.org/forecasts/aquatics/aquatics-2021-03-01-EFInull.csv.gz"
-download.file(example, "aquatics-2021-03-01-EFInull.csv.gz")
-forecast_output_validator("aquatics-2021-03-01-EFInull.csv.gz")
+example <- "https://data.ecoforecast.org/forecasts/aquatics/aquatics-2021-02-01-EFInull.csv.gz"
+download.file(example, "aquatics-2021-02-01-EFInull.csv.gz")
+forecast_output_validator("aquatics-2021-02-01-EFInull.csv.gz")
 ```
 
 ### Compute forecast scores locally
 
 ```{r}
-
+forecast <- readr::read_csv("aquatics-2021-02-01-EFInull.csv.gz")
+score(forecast, theme = "aquatics")
 ```
 
 ### Generate forecast metadata in EML
 
+Coming soon!
+
 ### Access EFI snapshots of NOAA forecasts at NEON sites
 
+```{r}
+download_noaa("ABBY")
+abby <- stack_noaa()
+abby
+```
+
 ### Submit a forecast
+
+``` r
+submit("aquatics-2021-02-01-EFInull.csv.gz")
+```
 
 ### Other functions
 
@@ -62,5 +77,5 @@ Encountered a bug?  Facing another challenge in participating in the challenge? 
 
 
 ```{r include=FALSE}
-unlink("aquatics-2021-03-01-EFInull.csv.gz")
+unlink("aquatics-2021-02-01-EFInull.csv.gz")
 ```

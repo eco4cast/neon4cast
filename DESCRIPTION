@@ -26,7 +26,12 @@ Imports:
     lubridate,
     purrr,
     readr,
-    stringr
+    stringr,
+    scoringRules,
+    stats,
+    dplyr,
+    tidyr,
+    tidyselect
 RoxygenNote: 7.1.1
 Language: en-US
 Remotes: eco4cast/EFIstandards

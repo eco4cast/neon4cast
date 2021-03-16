@@ -28,7 +28,7 @@ forecast_output_validator <- function(forecast_file,
   
   message(file_in)
   
-  usethis::ui_todo("Checking validity of file name...")
+  #usethis::ui_todo("Checking validity of file name...")
   file_basename <- basename(file_in)
   parsed_basename <- unlist(stringr::str_split(file_basename, "-"))
   file_name_parsable <- TRUE
@@ -57,7 +57,7 @@ forecast_output_validator <- function(forecast_file,
     # if file is csv zip file
      out <- readr::read_csv(file_in, guess_max = 1e6)
      
-     usethis::ui_todo("Checking that file contains correct variables...")
+     #usethis::ui_todo("Checking that file contains correct variables...")
 
     if(lexists(out, target_variables) > 0){
       usethis::ui_done("target variables found")
@@ -66,7 +66,7 @@ forecast_output_validator <- function(forecast_file,
       valid <- FALSE
     }
      
-     usethis::ui_todo("Checking that file contains either ensemble or statistic column...")
+     #usethis::ui_todo("Checking that file contains either ensemble or statistic column...")
     
     if(lexists(out, "ensemble")){
       usethis::ui_done("file has ensemble members")
@@ -89,14 +89,14 @@ forecast_output_validator <- function(forecast_file,
       valid <- FALSE
     }
     
-     usethis::ui_todo("Checking that file contains siteID column...")
+     #usethis::ui_todo("Checking that file contains siteID column...")
     if(lexists(out, "siteID")){
       usethis::ui_done("file has siteID column")
     }else{
       usethis::ui_warn("file missing siteID column")
     }
     
-     usethis::ui_todo("Checking that file contains parsable time column...")
+     #usethis::ui_todo("Checking that file contains parsable time column...")
     if(lexists(out, "time")){
       usethis::ui_done("file has time column")
       if(sum(class(out$time) %in% c("Date","POSIXct")) > 0){
@@ -132,7 +132,7 @@ forecast_output_validator <- function(forecast_file,
     
     nc <- ncdf4::nc_open(file_in)
     
-    usethis::ui_todo("Checking that file contains correct variables...")
+    #usethis::ui_todo("Checking that file contains correct variables...")
     
     if(lexists(nc$var, target_variables) > 0){
       usethis::ui_done("target variables found")
@@ -142,7 +142,7 @@ forecast_output_validator <- function(forecast_file,
       valid <- FALSE
     }
     
-    usethis::ui_todo("Checking that time variable exist and is parseable...")
+    #usethis::ui_todo("Checking that time variable exist and is parseable...")
     
     if(lexists(nc$dim, "time")){
       usethis::ui_done("file has time dimension")
@@ -162,7 +162,7 @@ forecast_output_validator <- function(forecast_file,
       valid <- FALSE
     }
     
-    usethis::ui_todo("Checking that siteID variable exists...")
+    #usethis::ui_todo("Checking that siteID variable exists...")
     if(lexists(nc$var, "siteID")){
       usethis::ui_done("file has siteID variable")
     }else{
@@ -170,7 +170,7 @@ forecast_output_validator <- function(forecast_file,
       valid <- FALSE
     }
     
-    usethis::ui_todo("Checking that netcdf contains site dimension...")
+    #usethis::ui_todo("Checking that netcdf contains site dimension...")
     
     if(lexists(nc$dim, c("site")) > 0){
       usethis::ui_done("file has site dimension")
@@ -181,7 +181,7 @@ forecast_output_validator <- function(forecast_file,
       valid <- FALSE
     }
     
-    usethis::ui_todo("Checking that netcdf contains ensemble dimension...")
+    #usethis::ui_todo("Checking that netcdf contains ensemble dimension...")
     
     if(lexists(nc$dim, "ensemble")){
       usethis::ui_done("file has ensemble dimension")
@@ -191,7 +191,7 @@ forecast_output_validator <- function(forecast_file,
       valid <- FALSE
     }
     
-    usethis::ui_todo("Checking that netcdf dimensions are correct order...")
+    #usethis::ui_todo("Checking that netcdf dimensions are correct order...")
     dim_order <- TRUE
     
     if(var_dim[1] != time_dim){
@@ -220,7 +220,7 @@ forecast_output_validator <- function(forecast_file,
     
   }else if(grepl("[.]xml", file_in)){ #if file is eml
     
-    usethis::ui_todo("Checking validity of metdata...")
+    #usethis::ui_todo("Checking validity of metdata...")
     
     out <- EML::read_eml(file_in)
     

@@ -2,4 +2,7 @@
 
 export(download_noaa)
 export(forecast_output_validator)
+export(score)
 export(stack_noaa)
+export(submit)
+importFrom(dplyr,`%>%`)
