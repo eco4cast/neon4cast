@@ -18,3 +18,8 @@ score(
 \description{
 Compute the CRPS score of your forecast
 }
+\examples{
+forecast_file <- system.file("extdata/aquatics-2021-02-01-EFInull.csv.gz", 
+                              package = "neon4cast")
+score(forecast_file, "aquatics")                          
+}

@@ -5,7 +5,13 @@
 #' @param target_variables  Possible target variables
 #' @param theme_names valid EFI theme names
 #' @export
-#'
+#' 
+#' @examples 
+#' 
+#' forecast_file <- system.file("extdata/aquatics-2021-02-01-EFInull.csv.gz", 
+#'                               package = "neon4cast")
+#' forecast_output_validator(forecast_file)
+#' 
 forecast_output_validator <- function(forecast_file, 
                                grouping_variables = c("siteID", "time"),
                                target_variables = c("oxygen", 

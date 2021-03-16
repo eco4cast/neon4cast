@@ -10,6 +10,8 @@
 #' data around on your computer, in which case, `neonstore::neon_dir()` might
 #' be a convenient choice.
 #' @export
+#' @examples 
+#' download_noaa("ABBY")
 download_noaa <- function(siteID, 
                           interval = "6hr",
                           date = Sys.Date()-2, 
@@ -39,6 +41,8 @@ download_noaa <- function(siteID,
 #' Stack downloaded NOAA files
 #' 
 #' @inheritParams download_noaa
+#' @examples 
+#' stack_noaa()
 #' @export
 stack_noaa <- function(dir = tempdir()) {
   files <- list.files(file.path(dir, "noaa"), pattern = "[.]nc",

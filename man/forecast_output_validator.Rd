@@ -25,3 +25,10 @@ forecast_output_validator(
 \description{
 forecast_output_validator
 }
+\examples{
+
+forecast_file <- system.file("extdata/aquatics-2021-02-01-EFInull.csv.gz", 
+                              package = "neon4cast")
+forecast_output_validator(forecast_file)
+
+}

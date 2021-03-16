@@ -12,22 +12,20 @@ submit <- function(forecast_file, metadata = NULL, ask = interactive()){
                   "Consider renaming these so that automated upload will work"))
   }
   
-  forecast_output_validator(forecast_file)
-  
   go <- TRUE
   if(ask){
     go <- utils::askYesNo("Forecast file is valid, ready to submit?")
   }
   if(!go) return(NULL)
   
-  aws.s3::put_object(object = forecast_file, 
+  aws.s3::put_object(file = forecast_file, 
                      bucket = "submissions",
                      region="data",
                      base_url = "ecoforecast.org")
   
   if(!is.null(metadata)){
     EFIstandards::forecast_validator(metadata)
-    aws.s3::put_object(object = metadata, 
+    aws.s3::put_object(file = metadata, 
                        bucket = "submissions",
                        region="data",
                        base_url = "ecoforecast.org")

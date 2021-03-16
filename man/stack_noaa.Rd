@@ -14,3 +14,6 @@ be a convenient choice.}
 \description{
 Stack downloaded NOAA files
 }
+\examples{
+stack_noaa()
+}

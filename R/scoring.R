@@ -5,6 +5,10 @@
 #' @importFrom dplyr `%>%`
 #' 
 #' @export
+#' @examples 
+#' forecast_file <- system.file("extdata/aquatics-2021-02-01-EFInull.csv.gz", 
+#'                               package = "neon4cast")
+#' score(forecast_file, "aquatics")                          
 score <- function(forecast, 
                   theme = c("aquatics", "beetles",
                             "phenology", "terrestrial_30min",
