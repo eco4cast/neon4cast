@@ -23,19 +23,25 @@ Imports:
     tidync,
     usethis,
     ncdf4,
-    lubridate,
-    purrr,
-    readr,
-    stringr,
+    tidyverse,
     scoringRules,
     stats,
-    dplyr,
-    tidyr,
-    tidyselect,
-    jsonlite
+    distributional,
+    rlang
 RoxygenNote: 7.1.1
 Language: en-US
 Remotes: eco4cast/EFIstandards
 Suggests: 
-    testthat (>= 3.0.0)
+    testthat (>= 3.0.0),
+    glue,
+    fable,
+    tsibble,
+    dplyr,
+    readr,
+    purrr,
+    stringr,
+    lubridate,
+    tidyr,
+    tidyselect,
+    jsonlite
 Config/testthat/edition: 3

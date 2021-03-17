@@ -40,7 +40,8 @@ forecast_output_validator <- function(forecast_file,
   file_name_parsable <- TRUE
   
   if(!(parsed_basename[1] %in% theme_names)){
-    usethis::ui_warn(paste0("first position of file name (before first -) is not one of the following : ", paste(theme_names, collapse = " ")))
+    usethis::ui_warn(paste0("first position of file name (before first -) is not one of the following : ",
+                            paste(theme_names, collapse = " ")))
     valid <- FALSE
     file_name_parsable <- FALSE
   }

@@ -13,7 +13,7 @@ download_noaa(
 )
 }
 \arguments{
-\item{siteID}{a 4-character NEON siteID}
+\item{siteID}{vector of 4-character NEON siteIDs}
 
 \item{interval}{Time interval for the forecast}
 

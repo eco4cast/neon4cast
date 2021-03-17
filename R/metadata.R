@@ -1,3 +1,9 @@
+write_metadata <- function(){
+  
+  template <- system.file("extdata/metadata_template.yml", package="neon4cast")
+  usethis::edit_file(template)
+}
+
 
 ## internal functions for metadata
 

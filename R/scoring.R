@@ -2,7 +2,7 @@
 #' 
 #' @param forecast forecast data frame or file
 #' @param theme theme name. Note: terrestrial must specify the interval.
-#' @importFrom dplyr `%>%`
+#' @importFrom tidync `%>%`
 #' 
 #' @export
 #' @examples 

@@ -1,6 +1,6 @@
 #' Download NOAA Weather forecasts for NEON sites from the EFI server
 #'  
-#' @param siteID a 4-character NEON siteID
+#' @param siteID vector of 4-character NEON siteIDs
 #' @param interval Time interval for the forecast
 #' @param date start date for the forecast
 #' @param cycle NOAA hour-cycle (first hour of the forecast),
@@ -13,6 +13,14 @@
 #' @examples 
 #' download_noaa("ABBY")
 download_noaa <- function(siteID, 
+                           interval = "6hr",
+                           date = Sys.Date()-2, 
+                           cycle = "00", 
+                           dir = tempdir()){
+  lapply(siteID, download_noaa_, interval, date, cycle, dir)
+  invisible(dir)
+}
+download_noaa_ <- function(siteID, 
                           interval = "6hr",
                           date = Sys.Date()-2, 
                           cycle = "00", 
@@ -47,14 +55,15 @@ download_noaa <- function(siteID,
 stack_noaa <- function(dir = tempdir()) {
   files <- list.files(file.path(dir, "noaa"), pattern = "[.]nc",
                       recursive = TRUE, full.names = TRUE)
-  
+  names(files) <- basename(files)
   out <- purrr::map_dfr(files, function(x){
     tidync::hyper_tibble(tidync::tidync(x))
   }, .id = "file")
   
   ## Add metadata from filename as column...
-  
-  out
+  tidyr::separate(out, file, "_",
+                  into=c("model","interval","siteID",
+                         "startDate", "endDate", "ensemble"))
 }
 ############ and we're ready to go:
 

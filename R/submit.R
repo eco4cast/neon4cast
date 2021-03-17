@@ -11,13 +11,11 @@ submit <- function(forecast_file, metadata = NULL, ask = interactive()){
     warning(paste("Detected existing AWS credentials file in ~/.aws,",
                   "Consider renaming these so that automated upload will work"))
   }
-  
-  go <- TRUE
-  if(ask){
+  go <- forecast_output_validator(forecast_file)
+  if(go & ask){
     go <- utils::askYesNo("Forecast file is valid, ready to submit?")
   }
   if(!go) return(NULL)
-  
   aws.s3::put_object(file = forecast_file, 
                      bucket = "submissions",
                      region="data",
