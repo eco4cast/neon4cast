@@ -1,0 +1,7 @@
+attributeName, attributeDefinition, unit, formatString, definition, numberType
+"time",              "[dimension]{time}",                          "year",                 "YYYY-MM-DD",   NA,          "datetime"
+"ensemble",          "[dimension]{index of ensemble member}",      "dimensionless",         NA,            NA,          "integer"
+"siteID",            "[dimension]{neon site}",                     NA,                      NA,           "NEON site ID",  "character"
+"gcc_90",            "[variable]{green chromatic coordinate}",     "dimensionless",         NA,           NA,           "real"
+"forecast",          "[flag]{whether represents forecast}",        "dimensionless",         NA,           NA,          "integer"
+"data_assimilation", "[flag]{whether time step assimilated data}", "dimensionless",         NA,           NA,          "integer"
