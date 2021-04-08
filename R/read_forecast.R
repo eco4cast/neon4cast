@@ -25,7 +25,7 @@ read_forecast <- function(file_in,
     
     nc <- ncdf4::nc_open(file_in)
     siteID <- ncdf4::ncvar_get(nc, "siteID")
-    time <- ncdf4::ncvar_get(nc, "time")
+    time <- as.integer(ncdf4::ncvar_get(nc, "time"))
     #tustr<-strsplit(ncdf4::ncatt_get(nc, varid = "time", "units")$value, " ")
     #time <-lubridate::as_date(time,origin=unlist(tustr)[3])
     t_string <- strsplit(ncdf4::ncatt_get(nc, varid = "time", "units")$value, " ")[[1]]
@@ -49,7 +49,7 @@ read_forecast <- function(file_in,
           tidyr::pivot_longer(-time, names_to = reps_col, values_to = "value") %>%
           dplyr::mutate(siteID = siteID[i],
                         variable = targets[j])
-        combined_forecast <- rbind(combined_forecast, d)
+        combined_forecast <- bind_rows(combined_forecast, d)
       }
     }
     ncdf4::nc_close(nc)
