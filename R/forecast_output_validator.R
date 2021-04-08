@@ -107,7 +107,7 @@ forecast_output_validator <- function(forecast_file,
      #usethis::ui_todo("Checking that file contains parsable time column...")
     if(lexists(out, "time")){
        usethis::ui_done("file has time column")
-       out2  <- read.csv(file_in)
+       out2  <- readr::read_csv(file_in)
        if(!stringr::str_detect(out2$time[1], "-")){
          usethis::ui_done("time column format is not in the correct YYYY-MM-DD format")
          valid <- FALSE
