@@ -1,4 +1,4 @@
-write_metadata <- function(dir, forecast_file){
+write_meta_template <- function(dir, forecast_file){
   
   template_name <- paste0(tools::file_path_sans_ext(tools::file_path_sans_ext(basename(forecast_file))),".yml")
   
