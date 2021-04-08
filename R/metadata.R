@@ -28,6 +28,8 @@ generate_metadata <- function(forecast_file,
                               forecast_issue_time, 
                               forecast_iteration_id){
   
+  dir <- dirname(forecast_file)
+  
   forecast_file_name_base <- paste0(tools::file_path_sans_ext(tools::file_path_sans_ext(basename(forecast_file))),".yml")
   metadata <- yaml::read_yaml(metadata_yaml)
   
@@ -127,7 +129,7 @@ generate_metadata <- function(forecast_file,
   #'Check that EML matches EFI Standards
   if(EFIstandards::forecast_validator(my_eml)){
     #'Write metadata
-    meta_data_filename <-  paste0(forecast_file_name_base,".xml")
+    meta_data_filename <-  paste0(dir, "/", forecast_file_name_base,".xml")
     EML::write_eml(my_eml, meta_data_filename)
   }else{
     message("Error in EFI metadata")
