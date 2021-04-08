@@ -1,14 +1,14 @@
 #' Write metadata from template
 #' 
-#' @param dir directory with forecast file
-#' @param forecast_file file name of forecast.
+#' @param forecast_file full path of forecast file
 #' 
 #' @export
 #' @examples 
-write_meta_template <- function(dir, forecast_file){
+write_meta_template <- function(forecast_file){
   
+  dir <- dirname(forecast_file)
   template_name <- paste0(tools::file_path_sans_ext(tools::file_path_sans_ext(basename(forecast_file))),".yml")
-  
+
   file.copy(system.file("extdata/metadata_template.yml", package="neon4cast"), file.path(dir, template_name))
   template <- file.path(dir, template_name)
   usethis::edit_file(template)
