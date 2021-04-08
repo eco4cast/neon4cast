@@ -9,10 +9,12 @@ read_forecast <- function(file_in,
                                                "nee",
                                                "le", 
                                                "vswc",
-                                               "gcc_90"),
+                                               "gcc_90",
+                                               "ixodes_scapularis",
+                                                "amblyomma_americanum"),
                           reps_col = "ensemble",
                           ...){
-  print(file_in)
+
   no_forecast <- FALSE
   if(any(vapply(c("[.]csv", "[.]csv\\.gz"), grepl, logical(1), file_in))){  
     # if file is csv zip file

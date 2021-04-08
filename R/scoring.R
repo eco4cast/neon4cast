@@ -16,7 +16,7 @@ score <- function(forecast,
   
   theme <- match.arg(theme)
   if(is.character(forecast))
-    forecast <- readr::read_csv(forecast)
+    forecast <- read_forecast(forecast)
 
   target_file <- switch(theme,
                      aquatics = "aquatics-targets.csv.gz",
