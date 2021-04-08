@@ -49,7 +49,7 @@ read_forecast <- function(file_in,
           tidyr::pivot_longer(-time, names_to = reps_col, values_to = "value") %>%
           dplyr::mutate(siteID = siteID[i],
                         variable = targets[j])
-        combined_forecast <- bind_rows(combined_forecast, d)
+        combined_forecast <- dplyr::bind_rows(combined_forecast, d)
       }
     }
     ncdf4::nc_close(nc)
