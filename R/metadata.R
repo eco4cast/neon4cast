@@ -41,35 +41,25 @@ generate_metadata <- function(forecast_file,
   }
   
   theme <- unlist(stringr::str_split(stringr::str_split(forecast_file, "-")[[1]][1], "_")[[1]][1])
-  team_name <- unlist(stringr::str_split(unlist(stringr::str_split(forecast_file, "-"))[5], ".csv"))[1]
+  team_name <- unlist(stringr::str_split(forecast_file_name_base, "-"))[5]
   
-  if(theme == "terrestrial"){
-    attributes <- readr::read_csv(system.file("extdata/terrestrial_metadata_attributes.csv", package="neon4cast"))
-    if(!is.null(forecast)){
-      if(all.equal(names(forecast), attributes$attributeName) != TRUE){
-        message("Column names in file do not match required names for complete metadate")
-        message(paste0("File names are: ",names(forecast)))
-        message(paste0("Required names are: ",attributes$attributeName))
-        stop()
-      }
-    }
-    
-    entityDescription_text = "Forecast of NEE and LE for four NEON sites"
-    
-  }else if(theme == "phenology"){
-    attributes <- readr::read_csv(system.file("extdata/terrestrial_metadata_attributes.csv", package="neon4cast"))
-    if(!is.null(forecast)){
-      if(all.equal(names(forecast), attributes$attributeName) != TRUE){
-        message("Column names in file do not match required names for complete metadate")
-        message(paste0("File names are: ",names(forecast)))
-        message(paste0("Required names are: ",attributes$attributeName))
-        stop()
-      }
-    }
-    
-    entityDescription_text = "Forecasts of GCC"
+  attributes <- readr::read_csv(system.file(paste0("extdata/",theme, "metadata_attributes.csv"), package="neon4cast"))
+  if("ensemble" %in% names(forecast)){
+    attributes <- dplyr::filter(attributes, attributeName != "statistic")
+  }else if("statistic" %in% names(forecast)){
+    attributes <- dplyr::filter(attributes, attributeName != "ensemble")
+  }else{
+    message("Column names in file does not have ensemble or statistic column")
   }
   
+  entityDescription_text <- switch(theme,
+         terrestrial = "Forecast of NEE and LE for four NEON sites",
+         aquatics = "Forecasts of water temperature and oxygen",
+         beetles = "Forecasts of beetles abundance and richness",
+         tick =  "Forecasts of tick abundance",
+         phenology =  "Forecasts of GCC"
+  )
+
   #' use `EML` package to build the attribute list
   attrList <- EML::set_attributes(attributes, 
                                   col_classes = c("Date", "numeric", "character","numeric","numeric", 
