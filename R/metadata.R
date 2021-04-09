@@ -107,7 +107,7 @@ generate_metadata <- function(forecast_file,
   metadata$metadata$forecast$forecast_project_id <- team_name
   
   my_eml <- EML::eml$eml(dataset = dataset,
-                    additionalMetadata = eml$additionalMetadata(metadata = metadata$metadata),
+                    additionalMetadata = EML::eml$additionalMetadata(metadata = metadata$metadata),
                     packageId = forecast_iteration_id , 
                     system = "datetime"  ## system used to generate packageId
   )
