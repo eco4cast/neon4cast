@@ -1,9 +1,9 @@
-#' Write metadata from template
+#' Write model metadata from template
 #' 
 #' @param forecast_file full path of forecast file
 #' @export
 #' @examples 
-write_meta_template <- function(forecast_file){
+create_model_metadata <- function(forecast_file){
   
   dir <- dirname(forecast_file)
   filename <- tools::file_path_sans_ext(basename(forecast_file),
@@ -25,7 +25,7 @@ write_meta_template <- function(forecast_file){
 #' @param forecast_iteration_id unique ID for forecast
 #' @export
 #' @examples 
-generate_metadata <- function(forecast_file, 
+write_metadata_eml <- function(forecast_file, 
                               metadata_yaml, 
                               forecast_issue_time, 
                               forecast_iteration_id){
