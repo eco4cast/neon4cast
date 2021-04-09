@@ -1,5 +1,5 @@
-[{"id":"POSE","geographicDescription":"POSE, D02","boundingCoordinates":{"westBoundingCoordinate":"-78.147258","eastBoundingCoordinate":"-78.147258","northBoundingCoordinate":"38.89431","southBoundingCoordinate":"38.89431","boundingAltitudes":{"altitudeMinimum":276,"altitudeMaximum":2763,"altitudeUnits":"meter"}}},
-{"id":"BARC","geographicDescription":"BARC, D03","boundingCoordinates":{"westBoundingCoordinate":"-82.008414","eastBoundingCoordinate":"-82.008414","northBoundingCoordinate":"29.675982","southBoundingCoordinate":"29.675982","boundingAltitudes":{"altitudeMinimum":27,"altitudeMaximum":27,"altitudeUnits":"meter"}}},
+[{"geographicDescription":"POSE, D02","boundingCoordinates":{"westBoundingCoordinate":"-78.147258","eastBoundingCoordinate":"-78.147258","northBoundingCoordinate":"38.89431","southBoundingCoordinate":"38.89431","boundingAltitudes":{"altitudeMinimum":276,"altitudeMaximum":2763,"altitudeUnits":"meter"}}},
+{"geographicDescription":"BARC, D03","boundingCoordinates":{"westBoundingCoordinate":"-82.008414","eastBoundingCoordinate":"-82.008414","northBoundingCoordinate":"29.675982","southBoundingCoordinate":"29.675982","boundingAltitudes":{"altitudeMinimum":27,"altitudeMaximum":27,"altitudeUnits":"meter"}}},
   {
     "geographicDescription": [
       "BART, D01"
