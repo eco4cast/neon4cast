@@ -6,9 +6,12 @@
 write_meta_template <- function(forecast_file){
   
   dir <- dirname(forecast_file)
-  template_name <- paste0(tools::file_path_sans_ext(tools::file_path_sans_ext(basename(forecast_file))),".yml")
+  filename <- tools::file_path_sans_ext(basename(forecast_file),
+                                        compression = TRUE)
+  template_name <- paste0(filenamename,".yml")
 
-  file.copy(system.file("extdata/metadata_template.yml", package="neon4cast"), file.path(dir, template_name))
+  file.copy(system.file("extdata/metadata_template.yml", package="neon4cast"),
+            file.path(dir, template_name))
   template <- file.path(dir, template_name)
   usethis::edit_file(template)
   
@@ -107,25 +110,18 @@ generate_metadata <- function(forecast_file,
   metadata$metadata$forecast$forecast_project_id <- team_name
   
   my_eml <- EML::eml$eml(dataset = dataset,
-                    additionalMetadata = eml$additionalMetadata(metadata = metadata$metadata),
+                    additionalMetadata = EML::eml$additionalMetadata(metadata = metadata$metadata),
                     packageId = forecast_iteration_id , 
                     system = "datetime"  ## system used to generate packageId
   )
   
-  #'Check base EML
-  if(!EML::eml_validate(my_eml)){
-    EML::eml_validate(my_eml)
-    message("Error in EML metadata")
-  }
-  
   #'Check that EML matches EFI Standards
-  if(EFIstandards::forecast_validator(my_eml)){
-    #'Write metadata
-    meta_data_filename <-  paste0(dir, "/", forecast_file_name_base,".xml")
-    EML::write_eml(my_eml, meta_data_filename)
-  }else{
-    message("Error in EFI metadata")
+  if(!EFIstandards::forecast_validator(my_eml)){
+    warning("Error in EFI metadata", call. = FALSE)
   }
+  #'Write metadata
+  meta_data_filename <-  paste0(dir, "/", forecast_file_name_base,".xml")
+  EML::write_eml(my_eml, meta_data_filename)
   return(meta_data_filename)
 }
 
@@ -141,7 +137,6 @@ neon_geographic_coverage <- function(sites){
   geo <- jsonlite::read_json(system.file("extdata/geo.json", package="neon4cast"))
   site_ids <- purrr::map_chr(purrr::map(geo, "geographicDescription"), 1)
   site_ids <- purrr::map_chr(strsplit(site_ids, ","), 1)
-  names(geo) <- site_ids
   geo[sites]
 }
 
