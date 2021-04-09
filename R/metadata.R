@@ -8,7 +8,7 @@ write_meta_template <- function(forecast_file){
   dir <- dirname(forecast_file)
   filename <- tools::file_path_sans_ext(basename(forecast_file),
                                         compression = TRUE)
-  template_name <- paste0(filenamename,".yml")
+  template_name <- paste0(filename,".yml")
 
   file.copy(system.file("extdata/metadata_template.yml", package="neon4cast"),
             file.path(dir, template_name))
