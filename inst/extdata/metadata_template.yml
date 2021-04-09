@@ -9,8 +9,6 @@ team_list:
       givenName: FirstName
       surName: SecondAuthorSurName
       id: 
-theme: "terrestrial"
-sites: ["BART", "KONZ", "OSBS", "SRER"]
 metadata:
   forecast:
     timestep: 1 day
