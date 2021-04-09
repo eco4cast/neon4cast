@@ -32,60 +32,8 @@ generate_metadata <- function(forecast_file,
   forecast_file_name_base <- tools::file_path_sans_ext(tools::file_path_sans_ext(basename(forecast_file)))
   metadata <- yaml::read_yaml(metadata_yaml)
   
-  if(tools::file_ext(forecast_file) %in% c("csv", "gz")){
-    forecast <- readr::read_csv(forecast_file)
-  } else if(tools::file_ext(forecast_file) %in% c("nc")){ #if file is nc
-      
-      nc <- ncdf4::nc_open(forecast_file)
-      siteID <- ncdf4::ncvar_get(nc, "siteID")
-      time <- as.integer(ncdf4::ncvar_get(nc, "time"))
-      #tustr<-strsplit(ncdf4::ncatt_get(nc, varid = "time", "units")$value, " ")
-      #time <-lubridate::as_date(time,origin=unlist(tustr)[3])
-      t_string <- strsplit(ncdf4::ncatt_get(nc, varid = "time", "units")$value, " ")[[1]]
-      if(t_string[1] == "days"){
-        tustr<-strsplit(ncdf4::ncatt_get(nc, varid = "time", "units")$value, " ")
-        time <-lubridate::as_date(time,origin=unlist(tustr)[3])
-      }else{
-        tustr <- lubridate::as_datetime(strsplit(ncdf4::ncatt_get(nc, varid = "time", "units")$value, " ")[[1]][3])
-        time <- as.POSIXct.numeric(time, origin = tustr)
-      } 
-      
-      target_variables = c("oxygen", 
-                           "temperature", 
-                           "richness",
-                           "abundance", 
-                           "nee",
-                           "le", 
-                           "vswc",
-                           "gcc_90",
-                           "ixodes_scapularis",
-                           "amblyomma_americanum")
-      
-      reps_col <- "ensemble"
-      
-      targets <- names(nc$var)[which(names(nc$var) %in% target_variables)]
-      combined_forecast <- NULL
-      for(j in 1:length(targets)){
-        forecast_targets <- ncdf4::ncvar_get(nc, targets[j])
-        for(i in 1:length(siteID)){
-          tmp <- forecast_targets[ ,i ,]
-          d <- cbind(time, as.data.frame(tmp))
-          names(d) <- c("time", seq(1,dim(tmp)[2]))
-          d <- d %>%
-            tidyr::pivot_longer(-time, names_to = reps_col, values_to = "value") %>%
-            dplyr::mutate(siteID = siteID[i],
-                          variable = targets[j])
-          combined_forecast <- dplyr::bind_rows(combined_forecast, d)
-        }
-      }
-      ncdf4::nc_close(nc)
-      combined_forecast <- combined_forecast %>%
-        tidyr::pivot_wider(names_from = variable, values_from = value) %>% 
-        dplyr::mutate(filename = basename(file_in))
-      
-      forecast <- combined_forecast
-  }
-  
+  forecast <- neon4cast:::read_forecast(file_in = forecast_file)
+ 
   theme <- unlist(stringr::str_split(stringr::str_split(forecast_file, "-")[[1]][1], "_")[[1]][1])
   team_name <- unlist(stringr::str_split(forecast_file_name_base, "-"))[5]
   

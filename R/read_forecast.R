@@ -1,5 +1,4 @@
 
-
 read_forecast <- function(file_in, 
                           grouping_variables = c("siteID", "time"),
                           target_variables = c("oxygen", 
