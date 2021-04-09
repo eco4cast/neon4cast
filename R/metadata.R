@@ -109,6 +109,8 @@ write_metadata_eml <- function(forecast_file,
   metadata$metadata$forecast$forecast_iteration_id <- forecast_iteration_id
   metadata$metadata$forecast$forecast_project_id <- team_name
   
+  metadata$forecast$metadata_standard_version <- 0.3
+  
   my_eml <- EML::eml$eml(dataset = dataset,
                     additionalMetadata = EML::eml$additionalMetadata(metadata = metadata$metadata),
                     packageId = forecast_iteration_id , 

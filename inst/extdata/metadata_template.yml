@@ -11,30 +11,30 @@ team_list:
       id: 
 metadata:
   forecast:
-    timestep: 1 day
-    forecast_horizon: 35 days
-    forecast_issue_time: NA   # Leave NA if using R function to generate metadata
-    forecast_iteration_id: NA # Leave NA if using R function to generate metadata
-    metadata_standard_version: 0.3  # Don't change
+    timestep: 1 day #time step of model
+    forecast_horizon: 35 days #number of time steps in the future
+
     model_description:
       # model identifier:
       forecast_model_id: "null"
       name: state-space Bayesian null
-      type: empirical
-      # put your GitHub Repository in here
-      repository: https://github.com/...
+      type: empirical. #General type of model empirical, machine learning, process
+      repository: https://github.com/...        # put your GitHub Repository in here
+      
     initial_conditions:
-      status: assimilates
-      complexity: 2
+      status: assimilates #options: absent, present, assimilates, 
+      complexity: 2 #How many models states need initial conditions
       propagation:
-        type: ensemble
-        size: 2000
+        type: ensemble. #How does your model propogate initial conditions (ensemble or MCMC is most common)
+        size: 2000. #number of ensemble or MCMC members
       assimilation:
-        type: refit
-        reference: "NA"
-        complexity: 4
+        type: refit #description of assimilation method
+        reference: "NA" #reference for assimilation method
+        complexity: 4 #number of states that are updated with assimilation
+        
     drivers:
       status: absent
+      
     parameters:
       status: absent
       complexity: 2
@@ -45,8 +45,10 @@ metadata:
         type: refit
         reference: "NA"
         complexity: 4
+        
     random_effects:
       status: absent
+      
     process_error:
       status: assimilates
       complexity: 2
@@ -58,6 +60,7 @@ metadata:
         reference: "NA"
         complexity: 4
       covariance: FALSE
+      
     obs_error:
       status: present
       complexity: 2
