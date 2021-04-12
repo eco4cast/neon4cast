@@ -3,6 +3,7 @@
 #' @param forecast_file full path of forecast file
 #' @export
 #' @examples 
+#'     create_model_metadata(forecast_file = forecast_file)                          
 create_model_metadata <- function(forecast_file){
   
   dir <- dirname(forecast_file)
@@ -25,6 +26,7 @@ create_model_metadata <- function(forecast_file){
 #' @param forecast_iteration_id unique ID for forecast
 #' @export
 #' @examples 
+#' write_metadata_eml(forecast_file =  forecast_file ,metadata_yaml = metadata_yaml, forecast_issue_time = Sys.Date(), forecast_iteration_id = "1")
 write_metadata_eml <- function(forecast_file, 
                               metadata_yaml, 
                               forecast_issue_time, 
