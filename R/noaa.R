@@ -52,18 +52,31 @@ download_noaa_ <- function(siteID,
 #' @examples 
 #' stack_noaa()
 #' @export
-stack_noaa <- function(dir = tempdir()) {
+stack_noaa <- function(dir = tempdir(), forecast_date = NULL) {
   files <- list.files(file.path(dir, "noaa"), pattern = "[.]nc",
                       recursive = TRUE, full.names = TRUE)
   names(files) <- basename(files)
+  if(!is.null(forecast_date)){
+    files <- files[stringr::str_detect(files, forecast_date)]
+  }
+  
+  
   out <- purrr::map_dfr(files, function(x){
     tidync::hyper_tibble(tidync::tidync(x))
   }, .id = "file")
   
   ## Add metadata from filename as column...
-  tidyr::separate(out, file, "_",
-                  into=c("model","interval","siteID",
-                         "startDate", "endDate", "ensemble"))
+  out <- tidyr::separate(out, file, "_",
+                         into=c("model","interval","siteID",
+                                "startDate", "endDate", "ensemble"))
+  
+  start_time <- stringr::str_split_fixed(out$startDate, pattern = "T", n = 2)
+  
+  out$time <- lubridate::as_datetime(start_time[, 1]) + lubridate::hours(start_time[, 2]) + lubridate::hours(out$time)
+  
+  out$ensemble <- stringr::str_split_fixed(out$ensemble, ".nc", 2)[, 1]
+  
+  return(out)
 }
 ############ and we're ready to go:
 
