@@ -70,7 +70,7 @@ stack_noaa <- function(dir = tempdir(), forecast_date = NULL) {
                          into=c("model","interval","siteID",
                                 "runStartDate", "runEndDate", "ensemble"))
   
-  start_time <- stringr::str_split_fixed(out$startDate, pattern = "T", n = 2)
+  start_time <- stringr::str_split_fixed(out$runStartDate, pattern = "T", n = 2)
   
   out$time <- lubridate::as_datetime(start_time[, 1]) + lubridate::hours(start_time[, 2]) + lubridate::hours(out$time)
   
