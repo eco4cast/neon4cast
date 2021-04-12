@@ -68,7 +68,7 @@ stack_noaa <- function(dir = tempdir(), forecast_date = NULL) {
   ## Add metadata from filename as column...
   out <- tidyr::separate(out, file, "_",
                          into=c("model","interval","siteID",
-                                "startDate", "endDate", "ensemble"))
+                                "runStartDate", "runEndDate", "ensemble"))
   
   start_time <- stringr::str_split_fixed(out$startDate, pattern = "T", n = 2)
   
