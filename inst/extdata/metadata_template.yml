@@ -56,13 +56,13 @@ metadata:
 #radiation, etc.).
     drivers:
       status: absent #options: absent, present, data_driven, propagates, assimilates
-            complexity: 2 #How many models states need initial conditions
-      propagation:
-        type: ensemble #How does your model propogate initial conditions (ensemble or MCMC is most common)
-        size: 2000. #number of ensemble or MCMC members
+      complexity: 2 #How many drivers are used?
+      propagation: 
+        type: ensemble #How does your model propogate driver (ensemble or MCMC is most common)
+        size: 2000 #number of ensemble or MCMC members
       assimilation:
         type: refit #description of assimilation method
-        reference: "NA" #reference for assimilation method
+        reference: "none" #reference for assimilation method
         complexity: 4 #number of states that are updated with assimilation
 #        
 #PARAMETERS
@@ -76,11 +76,11 @@ metadata:
       status: present #options: absent, present, data_driven, propagates, assimilates
       complexity: 2
       propagation:
-        type: ensemble
+        type: ensemble #how does your model propogate parameter uncertainity?
         size: 2000
       assimilation:
         type: refit
-        reference: "NA"
+        reference: "none"
         complexity: 4
 #
 #RANDOM EFFECTS
@@ -100,14 +100,14 @@ metadata:
 #not be part of the complexity dimensions.
 #
     random_effects:
-      status: absent #options: absent, present, data_driven, propagates, assimilates
-      complexity: 2 #How many models states need initial conditions
+      status: present #options: absent, present, data_driven, propagates, assimilates
+      complexity: 2
       propagation:
-        type: ensemble #How does your model propogate initial conditions (ensemble or MCMC is most common)
-        size: 2000. #number of ensemble or MCMC members
+        type: ensemble #How does your model propogate random effects (ensemble or MCMC is most common)
+        size: 2000 #number of ensemble or MCMC members
       assimilation:
         type: refit #description of assimilation method
-        reference: "NA" #reference for assimilation method
+        reference: "none" #reference for assimilation method
         complexity: 4 #number of states that are updated with assimilation
 #
 #PROCESS ERROR
@@ -124,14 +124,14 @@ metadata:
       status: assimilates #options: absent, present, data_driven, propagates, assimilates
       complexity: 2
       propagation:
-        type: ensemble
+        type: ensemble #How does your model propogate random effects uncertainty (ensemble or MCMC is most common)
         size: 2000
       assimilation:
         type: refit
-        reference: "NA"
+        reference: "none"
         complexity: 4
-        covariance: NA #TRUE OR FALSE
-        localization:
+        covariance: FALSE #TRUE OR FALSE
+        localization: FALSE
 #
 #OBSERVATION ERROR
 #Uncertainty in the observations of the output variables (g). Note that many 
@@ -147,14 +147,14 @@ metadata:
 #match the dimensionality of the initial_conditions unless there are state 
 #variables where process error is not being estimated or propagated
     obs_error:
-      status: absent #options: absent, present, data_driven, propagates, assimilates
-      complexity: 2 #How many models states need initial conditions
+      status: present #options: absent, present, data_driven, propagates, assimilates
+      complexity: 2
       propagation:
-        type: ensemble #How does your model propogate initial conditions (ensemble or MCMC is most common)
+        type: ensemble #How does your model propogate observation error (ensemble or MCMC is most common)
         size: 2000. #number of ensemble or MCMC members
       assimilation:
         type: refit #description of assimilation method
-        reference: "NA" #reference for assimilation method
+        reference: "none" #reference for assimilation method
         complexity: 4 #number of states that are updated with assimilation
-        covariance: NA #TRUE OR FALSE
-        localization:
+        covariance: FALSE #TRUE OR FALSE
+        localization: FALSE
