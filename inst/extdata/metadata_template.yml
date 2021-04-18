@@ -40,6 +40,7 @@ metadata:
       propagation:
         type: ensemble #How does your model propogate initial conditions (ensemble or MCMC is most common)
         size: 2000. #number of ensemble or MCMC members
+      #Leave everything below blank  UNLESS status = assimilates  
       assimilation:
         type: refit #description of assimilation method
         reference: "NA" #reference for assimilation method
@@ -58,9 +59,11 @@ metadata:
     drivers:
       status: absent #options: absent, present, data_driven, propagates, assimilates
       complexity: 2 #How many drivers are used?
+      #Leave everything below blank if status = absent, present, or data_driven
       propagation: 
         type: ensemble #How does your model propogate driver (ensemble or MCMC is most common)
         size: 2000 #number of ensemble or MCMC members
+      #Leave everything below blank  UNLESS status = assimilates  
       assimilation:
         type: refit #description of assimilation method
         reference: "none" #reference for assimilation method
@@ -76,9 +79,11 @@ metadata:
     parameters:
       status: present #options: absent, present, data_driven, propagates, assimilates
       complexity: 2
+      #Leave everything below blank if status = absent, present, or data_driven
       propagation:
         type: ensemble #how does your model propogate parameter uncertainity?
         size: 2000
+      #Leave everything below blank  UNLESS status = assimilates  
       assimilation:
         type: refit
         reference: "none"
@@ -103,9 +108,11 @@ metadata:
     random_effects:
       status: present #options: absent, present, data_driven, propagates, assimilates
       complexity: 2
+      #Leave everything below blank if status = absent, present, or data_driven
       propagation:
         type: ensemble #How does your model propogate random effects (ensemble or MCMC is most common)
         size: 2000 #number of ensemble or MCMC members
+      #Leave everything below blank  UNLESS status = assimilates  
       assimilation:
         type: refit #description of assimilation method
         reference: "none" #reference for assimilation method
@@ -123,10 +130,12 @@ metadata:
 #variables where process error is not being estimated or propagated
     process_error:
       status: assimilates #options: absent, present, data_driven, propagates, assimilates
-      complexity: 2
+      complexity: 2 #Leave blank if status = absent
+      #Leave everything below blank if status = absent, present, or data_driven
       propagation:
-        type: ensemble #How does your model propogate random effects uncertainty (ensemble or MCMC is most common)
-        size: 2000
+        type: ensemble #How does your model propogate random effects uncertainty (ensemble or MCMC is most common) 
+        size: 2000 
+      #Leave everything below blank  UNLESS status = assimilates
       assimilation:
         type: refit
         reference: "none"
@@ -149,13 +158,15 @@ metadata:
 #variables where process error is not being estimated or propagated
     obs_error:
       status: present #options: absent, present, data_driven, propagates, assimilates
-      complexity: 2
+      complexity: 2 #Leave blank if status = absent
+      #Leave everything below blank if status = absent, present, or data_driven
       propagation:
         type: ensemble #How does your model propogate observation error (ensemble or MCMC is most common)
         size: 2000. #number of ensemble or MCMC members
+      #Leave everything below blank  UNLESS status = assimilates
       assimilation:
         type: refit #description of assimilation method
         reference: "none" #reference for assimilation method
         complexity: 4 #number of states that are updated with assimilation
         covariance: FALSE #TRUE OR FALSE
-        localization: FALSE
+        localization: FALSE 
