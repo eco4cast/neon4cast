@@ -3,7 +3,7 @@
 ####
 team_name: pers_null_daily
 # ids are optional except for the first author, who is also the 'contact'
-team_list:
+team_list:    
   - individualName:
       givenName: FirstName
       surName: LastName 
@@ -12,11 +12,12 @@ team_list:
       givenName: FirstName
       surName: SecondAuthorSurName
       id: 
+#You should not add anything on the metadata and forecast lines (next two lines should only say metadata and forecast)      
 metadata:
   forecast:
     timestep: 1 day #time step of model
     forecast_horizon: 35 days #number of time steps in the future
-#
+#You should not add anything on the model_description lines (next line should only say model_description)      
     model_description:
       # model identifier:
       forecast_model_id: "null"

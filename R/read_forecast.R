@@ -10,7 +10,7 @@ read_forecast <- function(file_in,
                                                "vswc",
                                                "gcc_90",
                                                "ixodes_scapularis",
-                                                "amblyomma_americanum"),
+                                               "amblyomma_americanum"),
                           reps_col = "ensemble",
                           ...){
 
