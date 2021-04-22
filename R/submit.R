@@ -22,10 +22,15 @@ submit <- function(forecast_file, metadata = NULL, ask = interactive()){
                      base_url = "ecoforecast.org")
   
   if(!is.null(metadata)){
-    EFIstandards::forecast_validator(metadata)
-    aws.s3::put_object(file = metadata, 
-                       bucket = "submissions",
-                       region="data",
-                       base_url = "ecoforecast.org")
+    if(file_ext(metadata) == "xml"){
+      EFIstandards::forecast_validator(metadata)
+      aws.s3::put_object(file = metadata, 
+                         bucket = "submissions",
+                         region="data",
+                         base_url = "ecoforecast.org")
+    }else{
+      warning(paste("Metadata file is not an .xml file",
+                    "Did you incorrectly submit the model description yml file instead of an xml file"))
+    }
   }
 }

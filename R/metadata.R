@@ -10,7 +10,13 @@ create_model_metadata <- function(forecast_file){
   filename <- tools::file_path_sans_ext(basename(forecast_file),
                                         compression = TRUE)
   template_name <- paste0(filename,".yml")
-
+  
+  message("You only need to run this function once to generate the model metadata template.")  
+  message("If you model does not change between submittions you will not need change the yml.")
+  message("In this case, use a previously generated yaml in the write_metadata_eml() call")
+  message("If your model does change, save your old yaml under a new name and modify")
+  
+  
   file.copy(system.file("extdata/metadata_template.yml", package="neon4cast"),
             file.path(dir, template_name))
   template <- file.path(dir, template_name)
@@ -52,6 +58,7 @@ write_metadata_eml <- function(forecast_file,
                                                     rep("numeric", num_variables)))
   }else if("statistic" %in% names(forecast)){
     attributes <- dplyr::filter(attributes, attributeName != "ensemble")
+    num_variables <- length(which(stringr::str_detect(attributes$attributeDefinition,"variable")))
     #' use `EML` package to build the attribute list
     attrList <- EML::set_attributes(attributes, 
                                     col_classes = c("Date", "character", "character","numeric","numeric", 
@@ -111,7 +118,7 @@ write_metadata_eml <- function(forecast_file,
   metadata$metadata$forecast$forecast_iteration_id <- forecast_iteration_id
   metadata$metadata$forecast$forecast_project_id <- team_name
   
-  metadata$forecast$metadata_standard_version <- 0.3
+  metadata$metadata$forecast$metadata_standard_version <- 0.3
   
   my_eml <- EML::eml$eml(dataset = dataset,
                     additionalMetadata = EML::eml$additionalMetadata(metadata = metadata$metadata),

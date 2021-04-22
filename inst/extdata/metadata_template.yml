@@ -3,7 +3,7 @@
 ####
 team_name: pers_null_daily
 # ids are optional except for the first author, who is also the 'contact'
-team_list:
+team_list:    
   - individualName:
       givenName: FirstName
       surName: LastName 
@@ -12,11 +12,12 @@ team_list:
       givenName: FirstName
       surName: SecondAuthorSurName
       id: 
+#You should not add anything on the metadata and forecast lines (next two lines should only say metadata and forecast)      
 metadata:
   forecast:
     timestep: 1 day #time step of model
     forecast_horizon: 35 days #number of time steps in the future
-#
+#You should not add anything on the model_description lines (next line should only say model_description)      
     model_description:
       # model identifier:
       forecast_model_id: "null"
@@ -39,6 +40,7 @@ metadata:
       propagation:
         type: ensemble #How does your model propogate initial conditions (ensemble or MCMC is most common)
         size: 2000. #number of ensemble or MCMC members
+      #Leave everything below blank  UNLESS status = assimilates  
       assimilation:
         type: refit #description of assimilation method
         reference: "NA" #reference for assimilation method
@@ -56,13 +58,15 @@ metadata:
 #radiation, etc.).
     drivers:
       status: absent #options: absent, present, data_driven, propagates, assimilates
-            complexity: 2 #How many models states need initial conditions
-      propagation:
-        type: ensemble #How does your model propogate initial conditions (ensemble or MCMC is most common)
-        size: 2000. #number of ensemble or MCMC members
+      complexity: 2 #How many drivers are used?
+      #Leave everything below blank if status = absent, present, or data_driven
+      propagation: 
+        type: ensemble #How does your model propogate driver (ensemble or MCMC is most common)
+        size: 2000 #number of ensemble or MCMC members
+      #Leave everything below blank  UNLESS status = assimilates  
       assimilation:
         type: refit #description of assimilation method
-        reference: "NA" #reference for assimilation method
+        reference: "none" #reference for assimilation method
         complexity: 4 #number of states that are updated with assimilation
 #        
 #PARAMETERS
@@ -75,12 +79,14 @@ metadata:
     parameters:
       status: present #options: absent, present, data_driven, propagates, assimilates
       complexity: 2
+      #Leave everything below blank if status = absent, present, or data_driven
       propagation:
-        type: ensemble
+        type: ensemble #how does your model propogate parameter uncertainity?
         size: 2000
+      #Leave everything below blank  UNLESS status = assimilates  
       assimilation:
         type: refit
-        reference: "NA"
+        reference: "none"
         complexity: 4
 #
 #RANDOM EFFECTS
@@ -100,14 +106,16 @@ metadata:
 #not be part of the complexity dimensions.
 #
     random_effects:
-      status: absent #options: absent, present, data_driven, propagates, assimilates
-      complexity: 2 #How many models states need initial conditions
+      status: present #options: absent, present, data_driven, propagates, assimilates
+      complexity: 2
+      #Leave everything below blank if status = absent, present, or data_driven
       propagation:
-        type: ensemble #How does your model propogate initial conditions (ensemble or MCMC is most common)
-        size: 2000. #number of ensemble or MCMC members
+        type: ensemble #How does your model propogate random effects (ensemble or MCMC is most common)
+        size: 2000 #number of ensemble or MCMC members
+      #Leave everything below blank  UNLESS status = assimilates  
       assimilation:
         type: refit #description of assimilation method
-        reference: "NA" #reference for assimilation method
+        reference: "none" #reference for assimilation method
         complexity: 4 #number of states that are updated with assimilation
 #
 #PROCESS ERROR
@@ -122,16 +130,18 @@ metadata:
 #variables where process error is not being estimated or propagated
     process_error:
       status: assimilates #options: absent, present, data_driven, propagates, assimilates
-      complexity: 2
+      complexity: 2 #Leave blank if status = absent
+      #Leave everything below blank if status = absent, present, or data_driven
       propagation:
-        type: ensemble
-        size: 2000
+        type: ensemble #How does your model propogate random effects uncertainty (ensemble or MCMC is most common) 
+        size: 2000 
+      #Leave everything below blank  UNLESS status = assimilates
       assimilation:
         type: refit
-        reference: "NA"
+        reference: "none"
         complexity: 4
-        covariance: NA #TRUE OR FALSE
-        localization:
+        covariance: FALSE #TRUE OR FALSE
+        localization: FALSE
 #
 #OBSERVATION ERROR
 #Uncertainty in the observations of the output variables (g). Note that many 
@@ -147,14 +157,16 @@ metadata:
 #match the dimensionality of the initial_conditions unless there are state 
 #variables where process error is not being estimated or propagated
     obs_error:
-      status: absent #options: absent, present, data_driven, propagates, assimilates
-      complexity: 2 #How many models states need initial conditions
+      status: present #options: absent, present, data_driven, propagates, assimilates
+      complexity: 2 #Leave blank if status = absent
+      #Leave everything below blank if status = absent, present, or data_driven
       propagation:
-        type: ensemble #How does your model propogate initial conditions (ensemble or MCMC is most common)
+        type: ensemble #How does your model propogate observation error (ensemble or MCMC is most common)
         size: 2000. #number of ensemble or MCMC members
+      #Leave everything below blank  UNLESS status = assimilates
       assimilation:
         type: refit #description of assimilation method
-        reference: "NA" #reference for assimilation method
+        reference: "none" #reference for assimilation method
         complexity: 4 #number of states that are updated with assimilation
-        covariance: NA #TRUE OR FALSE
-        localization:
+        covariance: FALSE #TRUE OR FALSE
+        localization: FALSE 
