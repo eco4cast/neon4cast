@@ -2,8 +2,7 @@
 #' 
 #' @param forecast_file full path of forecast file
 #' @export
-#' @examples 
-#'     create_model_metadata(forecast_file = forecast_file)                          
+#' 
 create_model_metadata <- function(forecast_file){
   
   dir <- dirname(forecast_file)
@@ -31,8 +30,7 @@ create_model_metadata <- function(forecast_file){
 #' @param forecast_issue_time time that forecast was generated
 #' @param forecast_iteration_id unique ID for forecast
 #' @export
-#' @examples 
-#' write_metadata_eml(forecast_file =  forecast_file ,metadata_yaml = metadata_yaml, forecast_issue_time = Sys.Date(), forecast_iteration_id = "1")
+#' 
 write_metadata_eml <- function(forecast_file, 
                               metadata_yaml, 
                               forecast_issue_time, 
@@ -43,7 +41,7 @@ write_metadata_eml <- function(forecast_file,
   forecast_file_name_base <- tools::file_path_sans_ext(tools::file_path_sans_ext(basename(forecast_file)))
   metadata <- yaml::read_yaml(metadata_yaml)
   
-  forecast <- neon4cast:::read_forecast(file_in = forecast_file)
+  forecast <- read_forecast(file_in = forecast_file)
  
   theme <- unlist(stringr::str_split(stringr::str_split(forecast_file, "-")[[1]][1], "_")[[1]][1])
   team_name <- unlist(stringr::str_split(forecast_file_name_base, "-"))[5]
@@ -52,14 +50,14 @@ write_metadata_eml <- function(forecast_file,
   if("ensemble" %in% names(forecast)){
     attributes <- dplyr::filter(attributes, attributeName != "statistic")
     num_variables <- length(which(stringr::str_detect(attributes$attributeDefinition,"variable")))
-    #' use `EML` package to build the attribute list
+    # use EML package to build the attribute list
     attrList <- EML::set_attributes(attributes, 
                                     col_classes = c("Date", "numeric", "character","numeric","numeric", 
                                                     rep("numeric", num_variables)))
   }else if("statistic" %in% names(forecast)){
     attributes <- dplyr::filter(attributes, attributeName != "ensemble")
     num_variables <- length(which(stringr::str_detect(attributes$attributeDefinition,"variable")))
-    #' use `EML` package to build the attribute list
+    # use EML package to build the attribute list
     attrList <- EML::set_attributes(attributes, 
                                     col_classes = c("Date", "character", "character","numeric","numeric", 
                                                     rep("numeric", num_variables)))
@@ -75,14 +73,14 @@ write_metadata_eml <- function(forecast_file,
          phenology =  "Forecasts of GCC"
   )
 
-  #' use `EML` package to build the attribute list
+  # use EML package to build the attribute list
 
   
   
-  #' use `EML` package to build the physical list
+  # use EML package to build the physical list
   physical <- EML::set_physical(forecast_file)
   
-  #' use `EML` package to dataTable
+  # use EML package to dataTable
   dataTable <- EML::eml$dataTable(
     entityName = "forecast",  ## this is a standard name to allow us to distinguish this entity from 
     entityDescription = entityDescription_text,
@@ -99,11 +97,11 @@ write_metadata_eml <- function(forecast_file,
   temporalCoverage <- list(rangeOfDates =
                              list(beginDate = list(calendarDate = start_time),
                                   endDate = list(calendarDate = stop_time)))
-  #'Create the coverage EML
+  # Create the coverage EML
   coverage <- list(geographicCoverage = geographicCoverage,
                    temporalCoverage = temporalCoverage)
   
-  #'Create the dataset EML
+  # Create the dataset EML
   dataset <- EML::eml$dataset(
     title = "Daily persistence null forecast for nee and lee",
     creator = metadata$team_list,
@@ -126,11 +124,11 @@ write_metadata_eml <- function(forecast_file,
                     system = "datetime"  ## system used to generate packageId
   )
   
-  #'Check that EML matches EFI Standards
+  # Check that EML matches EFI Standards
   if(!EFIstandards::forecast_validator(my_eml)){
     warning("Error in EFI metadata", call. = FALSE)
   }
-  #'Write metadata
+  # Write metadata
   meta_data_filename <-  paste0(dir, "/", forecast_file_name_base,".xml")
   EML::write_eml(my_eml, meta_data_filename)
   return(meta_data_filename)
@@ -166,4 +164,5 @@ theme_sites <- function(theme){
   )
 }
 
+utils::globalVariables("attributeName", "neon4cast")
 

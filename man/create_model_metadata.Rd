@@ -12,6 +12,3 @@ create_model_metadata(forecast_file)
 \description{
 Write model metadata from template
 }
-\examples{
-    create_model_metadata(forecast_file = forecast_file)                          
-}

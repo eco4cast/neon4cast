@@ -10,6 +10,8 @@ stack_noaa(dir = tempdir(), forecast_date = NULL)
 \item{dir}{storage location.  Use tempdir unless you want to keep this
 data around on your computer, in which case, \code{neonstore::neon_dir()} might
 be a convenient choice.}
+
+\item{forecast_date}{Include only forecasts issued on this date}
 }
 \description{
 Stack downloaded NOAA files

@@ -23,15 +23,3 @@ write_metadata_eml(
 \description{
 Generate metadata from forecast and template files
 }
-\examples{
-write_metadata_eml(forecast_file =  forecast_file ,metadata_yaml = metadata_yaml, forecast_issue_time = Sys.Date(), forecast_iteration_id = "1")
-use `EML` package to build the attribute list
-use `EML` package to build the attribute list
-use `EML` package to build the attribute list
-use `EML` package to build the physical list
-use `EML` package to dataTable
-Create the coverage EML
-Create the dataset EML
-Check that EML matches EFI Standards
-Write metadata
-}

@@ -22,7 +22,7 @@ submit <- function(forecast_file, metadata = NULL, ask = interactive()){
                      base_url = "ecoforecast.org")
   
   if(!is.null(metadata)){
-    if(file_ext(metadata) == "xml"){
+    if(tools::file_ext(metadata) == "xml"){
       EFIstandards::forecast_validator(metadata)
       aws.s3::put_object(file = metadata, 
                          bucket = "submissions",
