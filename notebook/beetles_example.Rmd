@@ -195,21 +195,64 @@ ave_richness %>%
 
 
 
-A richer forecast may make use of NOAA weather predictions.
+A richer forecast may make use of NOAA weather predictions.  Default is to get current forecast going ahead for the next 30 days.  Some older forecasts are available, but only back to 2020-09-25 when regular EFI archiving began.  
 
 ```{r eval=FALSE}
-#sites <- unique(targets$siteID)
-#lapply(sites, neon4cast::download_noaa, dir = neonstore::neon_dir())
-#noaa <- neon4cast::stack_noaa()
+sites <- unique(targets$siteID)
+# lapply(sites, neon4cast::download_noaa, dir = neonstore::neon_dir())
+# noaa <- neon4cast::stack_noaa(dir = neonstore::neon_dir())
+
+## cache stacked files:
+# write_csv(noaa, "noaa.csv.gz")
 ```
-In calibrating our model, we can use NEON's local measurements of the meteorological variables.
+
+```{r}
+noaa <- read_csv("noaa.csv.gz")
+```
+
+We can also use NEON's local measurements of the meteorological variables.
+NEON's permanent sites make convenient summary weather data available.  
+
 
 ```{r}
 
-# Summary statistics for fixed-location sites:
-#neonstore::neon_download("DP4.00001.001")
-#neonstore::neon_store(product = "DP4.00001.001")
-# 
+# One-time commands for import and storage of weather data
+# neon_download("DP4.00001.001")
+# neon_store(product = "DP4.00001.001")
+
+## Weather files can get big! We'll use a remote database connection
+db <- neon_db()
+
+## View available tables under this product ID
+tables <- DBI::dbListTables(db)
+tables[grepl("DP4.00001.001", tables)]
+
+## Create remote connections to these tables
+temp <- tbl(db, "wss_daily_temp-basic-DP4.00001.001")
+
+# Similarly we could grab other tables of interest
+precip <- tbl(db, "wss_daily_precip-basic-DP4.00001.001")
+humid <- tbl(db, "wss_daily_humid-basic-DP4.00001.001")
+
+## Determine which sites we have data for
+fixed_sites <- temp %>% select(siteID) %>% distinct() %>% pull()
+```
+
+Using `duckdb` date manipulation (`strftime`) and dplyr SQL translation, we can very quickly compute weekly averages on disk:
+
+```{r}
+
+weekly_temp <- 
+  temp %>% 
+  mutate(week = as.Date(date_trunc("week", date))) %>% 
+  group_by(week, siteID) %>% 
+  summarise(mean_temp = mean(wssTempTripleMean, na.rm=TRUE),
+            min_temp = mean(wssTempTripleMinimum, na.rm=TRUE),
+            max_temp = mean(wssTempTripleMaximum, na.rm=TRUE),
+            .groups = "drop") %>% 
+  collect() %>% # Now import summarized results into R, turn into tsibble:
+  as_tsibble(index=week, key=siteID)
 
 ```
 
+Is there any correlation between abundance and temperature? 
