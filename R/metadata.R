@@ -43,7 +43,7 @@ write_metadata_eml <- function(forecast_file,
   
   forecast <- read_forecast(file_in = forecast_file)
  
-  theme <- unlist(stringr::str_split(stringr::str_split(forecast_file, "-")[[1]][1], "_")[[1]][1])
+  theme <- unlist(stringr::str_split(stringr::str_split(forecast_file_name_base, "-")[[1]][1], "_")[[1]][1])
   team_name <- unlist(stringr::str_split(forecast_file_name_base, "-"))[5]
   
   attributes <- readr::read_csv(system.file(paste0("extdata/",theme, "_metadata_attributes.csv"), package="neon4cast"))
