@@ -1,0 +1,118 @@
+---
+title: "Forecast Provenance"
+output: 
+  html_document:
+        df_print: paged
+---
+  
+  A quick look at forecast provenance in the EFI challenge
+
+
+```{r message=FALSE, warning=FALSE}
+library(tidyverse)
+library(rdflib)
+library(ggraph)
+library(tidygraph)
+```
+
+Forecast provenance is recorded in JSON-LD using the DCAT2 vocabulary. This is a widely used technical standard but probably unfamiliar to most domain scientists. (If you're feeling curious, you may like [A tidyverse lover's introduction to RDF](https://cran.r-project.org/web/packages/rdflib/vignettes/rdf_intro.html)).
+
+Anyway, we could read the file in as plain JSON, but turns out it is a lot more powerful to read in as RDF, so here goes:
+  
+  
+```{r}
+x <- rdf_parse("https://data.ecoforecast.org/forecasts/aquatics/prov.json")
+```
+
+This allows us to write _semantic_ queries, in a language kinda like SQL but with magic variables.
+
+Here, we say: 
+  
+1. find the `id` of everything with a title matching this pattern `aquatics-2021-0*-01-EFInull.csv.gz`.
+2. For each such object, find out which activity generated the object
+3. for that activity, determine what files it _used_ as input and which ones it _generated_ as output,
+4. for both input and output, extract the identifier, title, and description and give that back to me as columns.
+
+```{r}
+nodes <- rdf_query(x,
+                   'PREFIX dc: <http://purl.org/dc/terms/> 
+ PREFIX prov: <http://www.w3.org/ns/prov#>
+ SELECT DISTINCT ?identifier ?title ?description
+ WHERE { ?id dc:title ?forecast . 
+         FILTER regex(?forecast, "aquatics-2021-0[0-9]-01-EFInull.csv.gz") .
+         ?id prov:wasGeneratedBy ?activity .
+         ?activity prov:used ?input .
+         ?activity prov:generated ?output .
+         { 
+           ?input dc:identifier ?identifier .
+           ?input dc:title ?title .
+           ?input dc:description ?description .
+         } UNION { 
+           ?output dc:identifier ?identifier .
+           ?output dc:title ?title .
+           ?output dc:description ?description .
+         }
+        }'
+)
+nodes
+```
+
+Kinda cool!  So what do we have?  Let's tabulate by `title`, which in this case is the familiar filename we use to refer to each object.  Note that we often generate multiple versions of the same file over time, which are distinguished by different (content-based) identifiers
+
+```{r}
+nodes %>% count(title)
+```
+
+We have 3 versions of the code, and 15 versions of the target data, which have produced between 1 - 6 versions of each forecast file!  However, this summary doesn't really show us which code produced which outputs.  We can get a bit better handle on this by trying to visualize the data.
+
+First, let's just grab and edge list.  (This could have been extracted from the previous data, but it's "easy" to just write a new query)
+
+
+```{r}
+edges <- rdf_query(x,
+                   'PREFIX dc: <http://purl.org/dc/terms/> 
+ PREFIX prov: <http://www.w3.org/ns/prov#>
+ SELECT DISTINCT ?from ?to
+ WHERE { ?id dc:title ?forecast . 
+         FILTER regex(?forecast, "aquatics-2021-0[0-9]-01-EFInull.csv.gz") .
+         ?id prov:wasGeneratedBy ?activity .
+         ?activity prov:used ?from .
+         ?activity prov:generated ?to .
+        }'
+)
+edges
+
+
+
+```
+
+With a list of nodes and edges, we can plot the graph with standard `ggraph` tactics:
+  
+```{r}
+
+node_df <- nodes %>% mutate(label = str_extract(title, "\\d{4}-\\d{2}-\\d{2}"))
+gr <- tbl_graph(edges = edges, nodes = node_df, directed = TRUE)
+
+
+ggraph(gr,  layout = 'kk') + 
+  geom_node_point(aes(x = x, y = y, shape=description, col=label), size=10) + 
+  geom_edge_link(arrow = arrow(length = unit(4, 'mm')), 
+                 end_cap = circle(4, 'mm'))
+
+```
+
+Here's what we can see from this graph:
+
+Note that one version of the code created only a single January forecast (top left).  When updated, it the same data led to a new version of the forecast (second red triangle in from top-left.)  As the targets file evolved (different circles), that same code made three more versions of January forecast before rolling out the first Feburary forecast.  
+
+A third version of the code comes along and makes the second, third, and forth Feb forecast, each using different target data.  In March, six forecasts are produced, each from the same code and six distinct versions of the targets.  Then in April and May, the same code makes precisely the same forecast from the same target 
+
+Not shown is that the code is run many more times each month, but generates the identical output from identical input (code and target data)
+
+
+
+# Publishing forecasts
+
+Using content-based identifiers, there is no need to pre-register a forecast identifier. Each file has an identifier from the moment it is created.  Each unique data object is uniquely identified by it's content hash now, which lets us access each specific version from the EFI content store, and each object _can still be accessed_ by it's identifier once it is deposited in an appropriate database.  It just remains to decide how to "chunk" the objects into "packages" that each get a DOI.  
+
+We could upload all 34 objects in a single package with one DOI.  (Or at the opposite extreme, upload each separately, though that seems a poor choice).  Or we could sub-divide them, e.g. allowing each unique set of input data, code, output data to get a unique DOI (note that this would cause packages to share some elements, particularly the code file, which changes least frequently.
