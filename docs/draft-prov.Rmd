@@ -5,7 +5,7 @@ output:
         df_print: paged
 ---
   
-  A quick look at forecast provenance in the EFI challenge
+Here's a quick look at forecast provenance in the EFI challenge
 
 
 ```{r message=FALSE, warning=FALSE}
@@ -85,6 +85,8 @@ edges
 
 
 ```
+
+## Visualizing Provenance
 
 With a list of nodes and edges, we can plot the graph with standard `ggraph` tactics:
   
