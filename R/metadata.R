@@ -52,7 +52,7 @@ write_metadata_eml <- function(forecast_file,
   
   attribute_file <- system.file(paste0("extdata/",theme, "_metadata_attributes.csv"), package="neon4cast")
   if(file.exists(attribute_file)){
-    attributes <- readr::read_csv()
+    attributes <- readr::read_csv(attribute_file)
   }else{
     warning("Error in file name.  Please check the submission guidelines for file name conventions", call. = FALSE)
   }
