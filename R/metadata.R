@@ -9,7 +9,11 @@ create_model_metadata <- function(forecast_file){
   dir <- dirname(forecast_file)
   filename <- tools::file_path_sans_ext(basename(forecast_file),
                                         compression = TRUE)
-  template_name <- paste0(filename,".yml")
+  
+  theme <- stringr::str_split(filename, "-")[[1]][1]
+  team  <- stringr::str_split(filename, "-")[[1]][5]
+  
+  template_name <- paste0(theme, "-", team, ".yml")
   
   message("You only need to run this function once to generate the model metadata template.")  
   message("If you model does not change between submittions you will not need change the yml.")
@@ -48,7 +52,13 @@ write_metadata_eml <- function(forecast_file,
   theme <- unlist(stringr::str_split(stringr::str_split(forecast_file, "-")[[1]][1], "_")[[1]][1])
   team_name <- unlist(stringr::str_split(forecast_file_name_base, "-"))[5]
   
-  attributes <- readr::read_csv(system.file(paste0("extdata/",theme, "_metadata_attributes.csv"), package="neon4cast"))
+  attribute_file <- system.file(paste0("extdata/",theme, "_metadata_attributes.csv"), package="neon4cast")
+  if(file.exists(attribute_file)){
+    attributes <- readr::read_csv()
+  }else{
+    warning("Error in file name.  Please check the submission guidelines for file name conventions", call. = FALSE)
+  }
+  
   if("ensemble" %in% names(forecast)){
     attributes <- dplyr::filter(attributes, attributeName != "statistic")
     num_variables <- length(which(stringr::str_detect(attributes$attributeDefinition,"variable")))
