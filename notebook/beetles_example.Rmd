@@ -1,0 +1,339 @@
+---
+output: github_document
+---
+
+```{r}
+knitr::opts_chunk$set(message=FALSE)
+```
+
+```{r setup}
+library(neonstore)
+library(neon4cast) # remotes::install_github("eco4cast/neon4cast")
+library(tidyverse)
+library(tsibble)
+library(fable)
+```
+
+# A trivial forecast
+
+## Access Target Data
+
+```{r}
+targets <-
+  "https://data.ecoforecast.org/targets/beetles/beetles-targets.csv.gz" %>% 
+  read_csv(col_types = "cDdd") %>% 
+  as_tsibble(index = time, key = siteID)
+```
+
+For illustrative purposes, we will pretend most recent year is "future" data. In practice, "past" would be the `targets` data.frame downloaded on the day code is run (i.e. most recent data), while "future" would be the "targets" data downloaded some period of time (i.e. 1 yr) after when it is possible to test if the forecast was accurate.
+
+
+```{r}
+past <-  targets %>% filter(time < max(time) - 365)
+future <- targets %>% filter(time >= max(time) - 365)
+
+forecast_date <- max(targets$time) - 365
+```
+
+## Compute a forecast
+
+```{r}
+## Compute a simple mean/sd model per site... obviously silly given huge seasonal aspect
+null_richness <- past  %>% 
+  model(null = MEAN(richness)) %>%
+  forecast(h = "1 year")
+
+null_abundance <- past  %>%
+  model(null = MEAN(abundance)) %>%
+  forecast(h = "1 year")
+```
+
+
+## Visualize the forecast
+
+```{r}
+first4 <- unique(null_richness$siteID)[1:4]
+
+null_richness %>% filter(siteID %in% first4)  %>% autoplot(past) + ggtitle("richness")
+null_abundance %>% filter(siteID %in% first4)  %>% autoplot(targets) + ggtitle("abundance")
+```
+
+## Score the forecast
+
+`fable` can compute CRPS, by default computes averages by siteID (`key`) and `.model` only.  
+Optionally, we could include `by = c(".model", "siteID", "time")` to generate separate forecasts by time. 
+(For some reason `fable`s internal method is much slower than the EFI code, though results are numerically equivalent). 
+Note that fable can work across multiple models, (though we have only one in this case), but not across multiple target variables.
+We must handle predictions of `richness` and `abundance` separately.
+Recall that smaller CRPS scores are better.
+  
+
+```{r}
+null_richness %>%
+  accuracy(future, list(crps = CRPS))
+```
+
+## EFI Formatting
+
+EFI requires a flat-file format for forecasts that avoids the use of complex list columns.  
+To convey uncertainty, forecasts must be expressed either by giving mean and standard deviation (for predictions that are normally distributed) or must express forecasts as an ensemble of replicate draws from forecast distribution.
+The helper function `efi_format()` handles this transformation.
+
+```{r}
+## Combine richness and abundance forecasts. drop the 'model' column
+null_forecast <- inner_join(efi_format(null_richness), 
+                            efi_format(null_abundance)) %>%
+  select(!.model) # we have only one model
+```
+
+Score the forecast using EFI's internal method. By default, EFI's method reports the score every unique site-time combination (unique grouping variables).
+It is easy to later average across times for a by-site score.
+
+```{r}
+scores_null <- neon4cast::score(null_forecast, "beetles")
+# average richness scores by site
+scores_null %>% group_by(target) %>% summarise(mean = mean(score, na.rm=TRUE)) 
+```
+
+
+# Richer models: ARIMA
+
+
+ARIMA models are commonly used to predict future values from historical values, ([FPP Ch 9](https://otexts.com/fpp3/arima.html)).  A simple ARIMA model does not use any external driver variables, though it is possible to include regression (e.g. see [FPP Ch 10 on Dynamic Models](https://otexts.com/fpp3/dynamic.html))
+
+
+Our ARIMA model needs only one extra step, making implicit missing data into explicit missing values.  In both richness and abundance, we will treat gaps as missing data, not as zeros, using `
+
+```{r}
+gap_filled <- tsibble::fill_gaps(past)
+arima_richness <- gap_filled  %>% 
+  model(arima = ARIMA(richness)) %>%
+  forecast(h = "1 year") %>%
+  efi_format()
+
+arima_abundance <- gap_filled  %>%
+  model(arima = ARIMA(abundance)) %>%
+  forecast(h = "1 year") %>%
+  efi_format()
+
+## Combine richness and abundance forecasts. drop the 'model' column
+arima_forecast <- inner_join(arima_richness, arima_abundance) %>% select(!.model)
+```
+Score the forecast
+
+```{r}
+arima_scores <- neon4cast::score(arima_forecast, "beetles")
+arima_scores %>% group_by(target) %>% summarise(mean = mean(score, na.rm=TRUE))
+```
+
+# Process vs Noise
+
+As the example plots above show, counts of abundance and richness at individual sites and weeks are pretty noisy, with lots of gaps and zeros and no strong visual pattern.  In contrast, if we average by month over all sites nationally, we see a strong and predictable seasonal pattern:
+
+
+```{r}
+national_ave <- past %>%
+  index_by(Time = ~ yearmonth(.)) %>% # temporal aggregates
+  summarise(
+    richness = mean(richness, na.rm = TRUE),
+    abundance = mean(abundance, na.rm = TRUE)
+  ) %>% rename(time = Time)
+
+
+
+national_ave %>% 
+  pivot_longer(c("richness", "abundance"), 
+               names_to = "variable", 
+               values_to="mean_observed") %>% 
+  ggplot(aes(time, mean_observed)) + geom_line() +
+  facet_wrap(~variable, ncol = 1, scales = "free_y")
+```
+
+While a hierarchical forecast could allow us to pool power across sites, a simple starting point might be to try and back out the site-level predictions based on a forecast of this strong seasonal pattern.  
+An ARIMA model is a good way to capture this periodic trend.
+We will use log-transforms as a simple way to avoid the possibility of negative values in our predictions.
+
+
+```{r}
+ave_richness <- national_ave %>%
+  fill_gaps() %>%
+  model(arima = ARIMA(log(richness))) %>%
+  forecast(h = "1 year")
+
+ave_richness %>% autoplot(national_ave) + ggtitle("richness")
+```
+
+
+```{r}
+ave_abund <- national_ave %>%
+  fill_gaps() %>%
+  model(arima = ARIMA(log(abundance))) %>%
+  forecast(h = "1 year")
+
+ave_abund %>% autoplot(national_ave) + ggtitle("abundance")
+```
+
+We treat the sites as merely random draws from this national pool,
+weighted by the fraction that each site has contributed to the grand total observed richness.
+
+```{r}
+richness_weights <- 
+  past %>% as_tibble() %>% 
+  group_by(siteID) %>% 
+  summarise(richness_share = sum(richness, na.rm=TRUE)) %>% 
+  mutate(richness_share = richness_share / sum(richness_share))
+richness_weights
+
+```
+
+```{r}
+# Note distribution is normal in log-transformed variable
+ave_richness %>% 
+    dplyr::mutate(sd = sqrt( distributional::variance( richness ) ) ) %>%
+    dplyr::rename(mean = .mean) %>%
+    dplyr::select(time, .model, mean, sd) %>%
+    tidyr::pivot_longer(c(mean, sd), names_to = "statistic", values_to = "richness") %>%
+    dplyr::as_tibble()
+```
+
+
+Combining the forecast for the nation-wide pooled mean richness with the site-by-site richness share, we could then generate site-level forecasts for each month (not shown).  
+This is still a trivial model which treats differences between sites as fixed over time, but illustrates the basic idea of deriving the observational data from the forecast of a latent variable (in this case, the national means).
+A more realistic model might similarly seek to estimate latent variables for 'true abundance' and 'true richness' from an explicit observation model, forecast the latent values, and back out the expected distribution of observational values.  
+
+
+
+# Including additional driver data
+
+
+## NOAA data access
+
+A richer forecast may make use of NOAA weather predictions.  Default is to get current forecast going ahead for the next 30 days.  Some older forecasts are available, but only back to 2020-09-25 when regular EFI archiving began.  
+
+```{r eval=FALSE}
+sites <- unique(targets$siteID)
+# lapply(sites, neon4cast::download_noaa, dir = neonstore::neon_dir())
+# noaa <- neon4cast::stack_noaa(dir = neonstore::neon_dir())
+
+## cache stacked files:
+# write_csv(noaa, "noaa.csv.gz")
+```
+
+```{r message=FALSE}
+noaa <- read_csv("noaa.csv.gz")
+```
+
+## NEON weather data
+
+We can also use NEON's local measurements of the meteorological variables.
+NEON's permanent sites make convenient summary weather data available.  
+
+
+```{r}
+
+# One-time commands for import and storage of weather data
+# neon_download("DP4.00001.001")
+# neon_store(product = "DP4.00001.001")
+
+## Weather files can get big! We'll use a remote database connection
+db <- neon_db()
+
+## View available tables under this product ID
+tables <- DBI::dbListTables(db)
+tables[grepl("DP4.00001.001", tables)]
+
+## Create remote connections to these tables
+temp <- tbl(db, "wss_daily_temp-basic-DP4.00001.001")
+
+# Similarly we could grab other tables of interest
+precip <- tbl(db, "wss_daily_precip-basic-DP4.00001.001")
+humid <- tbl(db, "wss_daily_humid-basic-DP4.00001.001")
+
+## Determine which sites we have data for
+fixed_sites <- temp %>% select(siteID) %>% distinct() %>% pull()
+```
+
+Using `duckdb` date manipulation (`strftime`) and dplyr SQL translation, we can very quickly compute weekly averages on disk:
+
+```{r}
+temp <- tbl(db, "wss_daily_temp-basic-DP4.00001.001")
+
+weekly_temp <- 
+  temp %>% 
+  mutate(time = as.Date(date_trunc("week", date))) %>% 
+  group_by(time, siteID) %>% 
+  summarise(mean_temp = mean(wssTempTripleMean, na.rm=TRUE),
+            min_temp = mean(wssTempTripleMinimum, na.rm=TRUE),
+            max_temp = mean(wssTempTripleMaximum, na.rm=TRUE),
+            .groups = "drop") %>% 
+  collect() %>% # Now import summarized results into R, turn into tsibble:
+  as_tsibble(index=time, key=siteID)
+
+```
+
+All though the DP4 weather data covers only the permanent sites, we can just easily compute weekly means over the low-level triple-aspirated mean temperature data collected at all sites ourselves.  (Note this could be easily modified to group by day first to compute daily minimum and daily maximums):
+
+```{r}
+weekly_taat <- 
+   tbl(db, "TAAT_30min-basic-DP1.00003.001") %>% 
+  mutate(time = as.Date(date_trunc("week", startDateTime))) %>% 
+  group_by(time, siteID) %>% 
+  summarise(mean_temp = mean(tempTripleMean, na.rm=TRUE),
+            .groups = "drop") %>% 
+  collect() %>% # Now import summarized results into R, turn into tsibble:
+  as_tsibble(index=time, key=siteID)
+
+```
+
+
+## Regression models
+
+Is there any correlation between abundance and temperature? 
+
+
+```{r}
+past_w_covars <- left_join(past, weekly_temp)
+```
+
+We can try a simple time series linear model regression on min, max, and mean daily temperatures:
+(For simplicity we just use fixed sites, though as noted above it would be straightforward to compute daily min and max temp for all sites).
+
+```{r}
+report <- past_w_covars %>% 
+  filter(siteID %in% fixed_sites) %>% 
+  model(mean = TSLM(abundance ~ mean_temp),
+        max = TSLM(abundance ~ max_temp),
+        min = TSLM(abundance ~ min_temp)
+        ) %>%
+  report()
+
+report
+```
+
+
+```{r}
+report %>% 
+  filter(p_value < 0.05) %>% 
+  count(.model)
+```
+
+
+We can try a forecast based on this regression pattern of daily minimum.  This will of course need future values of mean_temp predictor variable.  Typically, that 'new data' would most likely be based on the NOAA forecast for temperatures at each site, as mentioned above.  As we have withheld the last year of data for this example, we can simply use the data NEON measured at the site for testing purposes here:
+
+```{r}
+
+new_data <- weekly_temp %>% filter(time > forecast_date, siteID %in% fixed_sites)
+
+tslm_abundance <-  past_w_covars %>%
+  filter(siteID %in% fixed_sites)  %>% 
+  model(mean = TSLM(abundance ~ mean_temp)) %>%
+  forecast(h = "1 year", new_data = new_data)
+```
+
+The resulting skill seems comparable to the mean; perhaps not surprising since few of the site-wise correlation were significant.
+
+```{r}
+
+tslm_abundance %>% accuracy(future, list(crps = CRPS)) 
+
+```

@@ -49,6 +49,7 @@ download_noaa_ <- function(siteID,
 #' Stack downloaded NOAA files
 #' 
 #' @inheritParams download_noaa
+#' @param forecast_date Include only forecasts issued on this date
 #' @examples 
 #' stack_noaa()
 #' @export
