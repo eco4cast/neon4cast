@@ -101,12 +101,13 @@ write_metadata_eml <- function(forecast_file,
   
   geographicCoverage <- neon_geographic_coverage(sites)
   
-  start_time <- min(forecast$time)
-  stop_time <- max(forecast$time)
+  start_date<- lubridate::as_date(min(forecast$time))
+  stop_date <- lubridate::as_date(max(forecast$time))
   
   temporalCoverage <- list(rangeOfDates =
-                             list(beginDate = list(calendarDate = start_time),
-                                  endDate = list(calendarDate = stop_time)))
+                             list(beginDate = list(calendarDate = start_date),
+                                  endDate = list(calendarDate = stop_date)))
+  
   # Create the coverage EML
   coverage <- list(geographicCoverage = geographicCoverage,
                    temporalCoverage = temporalCoverage)
