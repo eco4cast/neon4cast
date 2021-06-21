@@ -78,7 +78,7 @@ read_forecast <- function(file_in,
     team = tools::file_path_sans_ext(tools::file_path_sans_ext(dplyr::last(teams_tmp[, ncol(teams_tmp)])))
     
     out <- out %>% 
-      dplyr::mutate(forest_start_time = first_date,
+      dplyr::mutate(forecast_start_time = first_date,
                     horizon = horizon,
                     team = team,
                     theme = teams_tmp[,1])
