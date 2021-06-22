@@ -89,7 +89,7 @@ that the “score” simply the `crps_sample` (for ensemble forecasts) or
 (i.e. day/site/variable tuple).
 
 Note that scores are only possible once the data becomes available in
-the corresponding targets file\!
+the corresponding targets file!
 
 ``` r
 scores <- score(forecast, theme = "aquatics")
@@ -101,10 +101,10 @@ scores %>%
 #> # A tibble: 4 x 3
 #>   siteID target      mean_score
 #>   <chr>  <chr>            <dbl>
-#> 1 BARC   oxygen           0.677
+#> 1 BARC   oxygen           0.479
 #> 2 BARC   temperature    NaN    
-#> 3 POSE   oxygen           0.676
-#> 4 POSE   temperature      1.42
+#> 3 POSE   oxygen           0.777
+#> 4 POSE   temperature      2.58
 ```
 
 ### Validate a forecast file
@@ -117,7 +117,7 @@ invalid formats. Note that the validator accepts files in `.csv`
 
 ``` r
 forecast_output_validator(forecast_file)
-#> aquatics-2021-03-17-example_null.csv.gz
+#> aquatics-2021-06-22-example_null.csv.gz
 #> ✓ file name is correct
 #> 
 #> ── Column specification ────────────────────────────────────────────────────────
@@ -134,13 +134,29 @@ forecast_output_validator(forecast_file)
 #> ✓ file has summary statistic: sd
 #> ✓ file has siteID column
 #> ✓ file has time column
+#> 
+#> ── Column specification ────────────────────────────────────────────────────────
+#> cols(
+#>   time = col_date(format = ""),
+#>   siteID = col_character(),
+#>   statistic = col_character(),
+#>   oxygen = col_double(),
+#>   temperature = col_double()
+#> )
 #> ✓ file has correct time column
 #> [1] TRUE
 ```
 
 ### Generate forecast metadata in EML
 
-Coming soon\!
+``` r
+create_model_metadata(forecast_file)
+#> You only need to run this function once to generate the model metadata template.
+#> If you model does not change between submittions you will not need change the yml.
+#> In this case, use a previously generated yaml in the write_metadata_eml() call
+#> If your model does change, save your old yaml under a new name and modify
+#> • Edit './aquatics-example_null.yml'
+```
 
 ### Access EFI snapshots of NOAA forecasts at NEON sites
 
@@ -156,23 +172,23 @@ download_noaa(aq_sites)
 noaa_fc <- stack_noaa()
 noaa_fc
 #> # A tibble: 8,590 x 18
-#>    model interval siteID startDate endDate ensemble air_temperature air_pressure
-#>    <chr> <chr>    <chr>  <chr>     <chr>   <chr>              <dbl>        <dbl>
-#>  1 NOAA… 6hr      BARC   2021-03-… 2021-0… ens00.nc            295.      101473.
-#>  2 NOAA… 6hr      BARC   2021-03-… 2021-0… ens00.nc            291.      101595.
-#>  3 NOAA… 6hr      BARC   2021-03-… 2021-0… ens00.nc            289.      101595.
-#>  4 NOAA… 6hr      BARC   2021-03-… 2021-0… ens00.nc            302.      101602.
-#>  5 NOAA… 6hr      BARC   2021-03-… 2021-0… ens00.nc            296.      101479.
-#>  6 NOAA… 6hr      BARC   2021-03-… 2021-0… ens00.nc            292.      101553.
-#>  7 NOAA… 6hr      BARC   2021-03-… 2021-0… ens00.nc            290.      101461.
-#>  8 NOAA… 6hr      BARC   2021-03-… 2021-0… ens00.nc            302.      101408.
-#>  9 NOAA… 6hr      BARC   2021-03-… 2021-0… ens00.nc            296.      101281.
-#> 10 NOAA… 6hr      BARC   2021-03-… 2021-0… ens00.nc            291.      101360.
-#> # … with 8,580 more rows, and 10 more variables: relative_humidity <dbl>,
-#> #   surface_downwelling_longwave_flux_in_air <dbl>,
+#>    model    interval siteID runStartDate  runEndDate    ensemble air_temperature
+#>    <chr>    <chr>    <chr>  <chr>         <chr>         <chr>              <dbl>
+#>  1 NOAAGEFS 6hr      BARC   2021-06-20T00 2021-07-06T00 ens00               301.
+#>  2 NOAAGEFS 6hr      BARC   2021-06-20T00 2021-07-06T00 ens00               298.
+#>  3 NOAAGEFS 6hr      BARC   2021-06-20T00 2021-07-06T00 ens00               298.
+#>  4 NOAAGEFS 6hr      BARC   2021-06-20T00 2021-07-06T00 ens00               299.
+#>  5 NOAAGEFS 6hr      BARC   2021-06-20T00 2021-07-06T00 ens00               300.
+#>  6 NOAAGEFS 6hr      BARC   2021-06-20T00 2021-07-06T00 ens00               298.
+#>  7 NOAAGEFS 6hr      BARC   2021-06-20T00 2021-07-06T00 ens00               297.
+#>  8 NOAAGEFS 6hr      BARC   2021-06-20T00 2021-07-06T00 ens00               302.
+#>  9 NOAAGEFS 6hr      BARC   2021-06-20T00 2021-07-06T00 ens00               299.
+#> 10 NOAAGEFS 6hr      BARC   2021-06-20T00 2021-07-06T00 ens00               297.
+#> # … with 8,580 more rows, and 11 more variables: air_pressure <dbl>,
+#> #   relative_humidity <dbl>, surface_downwelling_longwave_flux_in_air <dbl>,
 #> #   surface_downwelling_shortwave_flux_in_air <dbl>, precipitation_flux <dbl>,
 #> #   specific_humidity <dbl>, cloud_area_fraction <dbl>, wind_speed <dbl>,
-#> #   time <dbl>, latitude <dbl>, longitude <dbl>
+#> #   time <dttm>, latitude <dbl>, longitude <dbl>
 ```
 
 ### Submit a forecast
@@ -181,7 +197,7 @@ When you are ready to submit your forecast to EFI:
 
 ``` r
 submit(forecast_file)
-#> aquatics-2021-03-17-example_null.csv.gz
+#> aquatics-2021-06-22-example_null.csv.gz
 #> ✓ file name is correct
 #> 
 #> ── Column specification ────────────────────────────────────────────────────────
@@ -198,6 +214,15 @@ submit(forecast_file)
 #> ✓ file has summary statistic: sd
 #> ✓ file has siteID column
 #> ✓ file has time column
+#> 
+#> ── Column specification ────────────────────────────────────────────────────────
+#> cols(
+#>   time = col_date(format = ""),
+#>   siteID = col_character(),
+#>   statistic = col_character(),
+#>   oxygen = col_double(),
+#>   temperature = col_double()
+#> )
 #> ✓ file has correct time column
 ```
 
@@ -209,4 +234,4 @@ metadata file.
 Encountered a bug? Facing another challenge in participating in the
 challenge? Developed a cool approach you would like to share with the
 community? Open an [issue](https://github.com/eco4cast/neon4cast/issues)
-or [pull request](https://github.com/eco4cast/neon4cast/pulls) here\!
+or [pull request](https://github.com/eco4cast/neon4cast/pulls) here!
