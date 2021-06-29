@@ -177,27 +177,59 @@ We treat the sites as merely random draws from this national pool,
 weighted by the fraction that each site has contributed to the grand total observed richness.
 
 ```{r}
-richness_weights <- 
+site_weights <- 
   past %>% as_tibble() %>% 
   group_by(siteID) %>% 
-  summarise(richness_share = sum(richness, na.rm=TRUE)) %>% 
-  mutate(richness_share = richness_share / sum(richness_share))
-richness_weights
+  summarise(richness_share = sum(richness, na.rm=TRUE),
+            abundance_share = sum(abundance, na.rm=TRUE)) %>% 
+  mutate(richness_share = richness_share / sum(richness_share),
+         abundance_share = abundance_share / sum(abundance_share))
+site_weights
 
 ```
 
 ```{r}
 # Note distribution is normal in log-transformed variable
-ave_richness %>% 
+national_model <- ave_richness %>% 
     dplyr::mutate(sd = sqrt( distributional::variance( richness ) ) ) %>%
     dplyr::rename(mean = .mean) %>%
     dplyr::select(time, .model, mean, sd) %>%
     tidyr::pivot_longer(c(mean, sd), names_to = "statistic", values_to = "richness") %>%
     dplyr::as_tibble()
+
+national_model <-  ave_abund %>% 
+    dplyr::mutate(sd = sqrt( distributional::variance( abundance ) ) ) %>%
+    dplyr::rename(mean = .mean) %>%
+    dplyr::select(time, .model, mean, sd) %>%
+    tidyr::pivot_longer(c(mean, sd), names_to = "statistic", values_to = "abundance") %>%
+    dplyr::as_tibble() %>% inner_join(national_model)
 ```
 
 
-Combining the forecast for the nation-wide pooled mean richness with the site-by-site richness share, we could then generate site-level forecasts for each month (not shown).  
+
+Combining the forecast for the nation-wide pooled mean richness with the site-by-site richness share, we could then generate site-level forecasts for each month.
+
+
+```{r}
+site_model <- national_model %>% group_by(time, statistic) %>% 
+  dplyr::group_map(~ mutate(site_weights, 
+                            richness = richness_share * .x$richness, 
+                            abundance = abundance_share * .x$abundance,
+                            statistic = .y$statistic, 
+                            time = .y$time)) %>%
+  bind_rows() %>%
+  select(time, siteID, statistic, abundance, richness)
+```
+
+
+Score the forecast
+
+```{r}
+national_arima_scores <- neon4cast::score(site_model, "beetles")
+national_arima_scores %>% group_by(target) %>% summarise(mean = mean(score, na.rm=TRUE))
+```
+
+
 This is still a trivial model which treats differences between sites as fixed over time, but illustrates the basic idea of deriving the observational data from the forecast of a latent variable (in this case, the national means).
 A more realistic model might similarly seek to estimate latent variables for 'true abundance' and 'true richness' from an explicit observation model, forecast the latent values, and back out the expected distribution of observational values.  
 
@@ -318,7 +350,7 @@ report %>%
 ```
 
 
-We can try a forecast based on this regression pattern of daily minimum.  This will of course need future values of mean_temp predictor variable.  Typically, that 'new data' would most likely be based on the NOAA forecast for temperatures at each site, as mentioned above.  As we have withheld the last year of data for this example, we can simply use the data NEON measured at the site for testing purposes here:
+We can try a forecast based on this regression pattern of daily mean.  This will of course need future values of mean_temp predictor variable.  Typically, that 'new data' would most likely be based on the NOAA forecast for temperatures at each site, as mentioned above.  As we have withheld the last year of data for this example, we can simply use the data NEON measured at the site for testing purposes here:
 
 ```{r}
 
