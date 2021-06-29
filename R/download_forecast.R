@@ -23,7 +23,8 @@ download_forecast_ <- function(theme,
                           dir = tempdir()){
   
   dir.create(dir, FALSE, TRUE)
-  prefix <- paste(theme, paste0(theme,"-", date), sep="/")
+  parent_theme <- unlist(stringr::str_split(theme, "_"))[1]
+  prefix <- paste(parent_theme, paste0(theme,"-", date), sep="/")
   object <- aws.s3::get_bucket("forecasts",
                                prefix = prefix,
                                region = "data",
