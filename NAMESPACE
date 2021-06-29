@@ -3,6 +3,7 @@
 export(create_model_metadata)
 export(download_forecast)
 export(download_noaa)
+export(download_scores)
 export(efi_format)
 export(forecast_output_validator)
 export(score)
