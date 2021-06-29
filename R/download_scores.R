@@ -2,7 +2,7 @@
 #project = "phenology"
 #dir = "~/efi_neon_challenge/forecasts/"
 
-#' Download forecasts for NEON sites from the EFI server
+#' Download score for NEON sites from the EFI server
 #'  
 #' @param theme string of the theme
 #' @param date start date for the forecast

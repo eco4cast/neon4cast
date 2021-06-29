@@ -2,7 +2,7 @@
 % Please edit documentation in R/download_scores.R
 \name{download_scores}
 \alias{download_scores}
-\title{Download forecasts for NEON sites from the EFI server}
+\title{Download score for NEON sites from the EFI server}
 \usage{
 download_scores(theme, date = Sys.Date() - 2, dir = tempdir())
 }
@@ -16,7 +16,7 @@ data around on your computer, in which case, \code{neonstore::neon_dir()} might
 be a convenient choice.}
 }
 \description{
-Download forecasts for NEON sites from the EFI server
+Download score for NEON sites from the EFI server
 }
 \examples{
 download_scores("phenology")
