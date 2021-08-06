@@ -48,6 +48,7 @@ crps_score <- function(forecast,
                                             "le", 
                                             "vswc",
                                             "gcc_90",
+                                            "rcc_90",
                                              "ixodes_scapularis",
                                              "amblyomma_americanum"),
                        reps_col = c("ensemble")){
