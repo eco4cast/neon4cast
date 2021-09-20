@@ -55,7 +55,7 @@ crps_logs_score <- function(forecast,
   
 
   ## drop extraneous columns && make grouping vars into chr ids (i.e. not dates)
-  
+
   if("ensemble" %in% colnames(forecast)){ 
     reps_col <- "ensemble"
     variables <- c(grouping_variables, target_variables, reps_col)
@@ -143,8 +143,14 @@ score_it <- function(targets_file,
                      score_files = score_filenames(forecast_files)
 ){
   
+  bad_read_ins <- c("forecasts/phenology/phenology-2021-02-22-Team_MODIS.csv",
+                    "forecasts/phenology/phenology-2021-04-16-VT_Ph_GDD.csv",
+                    "forecasts/phenology/phenology-2021-04-25-VT_Ph_GDD.csv")
+  
   ## Read in data and compute scores!
   target <- read_forecast(targets_file)
+  forecast_files <- forecast_files[which(!(forecast_files %in% bad_read_ins))]
+  score_files <- score_filenames(forecast_files)
   forecasts <- lapply(forecast_files, read_forecast)
   
   scores <- lapply(forecasts, 
@@ -153,6 +159,8 @@ score_it <- function(targets_file,
                    target_variables = target_variables, 
                    grouping_variables = c(grouping_variables),
                    reps_col = reps_col)
+  
+
   
   ## write out score files
   purrr::walk2(scores, score_files, readr::write_csv)
