@@ -143,10 +143,6 @@ score_it <- function(targets_file,
                      score_files = score_filenames(forecast_files)
 ){
   
-  bad_read_ins <- c("forecasts/phenology/phenology-2021-02-22-Team_MODIS.csv",
-                    "forecasts/phenology/phenology-2021-04-16-VT_Ph_GDD.csv",
-                    "forecasts/phenology/phenology-2021-04-25-VT_Ph_GDD.csv")
-  
   ## Read in data and compute scores!
   target <- read_forecast(targets_file)
   forecast_files <- forecast_files[which(!(forecast_files %in% bad_read_ins))]
