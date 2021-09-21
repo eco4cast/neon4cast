@@ -18,7 +18,7 @@ read_forecast <- function(file_in,
   if(any(vapply(c("[.]csv", "[.]csv\\.gz"), grepl, logical(1), file_in))){  
     # if file is csv zip file
     out <- readr::read_csv(file_in, guess_max = 1e6, ...) 
-    if(target_variables == "ixodes_scapularis" | target_variables == "amblyomma_americanum"){
+    if("ixodes_scapularis" %in% target_variables | "amblyomma_americanum" %in% target_variables){
       out <- out %>% 
         mutate(siteID = plotID) %>% 
         select(-plotID)
