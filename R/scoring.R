@@ -145,7 +145,6 @@ score_it <- function(targets_file,
   
   ## Read in data and compute scores!
   target <- read_forecast(targets_file)
-  forecast_files <- forecast_files[which(!(forecast_files %in% bad_read_ins))]
   score_files <- score_filenames(forecast_files)
   forecasts <- lapply(forecast_files, read_forecast)
   
