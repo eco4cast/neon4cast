@@ -18,7 +18,7 @@ read_forecast <- function(file_in,
   if(any(vapply(c("[.]csv", "[.]csv\\.gz"), grepl, logical(1), file_in))){  
     # if file is csv zip file
     out <- readr::read_csv(file_in, guess_max = 1e6, ...) 
-    if("ixodes_scapularis" %in% target_variables | "amblyomma_americanum" %in% target_variables){
+    if("ixodes_scapularis" %in% names(out) | "amblyomma_americanum" %in% names(out)){
       out <- out %>% 
         mutate(siteID = plotID) %>% 
         select(-plotID)
@@ -28,10 +28,10 @@ read_forecast <- function(file_in,
   } else if(grepl("[.]nc", file_in)){ #if file is nc
     
     nc <- ncdf4::nc_open(file_in)
-    if("ixodes_scapularis" %in% target_variables | "amblyomma_americanum" %in% target_variables){
-      siteID <- ncdf4::ncvar_get(nc, "siteID")
+    if("ixodes_scapularis" %in% nc$var | "amblyomma_americanum" %in% nc$var){
+      siteID <- ncdf4::ncvar_get(nc, "plotID")
     }else{
-      siteID <- ncdf4::ncvar_get(nc, "plotID")  
+      siteID <- ncdf4::ncvar_get(nc, "siteID")  
     }
     time <- as.integer(ncdf4::ncvar_get(nc, "time"))
     #tustr<-strsplit(ncdf4::ncatt_get(nc, varid = "time", "units")$value, " ")
