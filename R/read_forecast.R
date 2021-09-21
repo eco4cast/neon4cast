@@ -28,7 +28,7 @@ read_forecast <- function(file_in,
   } else if(grepl("[.]nc", file_in)){ #if file is nc
     
     nc <- ncdf4::nc_open(file_in)
-    if(target_variables == "ixodes_scapularis" | target_variables == "amblyomma_americanum"){
+    if("ixodes_scapularis" %in% target_variables | "amblyomma_americanum" %in% target_variables){
       siteID <- ncdf4::ncvar_get(nc, "siteID")
     }else{
       siteID <- ncdf4::ncvar_get(nc, "plotID")  
