@@ -20,8 +20,8 @@ read_forecast <- function(file_in,
     out <- readr::read_csv(file_in, guess_max = 1e6, ...) 
     if("ixodes_scapularis" %in% names(out) | "amblyomma_americanum" %in% names(out)){
       out <- out %>% 
-        mutate(siteID = plotID) %>% 
-        select(-plotID)
+        dplyr::mutate(siteID = plotID) %>% 
+        dplyr::select(-plotID)
     }
     
     
@@ -83,8 +83,8 @@ read_forecast <- function(file_in,
     
     time_step <- unique_dates[2] - unique_dates[1]
     first_date <- unique_dates[1] - time_step
-    horizon = as.numeric(dates - first_date) / as.numeric(time_step)
-    team = tools::file_path_sans_ext(tools::file_path_sans_ext(dplyr::last(teams_tmp[, ncol(teams_tmp)])))
+    horizon <- as.numeric(dates - first_date) / as.numeric(time_step)
+    team <- tools::file_path_sans_ext(tools::file_path_sans_ext(dplyr::last(teams_tmp[, ncol(teams_tmp)])))
     
     out <- out %>% 
       dplyr::mutate(forecast_start_time = first_date,
