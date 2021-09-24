@@ -27,10 +27,30 @@ score <- function(forecast,
                      ticks = "ticks-targets.csv.gz"
                      )
   
+
+  
   theme <- strsplit(theme, "-")[[1]][[1]]
   download_url <- paste0("https://data.ecoforecast.org/targets/",
                          theme, "/", target_file)
   target <- readr::read_csv(download_url)
+  
+  if(theme == "ticks"){
+    target <- target %>% 
+      dplyr::mutate(year = lubridate::year(time),
+                    week = ifelse(lubridate::week(time) < 10, 
+                                  paste0("0",lubridate::week(time)), 
+                                  lubridate::week(time)),
+                    week = paste0(year,"-W",week, "-","1"),
+                    time =  ISOweek::ISOweek2date(week))
+    forecast <- forecast %>% 
+      dplyr::mutate(year = lubridate::year(time),
+                    week = ifelse(lubridate::week(time) < 10, 
+                                  paste0("0",lubridate::week(time)), 
+                                  lubridate::week(time)),
+                    week = paste0(year,"-W",week, "-","1"),
+                    time =  ISOweek::ISOweek2date(week))
+
+  }
   crps_logs_score(forecast, target)
   
 }
@@ -67,6 +87,32 @@ crps_logs_score <- function(forecast,
   forecast <- forecast %>% dplyr::select(tidyselect::any_of(
     c(variables, "forest_start_time", "horizon", "team", "theme")))
   target <- target %>% dplyr::select(tidyselect::any_of(variables))
+  
+  if(forecast$theme[1] == "ticks"){
+    
+    current_year <- lubridate::year(forecast$time)
+    current_week <- ifelse(lubridate::week(forecast$time) < 10, paste0("0",lubridate::week(forecast$time)), lubridate::week(forecast$time))
+    
+    current_week <- paste0(current_year,"-W",
+                           current_week, "-",
+                           "1")
+    ISOweek::ISOweek2date(current_week)
+    
+    target <- target %>% 
+      dplyr::mutate(year = lubridate::year(time),
+                    week = ifelse(lubridate::week(time) < 10, 
+                                  paste0("0",lubridate::week(time)), 
+                                  lubridate::week(time)),
+                    week = paste0(year,"-W",week, "-","1"),
+                    time =  ISOweek::ISOweek2date(week))
+    forecast <- forecast %>% 
+      dplyr::mutate(year = lubridate::year(time),
+                    week = ifelse(lubridate::week(time) < 10, 
+                                  paste0("0",lubridate::week(time)), 
+                                  lubridate::week(time)),
+                    week = paste0(year,"-W",week, "-","1"),
+                    time =  ISOweek::ISOweek2date(week))
+  }
   
   ## Teach crps to treat any NA observations as NA scores:
   scoring_crps_ensemble <- function(y, dat) {
@@ -144,9 +190,9 @@ score_it <- function(targets_file,
 ){
   
   ## Read in data and compute scores!
-  target <- read_forecast(targets_file)
-  score_files <- score_filenames(forecast_files)
-  forecasts <- lapply(forecast_files, read_forecast)
+  target <- neon4cast:::read_forecast(targets_file)
+  score_files <- neon4cast:::score_filenames(forecast_files)
+  forecasts <- lapply(forecast_files, neon4cast:::read_forecast)
   
   scores <- lapply(forecasts, 
                    crps_logs_score, 
