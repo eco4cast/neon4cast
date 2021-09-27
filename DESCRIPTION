@@ -47,5 +47,5 @@ Suggests:
     jsonlite,
     feasts,
     urca
-additionalRepositories: https://cboettig.github.io/drat
+additional_repositories: https://cboettig.github.io/drat
 Config/testthat/edition: 3

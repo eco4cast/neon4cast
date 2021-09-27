@@ -263,16 +263,15 @@ NEON's permanent sites make convenient summary weather data available.
 
 
 ```{r}
-
 # One-time commands for import and storage of weather data
-# neon_download("DP4.00001.001")
-# neon_store(product = "DP4.00001.001")
-
-## Weather files can get big! We'll use a remote database connection
-db <- neon_db()
-
 neon_download("DP4.00001.001")
 neon_store(product="DP4.00001.001")
+```
+
+
+```{r}
+## Weather files can get big! We'll use a remote database connection
+db <- neon_db()
 
 ## View available tables under this product ID
 tables <- DBI::dbListTables(db)
