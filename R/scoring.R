@@ -37,16 +37,16 @@ score <- function(forecast,
   if(theme == "ticks"){
     target <- target %>% 
       dplyr::mutate(year = lubridate::year(time),
-                    week = ifelse(lubridate::week(time) < 10, 
-                                  paste0("0",lubridate::week(time)), 
-                                  lubridate::week(time)),
+                    week = ifelse(ISOweek::ISOweek(time) < 10, 
+                                  paste0("0",ISOweek::ISOweek(time)), 
+                                  ISOweek::ISOweek(time)),
                     week = paste0(year,"-W",week, "-","1"),
                     time =  ISOweek::ISOweek2date(week))
     forecast <- forecast %>% 
       dplyr::mutate(year = lubridate::year(time),
-                    week = ifelse(lubridate::week(time) < 10, 
-                                  paste0("0",lubridate::week(time)), 
-                                  lubridate::week(time)),
+                    week = ifelse(ISOweek::ISOweek(time) < 10, 
+                                  paste0("0",ISOweek::ISOweek(time)), 
+                                  ISOweek::ISOweek(time)),
                     week = paste0(year,"-W",week, "-","1"),
                     time =  ISOweek::ISOweek2date(week))
 
@@ -91,7 +91,7 @@ crps_logs_score <- function(forecast,
   if(forecast$theme[1] == "ticks"){
     
     current_year <- lubridate::year(forecast$time)
-    current_week <- ifelse(lubridate::week(forecast$time) < 10, paste0("0",lubridate::week(forecast$time)), lubridate::week(forecast$time))
+    current_week <- ifelse(ISOweek::ISOweek(forecast$time) < 10, paste0("0",ISOweek::ISOweek(forecast$time)), ISOweek::ISOweek(forecast$time))
     
     current_week <- paste0(current_year,"-W",
                            current_week, "-",
@@ -100,16 +100,16 @@ crps_logs_score <- function(forecast,
     
     target <- target %>% 
       dplyr::mutate(year = lubridate::year(time),
-                    week = ifelse(lubridate::week(time) < 10, 
-                                  paste0("0",lubridate::week(time)), 
-                                  lubridate::week(time)),
+                    week = ifelse(ISOweek::ISOweek(time) < 10, 
+                                  paste0("0",ISOweek::ISOweek(time)), 
+                                  ISOweek::ISOweek(time)),
                     week = paste0(year,"-W",week, "-","1"),
                     time =  ISOweek::ISOweek2date(week))
     forecast <- forecast %>% 
       dplyr::mutate(year = lubridate::year(time),
-                    week = ifelse(lubridate::week(time) < 10, 
-                                  paste0("0",lubridate::week(time)), 
-                                  lubridate::week(time)),
+                    week = ifelse(ISOweek::ISOweek(time) < 10, 
+                                  paste0("0",ISOweek::ISOweek(time)), 
+                                  ISOweek::ISOweek(time)),
                     week = paste0(year,"-W",week, "-","1"),
                     time =  ISOweek::ISOweek2date(week))
   }
