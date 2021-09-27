@@ -11,16 +11,16 @@ expect_true(status)
 ## ------------------------------------------------------------------------------------------------------------
 forecast <- readr::read_csv(forecast_file)
 df <- score(forecast, theme = "aquatics")
-expect_is(df, "data.frame")
+expect_true(is(df, "tbl"))
 
 ## ------------------------------------------------------------------------------------------------------------
 download_noaa("ABBY")
 abby <- stack_noaa()
-expect_is(abby, "data.frame")
+expect_s3_class(abby, "data.frame")
 
 
 ## ------------------------------------------------------------------------------------------------------------
-status <- submit(forecast_file)
-expect_null(status)
+#status <- submit(forecast_file)
+#expect_null(status)
 
 })

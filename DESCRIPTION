@@ -19,7 +19,6 @@ Imports:
     aws.s3,
     neonstore,
     EML,
-    EFIstandards,
     tidync,
     usethis,
     ncdf4,
@@ -30,9 +29,10 @@ Imports:
     rlang,
     yaml,
     ISOweek
-RoxygenNote: 7.1.1
+RoxygenNote: 7.1.2
 Language: en-US
 Suggests: 
+    EFIstandards,
     testthat (>= 3.0.0),
     glue,
     fable,
@@ -47,4 +47,5 @@ Suggests:
     jsonlite,
     feasts,
     urca
+additionalRepositories: https://cboettig.github.io/drat
 Config/testthat/edition: 3
