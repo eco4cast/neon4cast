@@ -28,7 +28,8 @@ Imports:
     stats,
     distributional,
     rlang,
-    yaml
+    yaml,
+    ISOweek
 RoxygenNote: 7.1.1
 Language: en-US
 Remotes: eco4cast/EFIstandards
@@ -44,5 +45,7 @@ Suggests:
     lubridate,
     tidyr,
     tidyselect,
-    jsonlite
+    jsonlite,
+    feasts,
+    urca
 Config/testthat/edition: 3

@@ -78,8 +78,10 @@ crps_logs_score <- function(forecast,
     c(variables, "forest_start_time", "horizon", "team", "theme")))
   target <- target %>% dplyr::select(tidyselect::any_of(variables))
   
-  if(forecast$theme[1] == "ticks"){
-    
+  
+  ## there's not necessarily a column for theme
+  is_ticks <- grepl("ixodes", colnames(target)) || grepl("amblyomma", colnames(target))
+  if(is_ticks){
     target <- target %>% 
       dplyr::mutate(time =  ISOweek::ISOweek2date(paste0(ISOweek::ISOweek(time), "-","1")))
     forecast <- forecast %>% 
@@ -142,9 +144,14 @@ crps_logs_score <- function(forecast,
 }
 
 
+
+
+
+
+
+
+
 utils::globalVariables(c("observed", "predicted", "value", "variable", "statistic", "sd"), "neon4cast")
-
-
 
 score_filenames <- function(forecast_files){
   f_name <- tools::file_path_sans_ext(paste0("scores-",
