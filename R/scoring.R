@@ -36,19 +36,9 @@ score <- function(forecast,
   
   if(theme == "ticks"){
     target <- target %>% 
-      dplyr::mutate(year = lubridate::year(time),
-                    week = ifelse(ISOweek::ISOweek(time) < 10, 
-                                  paste0("0",ISOweek::ISOweek(time)), 
-                                  ISOweek::ISOweek(time)),
-                    week = paste0(year,"-W",week, "-","1"),
-                    time =  ISOweek::ISOweek2date(week))
+      dplyr::mutate(time =  ISOweek::ISOweek2date(paste0(ISOweek::ISOweek(time), "-","1")))
     forecast <- forecast %>% 
-      dplyr::mutate(year = lubridate::year(time),
-                    week = ifelse(ISOweek::ISOweek(time) < 10, 
-                                  paste0("0",ISOweek::ISOweek(time)), 
-                                  ISOweek::ISOweek(time)),
-                    week = paste0(year,"-W",week, "-","1"),
-                    time =  ISOweek::ISOweek2date(week))
+      dplyr::mutate(time =  ISOweek::ISOweek2date(paste0(ISOweek::ISOweek(time), "-","1")))
 
   }
   crps_logs_score(forecast, target)
@@ -90,28 +80,10 @@ crps_logs_score <- function(forecast,
   
   if(forecast$theme[1] == "ticks"){
     
-    current_year <- lubridate::year(forecast$time)
-    current_week <- ifelse(ISOweek::ISOweek(forecast$time) < 10, paste0("0",ISOweek::ISOweek(forecast$time)), ISOweek::ISOweek(forecast$time))
-    
-    current_week <- paste0(current_year,"-W",
-                           current_week, "-",
-                           "1")
-    ISOweek::ISOweek2date(current_week)
-    
     target <- target %>% 
-      dplyr::mutate(year = lubridate::year(time),
-                    week = ifelse(ISOweek::ISOweek(time) < 10, 
-                                  paste0("0",ISOweek::ISOweek(time)), 
-                                  ISOweek::ISOweek(time)),
-                    week = paste0(year,"-W",week, "-","1"),
-                    time =  ISOweek::ISOweek2date(week))
+      dplyr::mutate(time =  ISOweek::ISOweek2date(paste0(ISOweek::ISOweek(time), "-","1")))
     forecast <- forecast %>% 
-      dplyr::mutate(year = lubridate::year(time),
-                    week = ifelse(ISOweek::ISOweek(time) < 10, 
-                                  paste0("0",ISOweek::ISOweek(time)), 
-                                  ISOweek::ISOweek(time)),
-                    week = paste0(year,"-W",week, "-","1"),
-                    time =  ISOweek::ISOweek2date(week))
+      dplyr::mutate(time =  ISOweek::ISOweek2date(paste0(ISOweek::ISOweek(time), "-","1")))
   }
   
   ## Teach crps to treat any NA observations as NA scores:
