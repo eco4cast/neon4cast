@@ -77,7 +77,7 @@ multi_team_plot <- function(combined_forecasts, target, theme, date, horizon, si
 }
 
 
-combined <- read_csv("https://data.ecoforecast.org/forecasts/combined_forecasts_scores.csv")
+combined <- read_csv("https://data.ecoforecast.org/analysis/combined_forecasts_scores.csv.gz")
 
 avial_dates <- combined %>%
   dplyr::filter(theme == "phenology") %>%
