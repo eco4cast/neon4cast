@@ -84,5 +84,8 @@ avial_dates <- combined %>%
   select(forecast_start_time) %>%
   distinct()
 
-multi_team_plot(combined_forecasts = combined, observations = observations,
-                target = "gcc_90", theme = "phenology", date = c("2021-05-01"), horizon = 35)
+multi_team_plot(combined_forecasts = combined, 
+                target = "gcc_90", 
+                theme = "phenology", 
+                date = c("2021-05-01"), 
+                horizon = 35)
