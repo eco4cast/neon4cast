@@ -11,7 +11,7 @@
 #' be a convenient choice.
 #' @export
 #' @examples 
-#' download_efi("phenology")
+#' download_forecast("phenology")
 download_forecast <- function(theme,
                          date = Sys.Date()-2, 
                          dir = tempdir()){

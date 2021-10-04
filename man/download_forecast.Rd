@@ -19,5 +19,5 @@ be a convenient choice.}
 Download forecasts for NEON sites from the EFI server
 }
 \examples{
-download_efi("phenology")
+download_forecast("phenology")
 }

@@ -89,12 +89,15 @@ Scores for valid forecasts should appear at <https://shiny.ecoforecast.org> the 
 Note that scores are only possible once the data becomes available in the corresponding targets file! 
 
 ```{r message=FALSE}
-scores <- score(forecast, theme = "aquatics")
+
+forecast$theme <- "aquatics"
+scores <- score(forecast)
 
 # The resulting data.frame scores each day for each site, but is also easy to summarize:
 scores %>% 
   group_by(siteID, target) %>% 
-  summarise(mean_score = mean(score, na.rm=TRUE))
+  summarise(mean_crps = mean(crps, na.rm=TRUE),
+            mean_logs =  mean(logs, na.rm=TRUE))
 ```
 
 

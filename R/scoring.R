@@ -32,7 +32,7 @@ score <- function(forecast,
   theme <- strsplit(theme, "-")[[1]][[1]]
   download_url <- paste0("https://data.ecoforecast.org/targets/",
                          theme, "/", target_file)
-  target <- readr::read_csv(download_url)
+  target <- readr::read_csv(download_url, show_col_types = FALSE)
   
   if(theme == "ticks"){
     target <- target %>% 
@@ -78,8 +78,10 @@ crps_logs_score <- function(forecast,
     c(variables, "forest_start_time", "horizon", "team", "theme")))
   target <- target %>% dplyr::select(tidyselect::any_of(variables))
   
-  if(forecast$theme[1] == "ticks"){
-    
+  
+  ## there's not necessarily a column for theme
+  is_ticks <- any(grepl("ixodes", colnames(target))) || any(grepl("amblyomma", colnames(target)))
+  if(is_ticks){
     target <- target %>% 
       dplyr::mutate(time =  ISOweek::ISOweek2date(paste0(ISOweek::ISOweek(time), "-","1")))
     forecast <- forecast %>% 
@@ -142,9 +144,14 @@ crps_logs_score <- function(forecast,
 }
 
 
+
+
+
+
+
+
+
 utils::globalVariables(c("observed", "predicted", "value", "variable", "statistic", "sd"), "neon4cast")
-
-
 
 score_filenames <- function(forecast_files){
   f_name <- tools::file_path_sans_ext(paste0("scores-",
@@ -162,9 +169,9 @@ score_it <- function(targets_file,
 ){
   
   ## Read in data and compute scores!
-  target <- neon4cast:::read_forecast(targets_file)
-  score_files <- neon4cast:::score_filenames(forecast_files)
-  forecasts <- lapply(forecast_files, neon4cast:::read_forecast)
+  target <- read_forecast(targets_file)
+  score_files <- score_filenames(forecast_files)
+  forecasts <- lapply(forecast_files, read_forecast)
   
   scores <- lapply(forecasts, 
                    crps_logs_score, 

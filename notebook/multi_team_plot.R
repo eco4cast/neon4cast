@@ -77,12 +77,15 @@ multi_team_plot <- function(combined_forecasts, target, theme, date, horizon, si
 }
 
 
-combined <- read_csv("https://data.ecoforecast.org/forecasts/combined_forecasts_scores.csv")
+combined <- read_csv("https://data.ecoforecast.org/analysis/combined_forecasts_scores.csv.gz")
 
 avial_dates <- combined %>%
   dplyr::filter(theme == "phenology") %>%
   select(forecast_start_time) %>%
   distinct()
 
-multi_team_plot(combined_forecasts = combined, observations = observations,
-                target = "gcc_90", theme = "phenology", date = c("2021-05-01"), horizon = 35)
+multi_team_plot(combined_forecasts = combined, 
+                target = "gcc_90", 
+                theme = "phenology", 
+                date = c("2021-05-01"), 
+                horizon = 35)

@@ -92,19 +92,21 @@ Note that scores are only possible once the data becomes available in
 the corresponding targets file!
 
 ``` r
-scores <- score(forecast, theme = "aquatics")
+forecast$theme <- "aquatics"
+scores <- score(forecast)
 
 # The resulting data.frame scores each day for each site, but is also easy to summarize:
 scores %>% 
   group_by(siteID, target) %>% 
-  summarise(mean_score = mean(score, na.rm=TRUE))
-#> # A tibble: 4 x 3
-#>   siteID target      mean_score
-#>   <chr>  <chr>            <dbl>
-#> 1 BARC   oxygen           0.479
-#> 2 BARC   temperature    NaN    
-#> 3 POSE   oxygen           0.777
-#> 4 POSE   temperature      2.58
+  summarise(mean_crps = mean(crps, na.rm=TRUE),
+            mean_logs =  mean(logs, na.rm=TRUE))
+#> # A tibble: 4 × 4
+#>   siteID target      mean_crps mean_logs
+#>   <chr>  <chr>           <dbl>     <dbl>
+#> 1 BARC   oxygen          0.464      1.46
+#> 2 BARC   temperature   NaN        NaN   
+#> 3 POSE   oxygen          0.607      1.77
+#> 4 POSE   temperature     1.48       2.62
 ```
 
 ### Validate a forecast file
@@ -117,32 +119,32 @@ invalid formats. Note that the validator accepts files in `.csv`
 
 ``` r
 forecast_output_validator(forecast_file)
-#> aquatics-2021-06-22-example_null.csv.gz
+#> aquatics-2021-09-27-example_null.csv.gz
 #> ✓ file name is correct
-#> 
+#> Rows: 140 Columns: 5
 #> ── Column specification ────────────────────────────────────────────────────────
-#> cols(
-#>   time = col_date(format = ""),
-#>   siteID = col_character(),
-#>   statistic = col_character(),
-#>   oxygen = col_double(),
-#>   temperature = col_double()
-#> )
+#> Delimiter: ","
+#> chr  (2): siteID, statistic
+#> dbl  (2): oxygen, temperature
+#> date (1): time
+#> 
+#> ℹ Use `spec()` to retrieve the full column specification for this data.
+#> ℹ Specify the column types or set `show_col_types = FALSE` to quiet this message.
 #> ✓ target variables found
 #> ✓ file has summary statistics column
 #> ✓ file has summary statistic: mean
 #> ✓ file has summary statistic: sd
 #> ✓ file has siteID column
 #> ✓ file has time column
-#> 
+#> Rows: 140 Columns: 5
 #> ── Column specification ────────────────────────────────────────────────────────
-#> cols(
-#>   time = col_date(format = ""),
-#>   siteID = col_character(),
-#>   statistic = col_character(),
-#>   oxygen = col_double(),
-#>   temperature = col_double()
-#> )
+#> Delimiter: ","
+#> chr  (2): siteID, statistic
+#> dbl  (2): oxygen, temperature
+#> date (1): time
+#> 
+#> ℹ Use `spec()` to retrieve the full column specification for this data.
+#> ℹ Specify the column types or set `show_col_types = FALSE` to quiet this message.
 #> ✓ file has correct time column
 #> [1] TRUE
 ```
@@ -171,19 +173,19 @@ aq_sites <- unique(aquatic$siteID)
 download_noaa(aq_sites)
 noaa_fc <- stack_noaa()
 noaa_fc
-#> # A tibble: 8,590 x 18
+#> # A tibble: 8,590 × 18
 #>    model    interval siteID runStartDate  runEndDate    ensemble air_temperature
 #>    <chr>    <chr>    <chr>  <chr>         <chr>         <chr>              <dbl>
-#>  1 NOAAGEFS 6hr      BARC   2021-06-20T00 2021-07-06T00 ens00               301.
-#>  2 NOAAGEFS 6hr      BARC   2021-06-20T00 2021-07-06T00 ens00               298.
-#>  3 NOAAGEFS 6hr      BARC   2021-06-20T00 2021-07-06T00 ens00               298.
-#>  4 NOAAGEFS 6hr      BARC   2021-06-20T00 2021-07-06T00 ens00               299.
-#>  5 NOAAGEFS 6hr      BARC   2021-06-20T00 2021-07-06T00 ens00               300.
-#>  6 NOAAGEFS 6hr      BARC   2021-06-20T00 2021-07-06T00 ens00               298.
-#>  7 NOAAGEFS 6hr      BARC   2021-06-20T00 2021-07-06T00 ens00               297.
-#>  8 NOAAGEFS 6hr      BARC   2021-06-20T00 2021-07-06T00 ens00               302.
-#>  9 NOAAGEFS 6hr      BARC   2021-06-20T00 2021-07-06T00 ens00               299.
-#> 10 NOAAGEFS 6hr      BARC   2021-06-20T00 2021-07-06T00 ens00               297.
+#>  1 NOAAGEFS 6hr      BARC   2021-09-25T00 2021-10-11T00 ens00               298.
+#>  2 NOAAGEFS 6hr      BARC   2021-09-25T00 2021-10-11T00 ens00               294.
+#>  3 NOAAGEFS 6hr      BARC   2021-09-25T00 2021-10-11T00 ens00               294.
+#>  4 NOAAGEFS 6hr      BARC   2021-09-25T00 2021-10-11T00 ens00               304.
+#>  5 NOAAGEFS 6hr      BARC   2021-09-25T00 2021-10-11T00 ens00               298.
+#>  6 NOAAGEFS 6hr      BARC   2021-09-25T00 2021-10-11T00 ens00               294.
+#>  7 NOAAGEFS 6hr      BARC   2021-09-25T00 2021-10-11T00 ens00               293.
+#>  8 NOAAGEFS 6hr      BARC   2021-09-25T00 2021-10-11T00 ens00               304.
+#>  9 NOAAGEFS 6hr      BARC   2021-09-25T00 2021-10-11T00 ens00               298.
+#> 10 NOAAGEFS 6hr      BARC   2021-09-25T00 2021-10-11T00 ens00               294.
 #> # … with 8,580 more rows, and 11 more variables: air_pressure <dbl>,
 #> #   relative_humidity <dbl>, surface_downwelling_longwave_flux_in_air <dbl>,
 #> #   surface_downwelling_shortwave_flux_in_air <dbl>, precipitation_flux <dbl>,
@@ -197,32 +199,32 @@ When you are ready to submit your forecast to EFI:
 
 ``` r
 submit(forecast_file)
-#> aquatics-2021-06-22-example_null.csv.gz
+#> aquatics-2021-09-27-example_null.csv.gz
 #> ✓ file name is correct
-#> 
+#> Rows: 140 Columns: 5
 #> ── Column specification ────────────────────────────────────────────────────────
-#> cols(
-#>   time = col_date(format = ""),
-#>   siteID = col_character(),
-#>   statistic = col_character(),
-#>   oxygen = col_double(),
-#>   temperature = col_double()
-#> )
+#> Delimiter: ","
+#> chr  (2): siteID, statistic
+#> dbl  (2): oxygen, temperature
+#> date (1): time
+#> 
+#> ℹ Use `spec()` to retrieve the full column specification for this data.
+#> ℹ Specify the column types or set `show_col_types = FALSE` to quiet this message.
 #> ✓ target variables found
 #> ✓ file has summary statistics column
 #> ✓ file has summary statistic: mean
 #> ✓ file has summary statistic: sd
 #> ✓ file has siteID column
 #> ✓ file has time column
-#> 
+#> Rows: 140 Columns: 5
 #> ── Column specification ────────────────────────────────────────────────────────
-#> cols(
-#>   time = col_date(format = ""),
-#>   siteID = col_character(),
-#>   statistic = col_character(),
-#>   oxygen = col_double(),
-#>   temperature = col_double()
-#> )
+#> Delimiter: ","
+#> chr  (2): siteID, statistic
+#> dbl  (2): oxygen, temperature
+#> date (1): time
+#> 
+#> ℹ Use `spec()` to retrieve the full column specification for this data.
+#> ℹ Specify the column types or set `show_col_types = FALSE` to quiet this message.
 #> ✓ file has correct time column
 ```
 

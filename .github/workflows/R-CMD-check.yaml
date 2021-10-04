@@ -42,11 +42,11 @@ jobs:
       - uses: r-lib/actions/setup-pandoc@v1
 
       - name: Query dependencies
+        shell: Rscript {0}
         run: |
           install.packages('remotes')
           saveRDS(remotes::dev_package_deps(dependencies = TRUE), ".github/depends.Rds", version = 2)
           writeLines(sprintf("R-%i.%i", getRversion()$major, getRversion()$minor), ".github/R-version")
-        shell: Rscript {0}
 
       - name: Restore R package cache
         if: runner.os != 'Windows'
@@ -55,10 +55,19 @@ jobs:
           path: ${{ env.R_LIBS_USER }}
           key: ${{ runner.os }}-${{ hashFiles('.github/R-version') }}-1-${{ hashFiles('.github/depends.Rds') }}
           restore-keys: ${{ runner.os }}-${{ hashFiles('.github/R-version') }}-1-
+      - name: Install system dependencies
+        if: runner.os == 'MacOS'
+        run: |
+          brew install pkg-config
+          brew install udunits
+          brew install gdal
+          brew install sqlite3
+          brew install v8
 
       - name: Install system dependencies
         if: runner.os == 'Linux'
         run: |
+          sudo apt-get update && sudo apt-get -y install libv8-dev
           while read -r cmd
           do
             eval sudo $cmd
@@ -68,6 +77,8 @@ jobs:
         run: |
           remotes::install_deps(dependencies = TRUE)
           remotes::install_cran("rcmdcheck")
+          remotes::install_github("eco4cast/EFIstandards", type="source")
+
         shell: Rscript {0}
 
       - name: Check

@@ -94,3 +94,6 @@ read_forecast <- function(file_in,
   }
   out
 }
+
+
+utils::globalVariables("plotID")

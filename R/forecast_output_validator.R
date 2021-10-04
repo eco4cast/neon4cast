@@ -65,7 +65,7 @@ forecast_output_validator <- function(forecast_file,
   if(any(vapply(c("[.]csv", "[.]csv\\.gz"), grepl, logical(1), file_in))){ 
     
     # if file is csv zip file
-     out <- readr::read_csv(file_in, guess_max = 1e6)
+     out <- readr::read_csv(file_in, guess_max = 1e6, show_col_types = FALSE)
      
      #usethis::ui_todo("Checking that file contains correct variables...")
 
@@ -109,7 +109,7 @@ forecast_output_validator <- function(forecast_file,
      #usethis::ui_todo("Checking that file contains parsable time column...")
     if(lexists(out, "time")){
        usethis::ui_done("file has time column")
-       out2  <- readr::read_csv(file_in)
+       out2  <- readr::read_csv(file_in, show_col_types = FALSE)
        if(!stringr::str_detect(out2$time[1], "-")){
          usethis::ui_done("time column format is not in the correct YYYY-MM-DD format")
          valid <- FALSE

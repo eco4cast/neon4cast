@@ -90,9 +90,10 @@ Score the forecast using EFI's internal method. By default, EFI's method reports
 It is easy to later average across times for a by-site score.
 
 ```{r}
+null_forecast$theme <- "beetles"
 scores_null <- neon4cast::score(null_forecast, "beetles")
 # average richness scores by site
-scores_null %>% group_by(target) %>% summarise(mean = mean(score, na.rm=TRUE)) 
+scores_null %>% group_by(target) %>% summarise(mean = mean(crps, na.rm=TRUE))
 ```
 
 
@@ -123,7 +124,7 @@ Score the forecast
 
 ```{r}
 arima_scores <- neon4cast::score(arima_forecast, "beetles")
-arima_scores %>% group_by(target) %>% summarise(mean = mean(score, na.rm=TRUE))
+arima_scores %>% group_by(target) %>% summarise(mean = mean(crps, na.rm=TRUE))
 ```
 
 # Process vs Noise
@@ -226,7 +227,7 @@ Score the forecast
 
 ```{r}
 national_arima_scores <- neon4cast::score(site_model, "beetles")
-national_arima_scores %>% group_by(target) %>% summarise(mean = mean(score, na.rm=TRUE))
+national_arima_scores %>% group_by(target) %>% summarise(mean = mean(crps, na.rm=TRUE))
 ```
 
 
@@ -262,11 +263,13 @@ NEON's permanent sites make convenient summary weather data available.
 
 
 ```{r}
-
 # One-time commands for import and storage of weather data
-# neon_download("DP4.00001.001")
-# neon_store(product = "DP4.00001.001")
+neon_download("DP4.00001.001")
+neon_store(product="DP4.00001.001")
+```
 
+
+```{r}
 ## Weather files can get big! We'll use a remote database connection
 db <- neon_db()
 
@@ -362,7 +365,7 @@ tslm_abundance <-  past_w_covars %>%
   forecast(h = "1 year", new_data = new_data)
 ```
 
-The resulting skill seems comparable to the mean; perhaps not surprising since few of the site-wise correlation were significant.
+The resulting skill seems comparable to the mean; perhaps not surprising since few of the site-wise correlations were significant.
 
 ```{r}
 
