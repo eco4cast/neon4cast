@@ -122,6 +122,9 @@ null_fill <- function(self_filled, null_team = "EFInull"){
 #' across different horizons, scores on null_filled_crps alone
 #' (no self-fill step) may be preferred.  
 #' The number of missing values filled in for each forecast is also reported.
+#' @param df a data frame from fill_scores()
+#' @importFrom dplyr group_by summarise arrange case_when left_join rename ungroup select mutate distinct collect filter
+#' @importFrom tidyr fill
 #' @export
 mean_scores <- function(df){
 

@@ -28,7 +28,9 @@ Imports:
     distributional,
     rlang,
     yaml,
-    ISOweek
+    ISOweek,
+    dplyr,
+    tidyr
 RoxygenNote: 7.1.2
 Language: en-US
 Suggests: 
@@ -37,12 +39,10 @@ Suggests:
     glue,
     fable,
     tsibble,
-    dplyr,
     readr,
     purrr,
     stringr,
     lubridate,
-    tidyr,
     tidyselect,
     jsonlite,
     feasts,
