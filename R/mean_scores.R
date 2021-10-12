@@ -9,7 +9,8 @@ db_import <- function(data, dir = tempfile()){
                 forecast_start_time = as.character(forecast_start_time))
   con <- DBI::dbConnect(RSQLite::SQLite(), dir)
   
-  #con <- DBI::dbConnect(duckdb::duckdb(), tempfile())  
+  ## Cannot use duckdb until tidyr::fill issue resolved in dbplyr
+  #con <- DBI::dbConnect(duckdb::duckdb(), dir)  
   DBI::dbWriteTable(con, "combined", df, overwrite=TRUE)
   dplyr::tbl(con, "combined")
   
@@ -93,9 +94,10 @@ null_fill <- function(self_filled, null_team = "EFInull"){
   null_score <- self_filled %>% ungroup() %>%
     filter(team == null_team) %>% 
     rename(crps_null = crps, logs_null = logs) %>%  
-    select(-team)
+    select("theme", "target", "siteID", "forecast_start_time",
+           "time", "crps_null", "logs_null")
   
-  self_filled %>%
+  null_filled <- self_filled %>%
     left_join(null_score) %>% # add null-score as a separate column
     ## Add columns which fill any remaining NAs after self-fill was applied:
     mutate(filled_crps = case_when(is.na(crps_self) ~ crps_null,
@@ -107,9 +109,10 @@ null_fill <- function(self_filled, null_team = "EFInull"){
                                         !is.na(crps) ~ crps),
            null_filled_logs = case_when(is.na(logs) ~ logs_null,
                                         !is.na(logs) ~ logs)
-           )
-
+           )  %>% select(-crps_null, -logs_null)
   
+  ## Restore date-time formatting (needs duckdb)
+  null_filled
   }
 
 #' mean_scores
@@ -135,8 +138,9 @@ scores <- df %>%
             mean_null_filled_crps = mean(null_filled_crps, na.rm =TRUE),
             mean_null_filled_logs = mean(null_filled_logs, na.rm =TRUE),
             na_raw = sum(is.na(crps)),
-            na_self  = sum(is.na(crps_self))
-            ) %>%
+            na_self  = sum(is.na(crps_self)),
+            na_filled = sum(is.na(filled_crps)),
+            .groups = "drop") %>%
   collect() %>% arrange(mean_crps)
 
 scores
