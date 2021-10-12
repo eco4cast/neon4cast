@@ -22,13 +22,16 @@ Imports:
     tidync,
     usethis,
     ncdf4,
-    tidyverse,
     scoringRules,
     stats,
     distributional,
     rlang,
     yaml,
     ISOweek,
+    tidyverse,
+    dbplyr,
+    DBI,
+    RSQLite,
     dplyr,
     tidyr
 RoxygenNote: 7.1.2
@@ -38,14 +41,13 @@ Suggests:
     testthat (>= 3.0.0),
     glue,
     fable,
-    tsibble,
-    readr,
+    feasts,
+    urca,
+    jsonlite,
+    lubridate,
     purrr,
     stringr,
-    lubridate,
     tidyselect,
-    jsonlite,
-    feasts,
-    urca
+    readr
 Additional_repositories: https://cboettig.github.io/drat
 Config/testthat/edition: 3

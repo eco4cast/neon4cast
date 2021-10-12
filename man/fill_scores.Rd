@@ -9,8 +9,9 @@ fill_scores(df, null_team = "EFInull")
 \arguments{
 \item{df}{data.frame of raw scores.  Must have columns:
 \code{theme}, \code{siteID}, \code{target}, \code{time}, \code{team}, \code{forecast_start_time},
-\code{crps} & \code{logs}.
-@param null name of the null team}
+\code{crps} & \code{logs}.}
+
+\item{null_team}{name of the null team}
 }
 \description{
 To compare teams which issue forecasts of multiple observations, we need

@@ -1,19 +1,17 @@
-library(dbplyr)
-
 
 db_import <- function(data, dir = tempfile()){
   
   df <- data %>% 
-    select(theme, siteID, target, time, team, forecast_start_time, crps, logs)
+    dplyr::select(theme, siteID, target, time, team, forecast_start_time, crps, logs)
   
   ## Hmm, SQLite doesn't have date format, might be better as character than as double...
-  df <- df %>% mutate(time = as.character(time), 
+  df <- df %>% dplyr::mutate(time = as.character(time), 
                 forecast_start_time = as.character(forecast_start_time))
   con <- DBI::dbConnect(RSQLite::SQLite(), dir)
   
   #con <- DBI::dbConnect(duckdb::duckdb(), tempfile())  
-  dbWriteTable(con, "combined", df, overwrite=TRUE)
-  tbl(con, "combined")
+  DBI::dbWriteTable(con, "combined", df, overwrite=TRUE)
+  dplyr::tbl(con, "combined")
   
 }
 
@@ -37,10 +35,10 @@ db_import <- function(data, dir = tempfile()){
 #' we will re-use that prediction when comparing against the prediction on the shorter horizon as well.
 #' If no prior forecast is available, we will fill the missing prediction with that of the null
 #' forecast.
+#' @param null_team name of the null team
 #' @param df data.frame of raw scores.  Must have columns:
 #' `theme`, `siteID`, `target`, `time`, `team`, `forecast_start_time`,
 #'  `crps` & `logs`.
-#'  @param null name of the null team
 #' @export
 fill_scores <- function(df, null_team = "EFInull"){
   raw_scores <- db_import(df)
@@ -67,7 +65,7 @@ na_fill <- function(df, null = "EFInull"){
     distinct() %>% collect()
   team <- df %>% select(team) %>% distinct() %>% pull(team)
   
-  all <- expand_grid(predicted_by_null, team)
+  all <- tidyr::expand_grid(predicted_by_null, team)
   
   ## Use this list to make explicit NA for any observation for which a forecast was not provided
   na_filled <- df %>% right_join(all, copy=TRUE)
@@ -123,8 +121,10 @@ null_fill <- function(self_filled, null_team = "EFInull"){
 #' (no self-fill step) may be preferred.  
 #' The number of missing values filled in for each forecast is also reported.
 #' @param df a data frame from fill_scores()
-#' @importFrom dplyr group_by summarise arrange case_when left_join rename ungroup select mutate distinct collect filter
-#' @importFrom tidyr fill
+#' @importFrom dplyr group_by summarise arrange case_when left_join right_join
+#' @importFrom dplyr rename ungroup select mutate distinct collect filter tbl
+#' @importFrom dplyr pull
+#' @importFrom tidyr fill expand_grid
 #' @export
 mean_scores <- function(df){
 
@@ -141,3 +141,8 @@ scores <- df %>%
 
 scores
 }
+
+
+globalVariables(c("crps", "crps_self", "filled_crps", "filled_logs",
+                  "forecast_start_time", "logs", "mean_crps", "null_filled_crps",
+                  "null_filled_logs", "target", "team", "theme"), "neon4cast")
