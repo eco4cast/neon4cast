@@ -92,7 +92,10 @@ read_forecast <- function(file_in,
                     team = team,
                     theme = teams_tmp[,1])
   }
-  out
+  out %>% 
+    dplyr::group_by(dplyr::across(tidyselect::any_of(c(grouping_variables, "statistic","ensemble")))) %>%
+    dplyr::filter(dplyr::row_number()==1) %>% dplyr::ungroup()
+  
 }
 
 
