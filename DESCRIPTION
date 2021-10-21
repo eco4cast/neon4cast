@@ -33,7 +33,8 @@ Imports:
     DBI,
     RSQLite,
     dplyr,
-    tidyr
+    tidyr,
+    furrr
 RoxygenNote: 7.1.2
 Language: en-US
 Suggests: 
