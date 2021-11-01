@@ -18,7 +18,7 @@ read_forecast <- function(file_in,
 
   if(any(vapply(c("[.]csv", "[.]csv\\.gz"), grepl, logical(1), file_in))){  
     # if file is csv zip file
-    out <- readr::read_csv(file_in, guess_max = 1e6, lazy = FALSE) 
+    out <- readr::read_csv(file_in, guess_max = 1e6, lazy = FALSE, show_col_types = FALSE) 
     if("ixodes_scapularis" %in% names(out) | "amblyomma_americanum" %in% names(out)){
       out <- out %>% 
         dplyr::mutate(siteID = plotID) %>% 
@@ -117,6 +117,7 @@ read_forecast_nc <- function(file_in,
   
   out <- combined_forecast
   out
+
 }
 
 
