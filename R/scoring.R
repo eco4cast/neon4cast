@@ -15,6 +15,8 @@ score <- function(forecast,
                             "terrestrial_daily","ticks")){
   
   theme <- match.arg(theme)
+  
+  
   if(is.character(forecast))
     forecast <- read_forecast(forecast)
 
@@ -28,44 +30,80 @@ score <- function(forecast,
                      )
   
 
-  
   theme <- strsplit(theme, "-")[[1]][[1]]
   download_url <- paste0("https://data.ecoforecast.org/targets/",
                          theme, "/", target_file)
-  target <- readr::read_csv(download_url, show_col_types = FALSE)
+  target <- readr::read_csv(download_url, show_col_types = FALSE, progress = FALSE)
   
-  if(theme == "ticks"){
-    target <- target %>% 
-      dplyr::mutate(time =  ISOweek::ISOweek2date(paste0(ISOweek::ISOweek(time), "-","1")))
-    forecast <- forecast %>% 
-      dplyr::mutate(time =  ISOweek::ISOweek2date(paste0(ISOweek::ISOweek(time), "-","1")))
-
-  }
+  
+  target <- format_target(target)
+  forecast <- format_forecast(forecast)
   crps_logs_score(forecast, target)
   
 }
 
-## Teach crps to treat any NA observations as NA scores:
-scoring_crps_ensemble <- function(y, dat) {
-  tryCatch(scoringRules::crps_sample(y, dat),
-           error = function(e) NA_real_, finally = NA_real_)
+
+isoweek <- function(time) {
+  ISOweek::ISOweek2date(paste0(ISOweek::ISOweek(time), "-","1"))
+  }
+
+format_target <- function(df){
+  
+  ## Tidy first
+  if (all(pull(df,theme)  == "ticks")) {
+    df <- df %>% mutate(time = isoweek(time))
+  }
+  # drop non-standard columns
+  df <- dplyr::select(tidyselect::any_of(VARS))
+  
+  
+  
+  df <- df %>% 
+    tidyr::pivot_longer(tidyselect::any_of(TARGET_VARS), 
+                        names_to = "target", 
+                        values_to = "observed")
+  
+  df <- df %>% filter(!is.na(observed))
+  
+  df
 }
 
-scoring_crps_stat <- function(y, mean, sd) {
-  tryCatch(scoringRules::crps_norm(y, mean = mean, sd = sd),
-           error = function(e) NA_real_, finally = NA_real_)
+format_forecast <- function(df){
+  
+  ## tidy
+  if (all(pull(df,theme)  == "ticks")) {
+    df <- df %>% mutate(time = isoweek(time))
+  }
+  df <- dplyr::select(tidyselect::any_of(VARS))
+  
+  
+  ## pivot
+  df <- df %>% 
+    tidyr::pivot_longer(tidyselect::any_of(TARGET_VARS), 
+                        names_to = "target", 
+                        values_to = "predicted")
+  
+  if("statistic" %in% colnames(df)){
+    df <- df %>% 
+      tidyr::pivot_wider(names_from = statistic,
+                         values_from = predicted)
+  }
 }
 
-## Teach crps to treat any NA observations as NA scores:
-scoring_logs_ensemble <- function(y, dat) {
-  tryCatch(scoringRules::logs_sample(y, dat),
-           error = function(e) NA_real_, finally = NA_real_)
-}
-
-scoring_logs_stat <- function(y, mean, sd) {
-  tryCatch(scoringRules::logs_norm(y, mean = mean, sd = sd),
-           error = function(e) NA_real_, finally = NA_real_)
-}
+GROUP_VARS = c("siteID", "time", "theme", "team", "issue_date")
+TARGET_VARS = c("oxygen", 
+                "temperature", 
+                "richness",
+                "abundance", 
+                "nee",
+                "le", 
+                "vswc",
+                "gcc_90",
+                "rcc_90",
+                "ixodes_scapularis",
+                "amblyomma_americanum")
+STAT_VARS = c("ensemble", "statistic")
+VARS <- c(GROUP_VARS, TARGET_VARS, STAT_VARS)
 
 
 ## FIXME:
@@ -75,85 +113,56 @@ scoring_logs_stat <- function(y, mean, sd) {
 ## pivot forecasts
 ## inner_join
 ## score
-crps_logs_score <- function(forecast, 
-                       target,
-                       grouping_variables = c("siteID", "time"),
-                       target_variables = c("oxygen", 
-                                            "temperature", 
-                                            "richness",
-                                            "abundance", 
-                                            "nee",
-                                            "le", 
-                                            "vswc",
-                                            "gcc_90",
-                                            "rcc_90",
-                                             "ixodes_scapularis",
-                                             "amblyomma_americanum"),
-                       reps_col = c("ensemble")){
+crps_logs_score <- function(forecast, target){
 
-  variables <- c(grouping_variables, target_variables, "ensemble", "statistic")
+  # left join will keep predictions even where we have no observations
+  joined <- forecasts %>% 
+    forecast_uncertainty_stats() %>%
+    dplyr::left_join(targets)
   
-
-  ## drop extraneous columns
-  if("ensemble" %in% colnames(forecast)){ 
-    reps_col <- "ensemble"
-    variables <- c(grouping_variables, target_variables, reps_col)
-  }else  if("statistic" %in% colnames(forecast)){ 
-    reps_col <- "statistic"
-    variables <- c(grouping_variables, target_variables, reps_col) 
-  }
-  
-  forecast <- forecast %>% dplyr::select(tidyselect::any_of(
-    c(variables, "forecast_start_time", "horizon", "team", "theme")))
-  target <- target %>% dplyr::select(tidyselect::any_of(variables))
-  
-  
-  is_ticks <- any(grepl("ixodes", colnames(target))) || any(grepl("amblyomma", colnames(target)))
-  if(is_ticks){
-    target <- target %>% 
-      dplyr::mutate(time =  ISOweek::ISOweek2date(paste0(ISOweek::ISOweek(time), "-","1")))
-    forecast <- forecast %>% 
-      dplyr::mutate(time =  ISOweek::ISOweek2date(paste0(ISOweek::ISOweek(time), "-","1")))
-  }
-  
-  ## Make tables into long format. 
-  ## FIXME  avoid repeatedly pivoting target data for each forecast
-  target_long <- target %>% 
-    tidyr::pivot_longer(tidyselect::any_of(target_variables), 
-                 names_to = "target", 
-                 values_to = "observed")
-  
-  
-  forecast_long <- forecast %>% 
-    tidyr::pivot_longer(tidyselect::any_of(target_variables), 
-                 names_to = "target", 
-                 values_to = "predicted")
-  
-  if(reps_col == "ensemble"){
-    
-    dplyr::inner_join(forecast_long, target_long, by = c(grouping_variables, "target"))  %>% 
-      dplyr::group_by(dplyr::across(tidyselect::any_of(c(grouping_variables, 
-        "target", "horizon", "team", "forecast_start_time", "theme")))) %>% 
-      dplyr::summarise(crps = scoring_crps_ensemble(observed[[1]], predicted),
-                       logs = scoring_logs_ensemble(observed[[1]], predicted),
-                       
+  if("ensemble" %in% colnames(joined)){
+    out <- joined %>% 
+      dplyr::group_by(tidyselect::any_of(GROUP_VARS)) %>% 
+      dplyr::summarise(crps = scoringRules::crps_sample(observed[[1]], na_rm(predicted)),
+                       logs = scoringRules::logs_sample(observed[[1]], na_rm(predicted)),
                 .groups = "drop")
     
   } else {
-    
-    forecast_long %>%
-      tidyr::pivot_wider(names_from = statistic, values_from = predicted) %>%
-      dplyr::inner_join(target_long, by = c(grouping_variables, "target"))  %>% 
-      dplyr::group_by(dplyr::across(dplyr::any_of(
-        c(grouping_variables, "target", "horizon", "team", "forecast_start_time", "theme")))) %>% 
-      dplyr::summarise(crps = scoring_crps_stat(observed[[1]], mean, sd),
-                       logs = scoring_logs_stat(observed[[1]], mean, sd),
-                .groups = "drop")
+    out <- joined  %>% 
+      dplyr::mutate(crps = scoringRules::crps_norm(observed, mean, sd),
+                    logs = scoringRules::logs_norm(observed, mean, sd))
     
   }
+  
+  out
 }
 
+na_rm <- function(x) as.numeric(na.exclude(x))
 
+
+# Optionally it might be cleaner but maybe slower to compute
+# these forecast-only statistics separately
+forecast_uncertainty_stats <- function(forecast){
+  
+  if("ensemble" %in% colnames(forecast)){
+    forecast %>% 
+      dplyr::group_by(tidyselect::any_of(GROUP_VARS)) %>% 
+      dplyr::summarise(mean = mean(predicted, na.rm =TRUE),
+                       sd = sd(predicted, na.rm =TRUE),
+                       upper95 = quantile(predicted, 0.975, na.rm = TRUE),
+                       lower95 = quantile(predicted, 0.025, na.rm = TRUE),
+                       .groups = "drop")
+  } else {
+    forecast %>% 
+      dplyr::mutate(upper95 = mean + 1.96 * sd,
+                    lower95 = mean - 1.96 * sd)
+    
+  }
+   
+  
+  
+                      
+}
 
 
 
@@ -179,7 +188,11 @@ score_it <- function(targets_file,
 ){
   
   ## Read in data and compute scores!
-  target <- read_forecast(targets_file)
+  target <- readr::read_csv(targets_file, show_col_types = FALSE, lazy = FALSE,
+                            progress = FALSE, id = filename) %>%
+    format_target()
+  
+  
   score_files <- score_filenames(forecast_files)
   
   forecasts <- furrr::future_map(forecast_files, read_forecast)
