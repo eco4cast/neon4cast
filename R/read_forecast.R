@@ -19,12 +19,7 @@ read_forecast <- function(file_in,
   if(any(vapply(c("[.]csv", "[.]csv\\.gz"), grepl, logical(1), file_in))){  
     # if file is csv zip file
     out <- readr::read_csv(file_in, guess_max = 1e6, lazy = FALSE, show_col_types = FALSE) 
-    if("ixodes_scapularis" %in% names(out) | "amblyomma_americanum" %in% names(out)){
-      out <- out %>% 
-        dplyr::mutate(siteID = plotID) %>% 
-        dplyr::select(-plotID)
-    }
-    
+
     
   } else if(grepl("[.]nc", file_in)){ #if file is nc
     out <- read_forecast_nc(file_in, target_variables, reps_col)
@@ -43,12 +38,7 @@ read_forecast <- function(file_in,
       dates <- lubridate::as_date(out$time)
     }
     
-    pattern<- "(\\w+)\\-(\\d{4}\\-\\d{2}\\-\\d{2})\\-(\\w+)\\.csv\\.gz"
-    
-    out <- out %>% 
-      mutate(theme = gsub(pattern, "\\1", file_in),
-             issue_date = gsub(pattern, "\\2", file_in),
-             team = gsub(pattern, "\\3", file_in))
+
     
     if(include_horizon){
     time_step <- unique_dates[2] - unique_dates[1]
