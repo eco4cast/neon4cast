@@ -94,7 +94,7 @@ deduplicate_predictions <- function(df){
     df <- df %>%
       filter(!is.na(predicted)) %>%
       group_by(across(-any_of("predicted"))) %>% 
-      filter(row_number() == 1L)
+      filter(dplyr::row_number() == 1L)
   }
   
   df
@@ -232,7 +232,7 @@ score_it <- function(targets_file,
                      dir = "scores"
 ){
   
-  fs::dir_create(dir)
+  dir.create(dir, FALSE, TRUE)
   theme <- strsplit(basename(targets_file), "[-_]")[[1]][[1]]
   
   ## Target is processed only once
@@ -274,5 +274,6 @@ write_scores <- function(scores, dir = "scores"){
 
 
 utils::globalVariables(c("observed", "predicted", "value",
-                         "variable", "statistic", "sd"),
+                         "variable", "statistic", "sd", 
+                         "filename"),
                        "neon4cast")

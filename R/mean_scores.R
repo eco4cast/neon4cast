@@ -149,4 +149,5 @@ scores
 
 globalVariables(c("crps", "crps_self", "filled_crps", "filled_logs",
                   "forecast_start_time", "logs", "mean_crps", "null_filled_crps",
-                  "null_filled_logs", "target", "team", "theme"), "neon4cast")
+                  "null_filled_logs", "target", "team", "theme",
+                  "crps_null", "logs_null"), "neon4cast")
