@@ -229,7 +229,7 @@ include_horizon <- function(df){
 ## scores in working RAM at the same time.
 score_it <- function(targets_file, 
                      forecast_files, 
-                     score_files = score_filenames(forecast_files)
+                     dir = "scores"
 ){
   
   theme <- strsplit(basename(targets_file), "[-_]")[[1]][[1]]
@@ -250,7 +250,7 @@ score_it <- function(targets_file,
           pivot_forecast() %>%
           crps_logs_score(target) %>% 
           include_horizon() %>%
-          write_scores()
+          write_scores(dir)
       }, 
       target = target
     )
