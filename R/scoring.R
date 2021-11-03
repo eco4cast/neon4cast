@@ -232,6 +232,7 @@ score_it <- function(targets_file,
                      dir = "scores"
 ){
   
+  fs::dir_create(dir)
   theme <- strsplit(basename(targets_file), "[-_]")[[1]][[1]]
   
   ## Target is processed only once
