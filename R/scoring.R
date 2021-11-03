@@ -185,12 +185,10 @@ crps_logs_score <- function(forecast, target){
   if("ensemble" %in% colnames(joined)){
     out <- joined %>% 
       group_by(across(-any_of(c("ensemble", "predicted")))) %>% 
-      summarise(crps = crps_sample(observed[[1]], na_rm(predicted)),
-                logs = logs_sample(observed[[1]], na_rm(predicted)),
-                
-                ## Ensemble stats must be done before collapsing ensemble data
-                mean = mean(predicted, na.rm =TRUE),
+      summarise(mean = mean(predicted, na.rm =TRUE),
                 sd = sd(predicted, na.rm =TRUE),
+                crps = crps_sample(observed[[1]], na_rm(predicted)),
+                logs = logs_sample(observed[[1]], na_rm(predicted)),
                 upper95 = stats::quantile(predicted, 0.975, na.rm = TRUE),
                 lower95 = stats::quantile(predicted, 0.025, na.rm = TRUE)
                ) %>% ungroup()
@@ -203,7 +201,11 @@ crps_logs_score <- function(forecast, target){
                     lower95 = mean - 1.96 * sd)
     
   }
-  out
+  ## Ensure both ensemble and stat-based have identical column order:
+  out %>% select(any_of("theme", "team", "issue_date", "siteID", "time",
+                        "target", "mean", "sd", "observed", "crps",
+                        "logs", "upper95", "lower95", "interval", 
+                        "forecast_start_date"))
 }
 
 
