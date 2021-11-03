@@ -17,9 +17,10 @@ score <- function(forecast,
   theme = match.arg(theme)
   
   ## read from file if necessary
-  if(is.character(forecast))
-    forecast <- read_forecast(forecast)
-  
+  if(is.character(forecast)){
+    filename <- forecast
+    forecast <- read_forecast(forecast) %>% mutate(filename = filename)
+  }
   ## tables must declare theme and be in "long" form:
   target <- download_target(theme) %>% 
     mutate(theme = theme) %>%
@@ -245,6 +246,7 @@ score_it <- function(targets_file,
       function(forecast_file, target){
         forecast_file %>%
           read_forecast() %>%
+          mutate(filename = forecast_file) %>%
           pivot_forecast() %>%
           crps_logs_score(target) %>% 
           include_horizon() %>%
