@@ -202,10 +202,10 @@ crps_logs_score <- function(forecast, target){
     
   }
   ## Ensure both ensemble and stat-based have identical column order:
-  out %>% select(any_of("theme", "team", "issue_date", "siteID", "time",
+  out %>% select(any_of(c("theme", "team", "issue_date", "siteID", "time",
                         "target", "mean", "sd", "observed", "crps",
                         "logs", "upper95", "lower95", "interval", 
-                        "forecast_start_date"))
+                        "forecast_start_time")))
 }
 
 
@@ -275,7 +275,22 @@ write_scores <- function(scores, dir = "scores"){
   
 }
 
-
+score_spec <- 
+c("theme" = col_character(),
+  "team" = col_character(), 
+  "issue_date" = col_character(), 
+  "siteID" = col_character(), 
+  "time" = col_datetime(),
+  "target"  = col_character(),
+  "mean" = col_double(),
+  "sd" = col_double(),
+  "observed" = col_double(),
+  "crps" = col_double(),
+  "logs" = col_double(), 
+  "upper95" = col_double(), 
+  "lower95" = col_double(), 
+  "interval" = col_integer(), 
+  "forecast_start_time" = col_datetime())
 
 
 utils::globalVariables(c("observed", "predicted", "value",
