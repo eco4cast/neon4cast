@@ -243,6 +243,7 @@ score_it <- function(targets_file,
     pivot_target()
 
     ## read, format, and score and write out each forecast file
+    suppressMessages({
     furrr::future_walk(forecast_files,
       function(forecast_file, target){
         forecast_file %>%
@@ -255,6 +256,7 @@ score_it <- function(targets_file,
       }, 
       target = target
     )
+    })
 }
 
 
@@ -267,6 +269,7 @@ write_scores <- function(scores, dir = "scores"){
   )
   
   readr::write_csv(scores, output)
+  invisible(output)
   
 }
 
