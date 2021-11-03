@@ -19,6 +19,8 @@ A data.frame (\verb{[tsibble]}) in the EFI format
 Format a fable fbl_ts forecast in EFI standard
 }
 \examples{
+
+\dontrun{
 library(dplyr)
 library(readr)
 library(fable)
@@ -28,5 +30,6 @@ oxygen_fc <- aquatic \%>\%
   model(null = MEAN(oxygen)) \%>\%
   forecast(h = "35 days") \%>\%
   efi_format()
+  }
 
 }

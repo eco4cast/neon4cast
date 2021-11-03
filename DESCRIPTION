@@ -34,7 +34,8 @@ Imports:
     RSQLite,
     dplyr,
     tidyr,
-    furrr
+    furrr,
+    vctrs
 RoxygenNote: 7.1.2
 Language: en-US
 Suggests: 

@@ -2,40 +2,41 @@
 #' 
 #' @param forecast forecast data frame or file
 #' @param theme theme name. Note: terrestrial must specify the interval.
-#' @importFrom tidync `%>%`
+#' @importFrom dplyr `%>%`
 #' 
 #' @export
 #' @examples 
 #' forecast_file <- system.file("extdata/aquatics-2021-02-01-EFInull.csv.gz", 
 #'                               package = "neon4cast")
 #' score(forecast_file, "aquatics")                          
-score <- function(forecast, 
+score <- function(forecast,
                   theme = c("aquatics", "beetles",
                             "phenology", "terrestrial_30min",
                             "terrestrial_daily","ticks")){
+
+  theme = match.arg(theme)
   
-  theme <- match.arg(theme)
+  ## read from file if necessary
+  if(is.character(forecast))
+    forecast <- read_forecast(forecast)
   
-  target_file <- switch(theme,
-                     aquatics = "aquatics-targets.csv.gz",
-                     beetles = "beetles-targets.csv.gz",
-                     phenology = "phenology-targets.csv.gz",
-                     terrestrial_daily = "terrestrial_daily-targets.csv.gz",
-                     terrestrial_30min = "terrestrial_30min-targets.csv.gz",
-                     ticks = "ticks-targets.csv.gz"
-                     )
+  ## tables must declare theme and be in "long" form:
+  target <- download_target(theme) %>% 
+    mutate(theme = theme) %>%
+    pivot_target()
+  forecast <- forecast %>% 
+    mutate(theme=theme) %>%
+    pivot_forecast()
   
   
-  download_url <- paste0("https://data.ecoforecast.org/targets/",
-                         theme, "/", target_file)
+  crps_logs_score(forecast, target)
   
-  score_it(download_url, forecast)
 }
+  
 
 
 
-
-GROUP_VARS = c("siteID", "time", "theme", "team", "issue_date")
+GROUP_VARS = c("theme", "team", "issue_date", "siteID", "time")
 TARGET_VARS = c("oxygen", 
                 "temperature", 
                 "richness",
@@ -60,6 +61,7 @@ na_rm <- function(x) as.numeric(stats::na.exclude(x))
 
 
 ## Tidy date formats and drop non-standard columns
+## shared by targets + forecasts
 standardize_format <- function(df) {
   ## Put tick dates to ISOweek
   ## (arguably should be applied to beetles if not already done too)
@@ -79,6 +81,23 @@ standardize_format <- function(df) {
 
 
 
+
+deduplicate_predictions <- function(df){
+  
+  has_dups <- df %>% 
+    select(-any_of("predicted")) %>% 
+    vctrs::vec_group_id() %>% 
+    vctrs::vec_duplicate_any()
+  
+  if(has_dups) {
+    df <- df %>%
+      filter(!is.na(predicted)) %>%
+      group_by(across(-any_of("predicted"))) %>% 
+      filter(row_number() == 1L)
+  }
+  
+  df
+}
 
 ## Parses neon4cast challenge forecast filename components.
 split_filename <- function(df){
@@ -115,29 +134,58 @@ pivot_forecast <- function(df){
                         names_to = "target", 
                         values_to = "predicted")
   
+  
+  
+
+  df <- deduplicate_predictions(df)
+
   if("statistic" %in% colnames(df)){
     df <- df %>% 
       tidyr::pivot_wider(names_from = statistic,
                          values_from = predicted)
   }
-  
+
   df
-  
 }
 
-## Assumes forecasts have already been standardized & pivoted!
+
+
+## Teach crps to treat any NA observations as NA scores:
+crps_sample <- function(y, dat) {
+  tryCatch(scoringRules::crps_sample(y, dat),
+           error = function(e) NA_real_, finally = NA_real_)
+}
+
+crps_norm <- function(y, mean, sd) {
+  tryCatch(scoringRules::crps_norm(y, mean = mean, sd = sd),
+           error = function(e) NA_real_, finally = NA_real_)
+}
+
+## Teach crps to treat any NA observations as NA scores:
+logs_sample <- function(y, dat) {
+  tryCatch(scoringRules::logs_sample(y, dat),
+           error = function(e) NA_real_, finally = NA_real_)
+}
+
+logs_norm <- function(y, mean, sd) {
+  tryCatch(scoringRules::logs_norm(y, mean = mean, sd = sd),
+           error = function(e) NA_real_, finally = NA_real_)
+}
+
+
+
+## Requires that forecasts and targets have already been cleaned & pivoted!
 crps_logs_score <- function(forecast, target){
   
-  ## assert either both or none have "theme", "issue_date", "team"
-  
+  ## FIXME ensure either both or none have "theme", "issue_date", "team"
   # left join will keep predictions even where we have no observations
-  joined <- dplyr::inner_join(forecast, target)
+  joined <- dplyr::left_join(forecast, target)
   
   if("ensemble" %in% colnames(joined)){
     out <- joined %>% 
       group_by(across(-any_of(c("ensemble", "predicted")))) %>% 
-      summarise(crps = scoringRules::crps_sample(observed[[1]], na_rm(predicted)),
-                logs = scoringRules::logs_sample(observed[[1]], na_rm(predicted)),
+      summarise(crps = crps_sample(observed[[1]], na_rm(predicted)),
+                logs = logs_sample(observed[[1]], na_rm(predicted)),
                 
                 ## Ensemble stats must be done before collapsing ensemble data
                 mean = mean(predicted, na.rm =TRUE),
@@ -148,34 +196,36 @@ crps_logs_score <- function(forecast, target){
     
   } else {
     out <- joined  %>% 
-      dplyr::mutate(crps = scoringRules::crps_norm(observed, mean, sd),
-                    logs = scoringRules::logs_norm(observed, mean, sd),
+      dplyr::mutate(crps = crps_norm(observed, mean, sd),
+                    logs = logs_norm(observed, mean, sd),
                     upper95 = mean + 1.96 * sd,
                     lower95 = mean - 1.96 * sd)
     
   }
-  
   out
 }
 
 
 
+include_horizon <- function(df){
 
-
-
-
-
-
-
-utils::globalVariables(c("observed", "predicted", "value", "variable", "statistic", "sd"), "neon4cast")
-
-score_filenames <- function(forecast_files){
-  f_name <- tools::file_path_sans_ext(paste0("scores-",
-                                             basename(forecast_files)), compression = TRUE)
-  file.path("scores", paste0(f_name, ".csv.gz"))
+  interval <- df %>%
+    group_by(across(any_of(c("theme", "team", "issue_date", "target", "siteID")))) %>% 
+    summarise(interval = min(time-dplyr::lag(time), na.rm=TRUE),
+              forecast_start_time = min(time) - interval,
+              .groups = "drop")
+  
+  ## add columns for start_time and horizon
+  df %>% 
+    left_join(interval) %>% 
+    mutate(horizon = time - forecast_start_time)
 }
 
 
+
+## score_it is batch-oriented: takes a large batch of forecast files,
+## outputs scores to disk.  This avoid the need to store all forecasts and
+## scores in working RAM at the same time.
 score_it <- function(targets_file, 
                      forecast_files, 
                      score_files = score_filenames(forecast_files)
@@ -189,23 +239,37 @@ score_it <- function(targets_file,
                     lazy = FALSE, progress = FALSE) %>% 
     mutate(theme = theme) %>%
     pivot_target()
-  
-  scores <- 
-    furrr::future_map(forecast_files,
+
+    ## read, format, and score and write out each forecast file
+    furrr::future_walk(forecast_files,
       function(forecast_file, target){
         forecast_file %>%
           read_forecast() %>%
           pivot_forecast() %>%
-          crps_logs_score(target)
-      }
+          crps_logs_score(target) %>% 
+          include_horizon() %>%
+          write_scores()
+      }, 
+      target = target
     )
+}
+
+
+## construct filename from columns and write to disk
+write_scores <- function(scores, dir = "scores"){
+  r <- utils::head(scores,1)
+  output <- file.path(dir, 
+                      paste0(paste("scores", r$theme, r$time, r$team, sep="-"),
+                             ".csv.gz")
+  )
   
-  ## write out score files
-  score_files <- score_filenames(forecast_files)
-  purrr::walk2(scores, score_files, readr::write_csv)
-  invisible(score_files)
+  readr::write_csv(scores, output)
+  
 }
 
 
 
 
+utils::globalVariables(c("observed", "predicted", "value",
+                         "variable", "statistic", "sd"),
+                       "neon4cast")

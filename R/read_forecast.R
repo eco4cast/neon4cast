@@ -38,18 +38,8 @@ read_forecast <- function(file_in,
       dates <- lubridate::as_date(out$time)
     }
     
-
-    
-    if(include_horizon){
-    time_step <- unique_dates[2] - unique_dates[1]
-    first_date <- unique_dates[1] - time_step
-    horizon <- as.numeric(dates - first_date) / as.numeric(time_step)
-
-    out <- out %>% 
-      dplyr::mutate(forecast_start_time = first_date,
-                    horizon = horizon)
-    }
   }
+  
   out
 }
 
