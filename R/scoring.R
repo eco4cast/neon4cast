@@ -105,7 +105,7 @@ split_filename <- function(df){
   
   ## arguably better to split on "-" and unite date components?
   if("filename" %in% colnames(df)) {
-    pattern<- "(\\w+)\\-(\\d{4}\\-\\d{2}\\-\\d{2})\\-(\\w+)\\.csv(\\.gz)?"
+    pattern<- "(\\w+)\\-(\\d{4}\\-\\d{2}\\-\\d{2})\\-(\\w+)\\.(csv)?(\\.gz)?(nc)"
     df <- df %>% 
       mutate(theme = gsub(pattern, "\\1", basename(filename)),
              issue_date = gsub(pattern, "\\2", basename(filename)),
