@@ -69,6 +69,7 @@ standardize_format <- function(df) {
   if ("theme" %in% colnames(df) && all(pull(df,theme) == "ticks")) {
     df <- df %>% 
       mutate(time = isoweek(time)) %>%
+      select(-siteID) %>%
       rename(siteID = plotID)
     
   }
