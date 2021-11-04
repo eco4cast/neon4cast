@@ -277,21 +277,21 @@ write_scores <- function(scores, dir = "scores"){
 }
 
 score_spec <- 
-c("theme" = col_character(),
-  "team" = col_character(), 
-  "issue_date" = col_character(), 
-  "siteID" = col_character(), 
-  "time" = col_datetime(),
-  "target"  = col_character(),
-  "mean" = col_double(),
-  "sd" = col_double(),
-  "observed" = col_double(),
-  "crps" = col_double(),
-  "logs" = col_double(), 
-  "upper95" = col_double(), 
-  "lower95" = col_double(), 
-  "interval" = col_integer(), 
-  "forecast_start_time" = col_datetime())
+c("theme" = readr::col_character(),
+  "team" = readr::col_character(), 
+  "issue_date" = readr::col_character(), 
+  "siteID" = readr::col_character(), 
+  "time" = readr::col_datetime(),
+  "target"  = readr::col_character(),
+  "mean" = readr::col_double(),
+  "sd" = readr::col_double(),
+  "observed" = readr::col_double(),
+  "crps" = readr::col_double(),
+  "logs" = readr::col_double(), 
+  "upper95" = readr::col_double(), 
+  "lower95" = readr::col_double(), 
+  "interval" = readr::col_integer(), 
+  "forecast_start_time" = readr::col_datetime())
 
 
 utils::globalVariables(c("observed", "predicted", "value",
