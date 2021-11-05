@@ -9,8 +9,7 @@ status <- forecast_output_validator(forecast_file)
 expect_true(status)
 
 ## ------------------------------------------------------------------------------------------------------------
-forecast <- readr::read_csv(forecast_file)
-df <- score(forecast, theme = "aquatics")
+df <- score(forecast_file, theme = "aquatics")
 expect_true(is(df, "tbl"))
 
 ## ------------------------------------------------------------------------------------------------------------

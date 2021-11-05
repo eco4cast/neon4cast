@@ -8,6 +8,8 @@
 #' ignored if distributions are normal.
 #' @return A data.frame (`[tsibble]`) in the EFI format
 #' @examples 
+#' 
+#' \dontrun{
 #' library(dplyr)
 #' library(readr)
 #' library(fable)
@@ -17,6 +19,7 @@
 #'   model(null = MEAN(oxygen)) %>%
 #'   forecast(h = "35 days") %>%
 #'   efi_format()
+#'   }
 #' 
 #' @export
 #' @importFrom rlang .data `:=`

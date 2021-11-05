@@ -13,7 +13,6 @@ Description: Helper utilities for the NEON forecast challenge.  Convience
   utilities only, this package is not intended for more general use. 
 License: MIT + file LICENSE
 Encoding: UTF-8
-LazyData: true
 Roxygen: list(markdown = TRUE)
 Imports: 
     aws.s3,
@@ -34,7 +33,8 @@ Imports:
     RSQLite,
     dplyr,
     tidyr,
-    furrr
+    furrr,
+    vctrs
 RoxygenNote: 7.1.2
 Language: en-US
 Suggests: 
