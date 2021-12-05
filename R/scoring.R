@@ -268,7 +268,7 @@ write_scores <- function(scores, dir = "scores"){
   r <- utils::head(scores,1)
   output <- file.path(dir, 
                       paste0(paste("scores", r$theme, r$time, r$team, sep="-"),
-                             ".csv.gz")
+                             ".csv")
   )
   
   readr::write_csv(scores, output)
