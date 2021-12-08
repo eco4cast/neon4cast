@@ -75,7 +75,9 @@ standardize_format <- function(df) {
   }
   
   # drop non-standard columns
-  df %>% dplyr::select(tidyselect::any_of(VARS))
+  df %>% 
+    dplyr::select(tidyselect::any_of(VARS)) %>%
+    enforce_schema()
 }
 
 
@@ -209,7 +211,11 @@ crps_logs_score <- function(forecast, target){
                         "forecast_start_time")))
 }
 
-
+enforce_schema <- function(df) {
+  df %>% 
+    mutate(across(any_of(c("time", "forecast_start_time")),
+           .fn = as.POSIXct))
+}
 
 include_horizon <- function(df){
 
