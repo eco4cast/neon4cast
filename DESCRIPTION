@@ -34,7 +34,8 @@ Imports:
     dplyr,
     tidyr,
     furrr,
-    vctrs
+    vctrs,
+    arrow
 RoxygenNote: 7.1.2
 Language: en-US
 Suggests: 

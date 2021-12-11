@@ -214,7 +214,7 @@ crps_logs_score <- function(forecast, target){
 enforce_schema <- function(df) {
   df %>% 
     mutate(across(any_of(c("time", "forecast_start_time")),
-           .fn = as.POSIXct))
+           .fns = as.POSIXct))
 }
 
 include_horizon <- function(df){
@@ -283,7 +283,36 @@ write_scores <- function(scores, dir = "scores"){
 }
 
 
-score_spec <-
+#' score schema for arrow::open_dataset
+#' 
+#' Open all score.csv files from local or remote disk using arrow by
+#' declaring the appropriate file schema.
+#' @importFrom arrow schema
+#' @export
+score_schema  <- function() {
+  
+  arrow::schema(
+  theme      = arrow::string(),
+  team       = arrow::string(),
+  issue_date = arrow::date32(),
+  siteID     = arrow::string(),
+  time       = arrow::timestamp("s", timezone="UTC"),
+  target     = arrow::string(),
+  mean       = arrow::float64(),
+  sd         = arrow::float64(),
+  observed   = arrow::float64(),
+  crps       = arrow::float64(),
+  logs       = arrow::float64(),
+  upper95    = arrow::float64(),
+  lower95    = arrow::float64(),
+  interval   = arrow::int64(),
+  forecast_start_time = arrow::timestamp("s", timezone="UTC"),
+  horizon    = arrow::float64()
+)
+}
+
+
+score_spec <- function() {
   list(
     "theme" = readr::col_character(),
     "team" = readr::col_character(),
@@ -301,6 +330,7 @@ score_spec <-
     "interval" = readr::col_integer(),
     "forecast_start_time" = readr::col_datetime()
   )
+}
 
 utils::globalVariables(c("observed", "predicted", "value",
                          "variable", "statistic", "sd", 
