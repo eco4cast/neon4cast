@@ -1,5 +1,5 @@
 
-db_import <- function(data, dir = tempfile()){
+db_import <- function(data, dir = tempfile(), use_db = getOption("neon4cast_usedb", FALSE)){
   
   df <- data %>% 
     dplyr::select(theme, siteID, target, time, team, forecast_start_time, crps, logs)
@@ -8,24 +8,28 @@ db_import <- function(data, dir = tempfile()){
   df <- df %>% dplyr::mutate(time = as.character(time), 
                 forecast_start_time = as.character(forecast_start_time))
   
+  
+  ## Cannot use duckdb until tidyr::fill issue resolved in dbplyr
+  if(use_db) {
+    con <- sql_db(dir)
+    DBI::dbWriteTable(con, "combined", df, overwrite=TRUE)
+    df <- dplyr::tbl(con, "combined")
+  }
+  
+  df
+}
+
+
+sql_db <- function(dir){
   con <- getOption("neon4cast_con")
   if(is.null(con)) {
     con <- DBI::dbConnect(RSQLite::SQLite(), dir)
   }
-  ## Cannot use duckdb until tidyr::fill issue resolved in dbplyr
-  #con <- DBI::dbConnect(duckdb::duckdb(), dir)  
-  DBI::dbWriteTable(con, "combined", df, overwrite=TRUE)
-  
-  
   ## cache connection so not garbage-collected
-  options(neon4cast_con = con)
+  options(neon4cast_con = con) 
   
-  dplyr::tbl(con, "combined")
-  
+  con
 }
-
-
-
 
 #' fill_scores
 #' 
