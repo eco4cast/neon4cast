@@ -15,11 +15,12 @@ db_import <- function(data, dir = tempfile()){
   ## Cannot use duckdb until tidyr::fill issue resolved in dbplyr
   #con <- DBI::dbConnect(duckdb::duckdb(), dir)  
   DBI::dbWriteTable(con, "combined", df, overwrite=TRUE)
-  dplyr::tbl(con, "combined")
   
   
   ## cache connection so not garbage-collected
   options(neon4cast_con = con)
+  
+  dplyr::tbl(con, "combined")
   
 }
 
