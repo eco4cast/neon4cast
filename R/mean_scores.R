@@ -90,11 +90,17 @@ na_fill <- function(df, null = "EFInull"){
 }
 
 self_fill <- function(na_filled){
+  
+  if(inherits(na_filled, "tbl_sql")){
+    arrange <- dbplyr::window_order
+  }
+  
   ## Fill in any missing observation with the most recent forecast made prior to the start_time
   self_filled <- na_filled %>%
-    dbplyr::window_order(theme, team, target, siteID, time, forecast_start_time) %>%
+   # dbplyr::window_order(theme, team, target, siteID, time, forecast_start_time) %>%
+    arrange(theme, team, target, siteID, time, forecast_start_time) %>%
     group_by(theme, team, target, siteID, time) %>% 
-    fill(crps, logs, .direction="up") %>% 
+    fill(crps, logs, .direction="up") %>%       ## not duckdb-compatible!
     ungroup() %>%
     rename(crps_self = crps, logs_self = logs)
   
