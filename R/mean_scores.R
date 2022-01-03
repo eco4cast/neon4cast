@@ -7,14 +7,24 @@ db_import <- function(data, dir = tempfile()){
   ## Hmm, SQLite doesn't have date format, might be better as character than as double...
   df <- df %>% dplyr::mutate(time = as.character(time), 
                 forecast_start_time = as.character(forecast_start_time))
-  con <- DBI::dbConnect(RSQLite::SQLite(), dir)
   
+  con <- getOption("neon4cast_con")
+  if(is.null(con)) {
+    con <- DBI::dbConnect(RSQLite::SQLite(), dir)
+  }
   ## Cannot use duckdb until tidyr::fill issue resolved in dbplyr
   #con <- DBI::dbConnect(duckdb::duckdb(), dir)  
   DBI::dbWriteTable(con, "combined", df, overwrite=TRUE)
   dplyr::tbl(con, "combined")
   
+  
+  ## cache connection so not garbage-collected
+  options(neon4cast_con = con)
+  
 }
+
+
+
 
 #' fill_scores
 #' 
