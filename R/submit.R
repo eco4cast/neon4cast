@@ -34,3 +34,42 @@ submit <- function(forecast_file, metadata = NULL, ask = interactive()){
     }
   }
 }
+
+#' Check that submission was successfully processed
+#' 
+#' @param forecast_file Your forecast csv or nc file
+#' @export
+
+check_submission <- function(forecast_file){
+  
+  theme <- stringr::str_split_fixed(forecast_file, "-", n = 2)
+  
+  
+  exists <- aws.s3::object_exists(object = file.path(theme[,1], forecast_file), 
+                        bucket = "forecasts",
+                        region="data",
+                        base_url = "ecoforecast.org")
+  if(exists){
+    message("Submission was successfully processed")
+  }else{
+    not_in_standard <- aws.s3::object_exists(object = file.path("not_in_standard", forecast_file), 
+                                    bucket = "forecasts",
+                                    region="data",
+                                    base_url = "ecoforecast.org")
+    if(not_in_standard){
+      message("Submission is not in required format. Try running neon4cast::forecast_output_validator on your file to see what the issue may be")
+    }else{
+      in_submissions <- aws.s3::object_exists(object = file.path(forecast_file), 
+                                               bucket = "submissions",
+                                               region="data",
+                                               base_url = "ecoforecast.org")
+      
+      if(in_submissions){
+      message("Your forecast is still in queue to be processed by the server. Please check again in a few hours")}else{
+        message("Submissions is not present on server.  Try uploading again.") 
+      }
+    }
+    
+  }
+  invisible(exists)
+}
