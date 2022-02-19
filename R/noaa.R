@@ -30,6 +30,8 @@ download_noaa_ <- function(siteID,
   dir.create(noaadir, FALSE, TRUE)
   prefix <- paste("noaa", paste0("NOAAGEFS_", interval), 
                   siteID, date, cycle, sep="/")
+  
+  #GENERALIZATION:  Specific AWS info
   object <- aws.s3::get_bucket("drivers",
                                prefix = prefix,
                                region = "data",
@@ -38,6 +40,7 @@ download_noaa_ <- function(siteID,
   #data <- purrr::map_chr(object, ~ .x$Key)
   
   for(i in seq_along(object)){
+    #GENERALIZATION:  Specific AWS info
     aws.s3::save_object(object[[i]], 
                         bucket = "drivers", 
                         file = file.path(noaadir, object[[i]]$Key),

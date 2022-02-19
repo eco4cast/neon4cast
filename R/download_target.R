@@ -1,4 +1,6 @@
 
+#GENERALIZATION: SPECIFC THEMES, TARGET FILES, AND TARGET FILE URL
+
 download_target <- function(theme = c("aquatics", "beetles",
                                       "phenology", "terrestrial_30min",
                                       "terrestrial_daily","ticks")){  

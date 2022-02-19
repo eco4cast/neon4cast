@@ -16,6 +16,7 @@ submit <- function(forecast_file, metadata = NULL, ask = interactive()){
     go <- utils::askYesNo("Forecast file is valid, ready to submit?")
   }
   if(!go) return(NULL)
+  #GENERALIZATION:  Here are specific AWS INFO
   aws.s3::put_object(file = forecast_file, 
                      bucket = "submissions",
                      region="data",

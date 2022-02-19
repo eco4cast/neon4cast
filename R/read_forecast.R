@@ -1,4 +1,5 @@
 
+#GENRALIZATION:  Specific target variables, missing spatial dimensions
 read_forecast <- function(file_in, 
                           grouping_variables = c("siteID", "time"),
                           target_variables = c("oxygen", 
@@ -30,6 +31,7 @@ read_forecast <- function(file_in,
   
   if(!is.na(no_forecast)){
     teams_tmp <- (stringr::str_split(basename(file_in), c("-"), simplify = TRUE))
+    #GENERALIZATION: This is looking for 30min in the theme name just to know to use datatime rather than date
     if(stringr::str_detect(teams_tmp[,1], "30min")){
       unique_dates <- sort(lubridate::as_datetime(unique(out$time)))
       dates <- lubridate::as_datetime(out$time)
@@ -43,7 +45,7 @@ read_forecast <- function(file_in,
   out
 }
 
-
+#GENERALIZATION: Specific target variables
 read_forecast_nc <- function(file_in,
                              target_variables = c("oxygen", 
                                                   "temperature", 
@@ -58,6 +60,7 @@ read_forecast_nc <- function(file_in,
                              reps_col = "ensemble")
 {    
   nc <- ncdf4::nc_open(file_in)
+  #GENERALIZATION:  Hack because ticks didn't make siteID unique in Round 1
   if("ixodes_scapularis" %in% nc$var | "amblyomma_americanum" %in% nc$var){
     siteID <- ncdf4::ncvar_get(nc, "plotID")
   }else{

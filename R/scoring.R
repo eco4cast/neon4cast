@@ -10,6 +10,7 @@
 #'                               package = "neon4cast")
 #' score(forecast_file, "aquatics")                          
 score <- function(forecast,
+                  #GENERALIZATION: need to pool this list from a file
                   theme = c("aquatics", "beetles",
                             "phenology", "terrestrial_30min",
                             "terrestrial_daily","ticks")){
@@ -35,9 +36,8 @@ score <- function(forecast,
 }
   
 
-
-
 GROUP_VARS = c("theme", "team", "issue_date", "siteID", "time")
+#GENERALIZATION:  Need to put this list from a file
 TARGET_VARS = c("oxygen", 
                 "temperature", 
                 "richness",
@@ -64,6 +64,8 @@ na_rm <- function(x) as.numeric(stats::na.exclude(x))
 ## Tidy date formats and drop non-standard columns
 ## shared by targets + forecasts
 standardize_format <- function(df) {
+  
+  #GENERALIZATION:  This is a theme specific hack. How do we generalize?
   ## Put tick dates to ISOweek
   ## (arguably should be applied to beetles if not already done too)
   if ("theme" %in% colnames(df) && all(pull(df,theme) == "ticks")) {
@@ -204,6 +206,8 @@ crps_logs_score <- function(forecast, target){
                     lower95 = mean - 1.96 * sd)
     
   }
+  
+  #GENERALIZATION:  How do we add spatial dimensions in here in a general way?
   ## Ensure both ensemble and stat-based have identical column order:
   out %>% select(any_of(c("theme", "team", "issue_date", "siteID", "time",
                         "target", "mean", "sd", "observed", "crps",
@@ -219,6 +223,7 @@ enforce_schema <- function(df) {
 
 include_horizon <- function(df){
 
+  #GENERALIZATION:  How do we add spatial dimensions in here in a general way?
   interval <- df %>%
     group_by(across(any_of(c("theme", "team", "issue_date", "target", "siteID")))) %>% 
     summarise(interval = min(time-dplyr::lag(time), na.rm=TRUE),
@@ -291,6 +296,7 @@ write_scores <- function(scores, dir = "scores"){
 #' @export
 score_schema  <- function() {
   
+  #GENERALIZATION:  How do we add spatial dimensions in here in a general way?
   arrow::schema(
   theme      = arrow::string(),
   team       = arrow::string(),
@@ -311,7 +317,7 @@ score_schema  <- function() {
 )
 }
 
-
+#GENERALIZATION:  How do we add spatial dimensions in here in a general way?
 score_spec <- function() {
   list(
     "theme" = readr::col_character(),

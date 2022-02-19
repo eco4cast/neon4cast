@@ -13,7 +13,9 @@
 #' forecast_output_validator(forecast_file)
 #' 
 forecast_output_validator <- function(forecast_file, 
+                              #GENERALIZATION: Missing spatial dimension
                                grouping_variables = c("siteID", "time"),
+                              #GENERALIZATION: Specific target variables
                                target_variables = c("oxygen", 
                                                     "temperature", 
                                                     "richness",
@@ -25,6 +27,7 @@ forecast_output_validator <- function(forecast_file,
                                                     "rcc_90",
                                                     "ixodes_scapularis", 
                                                     "ambloyomma_americanum"),
+                              #GENERALIZATION:  Specific themes
                                theme_names = c("aquatics", "beetles",
                                                "phenology", "terrestrial_30min",
                                                "terrestrial_daily","ticks")){
@@ -179,6 +182,7 @@ forecast_output_validator <- function(forecast_file,
     }
     
     #usethis::ui_todo("Checking that siteID variable exists...")
+    #GENERALIZATION: using siteID here - should be site
     if(lexists(nc$var, "siteID")){
       usethis::ui_done("file has siteID variable")
     }else{
