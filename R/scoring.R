@@ -20,7 +20,8 @@ score <- function(forecast,
   ## read from file if necessary
   if(is.character(forecast)){
     filename <- forecast
-    forecast <- read_forecast(forecast) %>% mutate(filename = filename)
+    forecast <- read_forecast(forecast) %>% 
+      mutate(filename = filename)
   }
   ## tables must declare theme and be in "long" form:
   target <- download_target(theme) %>% 
@@ -36,7 +37,7 @@ score <- function(forecast,
 }
   
 
-GROUP_VARS = c("theme", "team", "issue_date", "siteID", "time")
+GROUP_VARS = c("theme", "team", "issue_date", "site", "x", "y", "z", "time")
 #GENERALIZATION:  Need to put this list from a file
 TARGET_VARS = c("oxygen", 
                 "temperature", 
@@ -73,7 +74,52 @@ standardize_format <- function(df) {
       mutate(time = isoweek(time)) %>%
       select(-siteID) %>%
       rename(siteID = plotID)
-    
+  }
+  
+  if(("siteID" %in% colnames(df))){
+    df <- df %>% 
+      rename(site = siteID)
+  }
+  
+  if(!("site" %in% colnames(df))){
+    df <- df %>% 
+      mutate(site = NA)
+  }
+  
+  if(("depth" %in% colnames(df))){
+    df <- df %>% 
+      rename(z = depth)
+  }
+  
+  if(("height" %in% colnames(df))){
+    df <- df %>% 
+      rename(z = height)
+  }
+  
+  
+  if(!("z" %in% colnames(df))){
+    df <- df %>% 
+      mutate(z = NA)
+  }
+  
+  if(("latitude" %in% colnames(df))){
+    df <- df %>% 
+      rename(y = latitude)
+  }
+  
+  if(!("y" %in% colnames(df))){
+    df <- df %>% 
+      mutate(y = NA)
+  }
+  
+  if(("longitude" %in% colnames(df))){
+    df <- df %>% 
+      rename(x = longitude)
+  }
+  
+  if(!("x" %in% colnames(df))){
+    df <- df %>% 
+      mutate(x = NA)
   }
   
   # drop non-standard columns
@@ -82,11 +128,18 @@ standardize_format <- function(df) {
     enforce_schema()
 }
 
+#Select forecasted times using "forecast" flag in standard
+select_forecasts <- function(df){
+  
+  if("forecast" %in% colnames(df)){
+    df <- df %>% dplyr::filter(forecast == 1)
+  }
+  
+  df
+  
+}
 
 #' @importFrom dplyr across any_of
-
-
-
 
 deduplicate_predictions <- function(df){
   
@@ -119,7 +172,6 @@ split_filename <- function(df){
   df
 }
 
-
 pivot_target <- function(df){
 
   df %>% 
@@ -140,9 +192,6 @@ pivot_forecast <- function(df){
                         names_to = "target", 
                         values_to = "predicted")
   
-  
-  
-
   df <- deduplicate_predictions(df)
 
   if("statistic" %in% colnames(df)){
@@ -153,8 +202,6 @@ pivot_forecast <- function(df){
 
   df
 }
-
-
 
 ## Teach crps to treat any NA observations as NA scores:
 crps_sample <- function(y, dat) {
@@ -178,8 +225,6 @@ logs_norm <- function(y, mean, sd) {
            error = function(e) NA_real_, finally = NA_real_)
 }
 
-
-
 ## Requires that forecasts and targets have already been cleaned & pivoted!
 crps_logs_score <- function(forecast, target){
   
@@ -194,24 +239,27 @@ crps_logs_score <- function(forecast, target){
                 sd = sd(predicted, na.rm =TRUE),
                 crps = crps_sample(observed[[1]], na_rm(predicted)),
                 logs = logs_sample(observed[[1]], na_rm(predicted)),
-                upper95 = stats::quantile(predicted, 0.975, na.rm = TRUE),
-                lower95 = stats::quantile(predicted, 0.025, na.rm = TRUE)
-               ) %>% ungroup()
+                quantile02.5 = stats::quantile(predicted, 0.025, na.rm = TRUE),
+                quantile10 = stats::quantile(predicted, 0.10, na.rm = TRUE),
+                quantile90 = stats::quantile(predicted, 0.90, na.rm = TRUE),
+                quantile97.5 = stats::quantile(predicted, 0.975, na.rm = TRUE)) %>% 
+      ungroup()
     
   } else {
     out <- joined  %>% 
       dplyr::mutate(crps = crps_norm(observed, mean, sd),
                     logs = logs_norm(observed, mean, sd),
-                    upper95 = mean + 1.96 * sd,
-                    lower95 = mean - 1.96 * sd)
+                    quantile02.5 = stats::qnorm( 0.025, mean, sd),
+                    quantile10 = stats::qnorm(0.10, mean, sd),
+                    quantile90 = stats::qnorm(0.90, mean, sd),
+                    quantile97.5 = stats::qnorm(0.975, mean, sd))
     
   }
   
-  #GENERALIZATION:  How do we add spatial dimensions in here in a general way?
   ## Ensure both ensemble and stat-based have identical column order:
-  out %>% select(any_of(c("theme", "team", "issue_date", "siteID", "time",
+  out %>% select(any_of(c("theme", "team", "issue_date", "site", "x", "y", "z", "time",
                         "target", "mean", "sd", "observed", "crps",
-                        "logs", "upper95", "lower95", "interval", 
+                        "logs", "quantile02.5", "quantile10","quantile90","quantile97.5","interval", 
                         "forecast_start_time")))
 }
 
@@ -223,9 +271,8 @@ enforce_schema <- function(df) {
 
 include_horizon <- function(df){
 
-  #GENERALIZATION:  How do we add spatial dimensions in here in a general way?
   interval <- df %>%
-    group_by(across(any_of(c("theme", "team", "issue_date", "target", "siteID")))) %>% 
+    group_by(across(any_of(c("theme", "team", "issue_date", "target", "site", "x", "y", "z")))) %>% 
     summarise(interval = min(time-dplyr::lag(time), na.rm=TRUE),
               forecast_start_time = min(time) - interval,
               .groups = "drop")
@@ -263,6 +310,7 @@ score_it <- function(targets_file,
         forecast_file %>%
           read_forecast() %>%
           mutate(filename = forecast_file) %>%
+          select_forecasts() %>%
           pivot_forecast() %>%
           crps_logs_score(target) %>% 
           include_horizon() %>%
@@ -296,12 +344,14 @@ write_scores <- function(scores, dir = "scores"){
 #' @export
 score_schema  <- function() {
   
-  #GENERALIZATION:  How do we add spatial dimensions in here in a general way?
   arrow::schema(
   theme      = arrow::string(),
   team       = arrow::string(),
   issue_date = arrow::date32(),
-  siteID     = arrow::string(),
+  site       = arrow::string(),
+  x          = arrow::float64(),
+  y          = arrow::float64(),
+  z          = arrow::float64(),
   time       = arrow::timestamp("s", timezone="UTC"),
   target     = arrow::string(),
   mean       = arrow::float64(),
@@ -309,21 +359,25 @@ score_schema  <- function() {
   observed   = arrow::float64(),
   crps       = arrow::float64(),
   logs       = arrow::float64(),
-  upper95    = arrow::float64(),
-  lower95    = arrow::float64(),
+  quantile02.5 = arrow::float64(),
+  quantile10 =arrow::float64(),
+  quantile90 = arrow::float64(),
+  quantile97.5 = arrow::float64(),
   interval   = arrow::int64(),
   forecast_start_time = arrow::timestamp("s", timezone="UTC"),
   horizon    = arrow::float64()
 )
 }
 
-#GENERALIZATION:  How do we add spatial dimensions in here in a general way?
 score_spec <- function() {
   list(
     "theme" = readr::col_character(),
     "team" = readr::col_character(),
     "issue_date" = readr::col_character(),
-    "siteID" = readr::col_character(),
+    "site" = readr::col_character(),
+    "x"      = readr::col_double(),
+    "y"     = readr::col_double(),
+    "z"   = readr::col_double(),
     "time" = readr::col_datetime(),
     "target"  = readr::col_character(),
     "mean" = readr::col_double(),
@@ -331,8 +385,10 @@ score_spec <- function() {
     "observed" = readr::col_double(),
     "crps" = readr::col_double(),
     "logs" = readr::col_double(),
-    "upper95" = readr::col_double(),
-    "lower95" = readr::col_double(),
+    "quantile02.5"= readr::col_double(),
+    "quantile10" = readr::col_double(),
+    "quantile90" = readr::col_double(),
+    "quantile97.5" = readr::col_double(),
     "interval" = readr::col_integer(),
     "forecast_start_time" = readr::col_datetime()
   )

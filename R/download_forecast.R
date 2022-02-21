@@ -14,13 +14,17 @@
 #' download_forecast("phenology")
 download_forecast <- function(theme,
                          date = Sys.Date()-2, 
-                         dir = tempdir()){
+                         dir = tempdir(),
+                         s3_region = "data",
+                         s3_endpoint = "ecoforecast.org"){
   lapply(theme, download_forecast_, date, dir)
   invisible(dir)
 }
 download_forecast_ <- function(theme, 
                           date = Sys.Date()-2, 
-                          dir = tempdir()){
+                          dir = tempdir(),
+                          s3_region = "data",
+                          s3_endpoint = "ecoforecast.org"){
   
   dir.create(dir, FALSE, TRUE)
   parent_theme <- unlist(stringr::str_split(theme, "_"))[1]
@@ -28,15 +32,15 @@ download_forecast_ <- function(theme,
   #GENERALIZATION:  Specific AWS info
   object <- aws.s3::get_bucket("forecasts",
                                prefix = prefix,
-                               region = "data",
-                               base_url = "ecoforecast.org")
+                               region = s3_region,
+                               base_url = s3_endpoint)
   
   #GENERALIZATION:  Specific AWS info
   for(i in seq_along(object)){
     aws.s3::save_object(object[[i]], 
                         bucket = "forecasts", 
                         file = file.path(dir, object[[i]]$Key),
-                        region = "data",
-                        base_url = "ecoforecast.org")
+                        region = s3_region,
+                        base_url = s3_endpoint)
   }
 }
