@@ -7,18 +7,18 @@ download_target <- function(theme = c("aquatics", "beetles",
                             download_url = NA){  
   
   if(is.na(target_url)){
-  theme <- match.arg(theme)
-  
-  target_file <- switch(theme,
-                        aquatics = "aquatics-targets.csv.gz",
-                        beetles = "beetles-targets.csv.gz",
-                        phenology = "phenology-targets.csv.gz",
-                        terrestrial_daily = "terrestrial_daily-targets.csv.gz",
-                        terrestrial_30min = "terrestrial_30min-targets.csv.gz",
-                        ticks = "ticks-targets.csv.gz"
-  )
-  download_url <- paste0("https://data.ecoforecast.org/targets/",
-                         theme, "/", target_file)
+    theme <- match.arg(theme)
+    
+    target_file <- switch(theme,
+                          aquatics = "aquatics-targets.csv.gz",
+                          beetles = "beetles-targets.csv.gz",
+                          phenology = "phenology-targets.csv.gz",
+                          terrestrial_daily = "terrestrial_daily-targets.csv.gz",
+                          terrestrial_30min = "terrestrial_30min-targets.csv.gz",
+                          ticks = "ticks-targets.csv.gz"
+    )
+    download_url <- paste0("https://data.ecoforecast.org/targets/",
+                           theme, "/", target_file)
   }
   
   readr::read_csv(download_url, show_col_types = FALSE,
