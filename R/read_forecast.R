@@ -63,10 +63,43 @@ read_forecast_nc <- function(file_in,
   #GENERALIZATION:  Hack because ticks didn't make siteID unique in Round 1
   if("ixodes_scapularis" %in% nc$var | "amblyomma_americanum" %in% nc$var){
     siteID <- ncdf4::ncvar_get(nc, "plotID")
-  }else{
+  }
+  
+  time <- as.integer(ncdf4::ncvar_get(nc, "time"))
+  
+  if("siteID" %in% nc$var){
     siteID <- ncdf4::ncvar_get(nc, "siteID")  
   }
-  time <- as.integer(ncdf4::ncvar_get(nc, "time"))
+  
+  if("site" %in% nc$var){
+    site <- ncdf4::ncvar_get(nc, "site")  
+  }
+  
+  
+  if("depth" %in% nc$var){
+    depth <- ncdf4::ncvar_get(nc, "depth")  
+  }
+  
+  if("latitude" %in% nc$var){
+    latitude <- ncdf4::ncvar_get(nc, "latitude") 
+  }
+  
+  if("longitude" %in% nc$var){
+    longitude <- ncdf4::ncvar_get(nc, "longitude") 
+  }
+  
+  if("x" %in% nc$var){
+    x <- ncdf4::ncvar_get(nc, "x") 
+  }
+  
+  if("y" %in% nc$var){
+    y <- ncdf4::ncvar_get(nc, "y") 
+  }
+  
+  if("z" %in% nc$var){
+    z <- ncdf4::ncvar_get(nc, "z") 
+  }
+  
   #tustr<-strsplit(ncdf4::ncatt_get(nc, varid = "time", "units")$value, " ")
   #time <-lubridate::as_date(time,origin=unlist(tustr)[3])
   t_string <- strsplit(ncdf4::ncatt_get(nc, varid = "time", "units")$value, " ")[[1]]
@@ -90,6 +123,7 @@ read_forecast_nc <- function(file_in,
         tidyr::pivot_longer(-time, names_to = reps_col, values_to = "value") %>%
         dplyr::mutate(siteID = siteID[i],
                       variable = targets[j])
+      
       combined_forecast <- dplyr::bind_rows(combined_forecast, d)
     }
   }

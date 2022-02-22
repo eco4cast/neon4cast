@@ -3,7 +3,10 @@
 
 download_target <- function(theme = c("aquatics", "beetles",
                                       "phenology", "terrestrial_30min",
-                                      "terrestrial_daily","ticks")){  
+                                      "terrestrial_daily","ticks"),
+                            download_url = NA){  
+  
+  if(is.na(target_url)){
   theme <- match.arg(theme)
   
   target_file <- switch(theme,
@@ -16,6 +19,7 @@ download_target <- function(theme = c("aquatics", "beetles",
   )
   download_url <- paste0("https://data.ecoforecast.org/targets/",
                          theme, "/", target_file)
+  }
   
   readr::read_csv(download_url, show_col_types = FALSE,
                   lazy = FALSE, progress = FALSE)

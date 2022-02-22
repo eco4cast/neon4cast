@@ -10,11 +10,22 @@
 #'                               package = "neon4cast")
 #' score(forecast_file, "aquatics")                          
 score <- function(forecast,
-                  #GENERALIZATION: need to pool this list from a file
                   theme = c("aquatics", "beetles",
                             "phenology", "terrestrial_30min",
-                            "terrestrial_daily","ticks")){
-
+                            "terrestrial_daily","ticks"),
+                  target_url = NA,
+                  target_vars = c("oxygen", 
+                                  "temperature", 
+                                  "richness",
+                                  "abundance", 
+                                  "nee",
+                                  "le", 
+                                  "vswc",
+                                  "gcc_90",
+                                  "rcc_90",
+                                  "ixodes_scapularis",
+                                  "amblyomma_americanum")){
+  
   theme = match.arg(theme)
   
   ## read from file if necessary
@@ -24,34 +35,35 @@ score <- function(forecast,
       mutate(filename = filename)
   }
   ## tables must declare theme and be in "long" form:
-  target <- download_target(theme) %>% 
+  target <- download_target(theme, target_url) %>% 
     mutate(theme = theme) %>%
-    pivot_target()
+    pivot_target(target_vars)
+  
   forecast <- forecast %>% 
     mutate(theme=theme) %>%
-    pivot_forecast()
+    pivot_forecast(target_vars)
   
   
   crps_logs_score(forecast, target)
   
 }
-  
 
-GROUP_VARS = c("theme", "team", "issue_date", "site", "x", "y", "z", "time")
+
+#GROUP_VARS = c("theme", "team", "issue_date", "site", "x", "y", "z", "time")
 #GENERALIZATION:  Need to put this list from a file
-TARGET_VARS = c("oxygen", 
-                "temperature", 
-                "richness",
-                "abundance", 
-                "nee",
-                "le", 
-                "vswc",
-                "gcc_90",
-                "rcc_90",
-                "ixodes_scapularis",
-                "amblyomma_americanum")
-STAT_VARS = c("ensemble", "statistic")
-VARS <- c(GROUP_VARS, TARGET_VARS, STAT_VARS)
+#TARGET_VARS = c("oxygen", 
+#                "temperature", 
+#                "richness",
+#                "abundance", 
+#                "nee",
+#                "le", 
+#                "vswc",
+#                "gcc_90",
+#                "rcc_90",
+#                "ixodes_scapularis",
+#                "amblyomma_americanum")
+#STAT_VARS = c("ensemble", "statistic")
+#VARS <- c(GROUP_VARS, TARGET_VARS, STAT_VARS)
 
 
 
@@ -64,7 +76,10 @@ na_rm <- function(x) as.numeric(stats::na.exclude(x))
 
 ## Tidy date formats and drop non-standard columns
 ## shared by targets + forecasts
-standardize_format <- function(df) {
+standardize_format <- function(df, target_vars) {
+  
+  column_names <- c("theme", "team", "issue_date", "site", "x", "y", "z", "time",
+                    target_vars, "ensemble", "statistic")
   
   #GENERALIZATION:  This is a theme specific hack. How do we generalize?
   ## Put tick dates to ISOweek
@@ -124,14 +139,14 @@ standardize_format <- function(df) {
   
   # drop non-standard columns
   df %>% 
-    dplyr::select(tidyselect::any_of(VARS)) %>%
+    dplyr::select(tidyselect::any_of(column_names)) %>%
     enforce_schema()
 }
 
 #Select forecasted times using "forecast" flag in standard
-select_forecasts <- function(df){
+select_forecasts <- function(df, only_forecasts){
   
-  if("forecast" %in% colnames(df)){
+  if("forecast" %in% colnames(df) & only_forecasts){
     df <- df %>% dplyr::filter(forecast == 1)
   }
   
@@ -172,34 +187,34 @@ split_filename <- function(df){
   df
 }
 
-pivot_target <- function(df){
-
+pivot_target <- function(df, target_vars){
+  
   df %>% 
-    standardize_format() %>% 
-    tidyr::pivot_longer(tidyselect::any_of(TARGET_VARS), 
+    standardize_format(target_vars = target_vars) %>% 
+    tidyr::pivot_longer(tidyselect::any_of(target_vars), 
                         names_to = "target", 
                         values_to = "observed") %>% 
     filter(!is.na(observed))
 }
 
 
-pivot_forecast <- function(df){
+pivot_forecast <- function(df, target_vars){
   
   df <- df %>% 
     split_filename() %>%
-    standardize_format() %>% 
-    tidyr::pivot_longer(tidyselect::any_of(TARGET_VARS), 
+    standardize_format(target_vars = target_vars) %>% 
+    tidyr::pivot_longer(tidyselect::any_of(target_vars), 
                         names_to = "target", 
                         values_to = "predicted")
   
   df <- deduplicate_predictions(df)
-
+  
   if("statistic" %in% colnames(df)){
     df <- df %>% 
       tidyr::pivot_wider(names_from = statistic,
                          values_from = predicted)
   }
-
+  
   df
 }
 
@@ -230,7 +245,7 @@ crps_logs_score <- function(forecast, target){
   
   ## FIXME ensure either both or none have "theme", "issue_date", "team"
   # left join will keep predictions even where we have no observations
-  joined <- dplyr::left_join(forecast, target)
+  joined <- dplyr::left_join(forecast, target, by = c("theme", "site", "x", "y", "z", "time", "target"))
   
   if("ensemble" %in% colnames(joined)){
     out <- joined %>% 
@@ -242,8 +257,7 @@ crps_logs_score <- function(forecast, target){
                 quantile02.5 = stats::quantile(predicted, 0.025, na.rm = TRUE),
                 quantile10 = stats::quantile(predicted, 0.10, na.rm = TRUE),
                 quantile90 = stats::quantile(predicted, 0.90, na.rm = TRUE),
-                quantile97.5 = stats::quantile(predicted, 0.975, na.rm = TRUE)) %>% 
-      ungroup()
+                quantile97.5 = stats::quantile(predicted, 0.975, na.rm = TRUE), .groups = "drop")
     
   } else {
     out <- joined  %>% 
@@ -258,19 +272,19 @@ crps_logs_score <- function(forecast, target){
   
   ## Ensure both ensemble and stat-based have identical column order:
   out %>% select(any_of(c("theme", "team", "issue_date", "site", "x", "y", "z", "time",
-                        "target", "mean", "sd", "observed", "crps",
-                        "logs", "quantile02.5", "quantile10","quantile90","quantile97.5","interval", 
-                        "forecast_start_time")))
+                          "target", "mean", "sd", "observed", "crps",
+                          "logs", "quantile02.5", "quantile10","quantile90","quantile97.5","interval", 
+                          "forecast_start_time")))
 }
 
 enforce_schema <- function(df) {
   df %>% 
     mutate(across(any_of(c("time", "forecast_start_time")),
-           .fns = as.POSIXct))
+                  .fns = as.POSIXct))
 }
 
 include_horizon <- function(df){
-
+  
   interval <- df %>%
     group_by(across(any_of(c("theme", "team", "issue_date", "target", "site", "x", "y", "z")))) %>% 
     summarise(interval = min(time-dplyr::lag(time), na.rm=TRUE),
@@ -279,7 +293,7 @@ include_horizon <- function(df){
   
   ## add columns for start_time and horizon
   df %>% 
-    left_join(interval) %>% 
+    left_join(interval, by = c("theme", "team", "issue_date", "site", "x", "y", "z", "target")) %>% 
     mutate(horizon = time - forecast_start_time)
 }
 
@@ -290,7 +304,19 @@ include_horizon <- function(df){
 ## scores in working RAM at the same time.
 score_it <- function(targets_file, 
                      forecast_files, 
-                     dir = "scores"
+                     dir = "scores",
+                     target_vars = c("oxygen", 
+                                     "temperature", 
+                                     "richness",
+                                     "abundance", 
+                                     "nee",
+                                     "le", 
+                                     "vswc",
+                                     "gcc_90",
+                                     "rcc_90",
+                                     "ixodes_scapularis",
+                                     "amblyomma_americanum"),
+                     only_forecasts = TRUE
 ){
   
   dir.create(dir, FALSE, TRUE)
@@ -301,24 +327,26 @@ score_it <- function(targets_file,
     readr::read_csv(targets_file, show_col_types = FALSE,
                     lazy = FALSE, progress = FALSE) %>% 
     mutate(theme = theme) %>%
-    pivot_target()
-
-    ## read, format, and score and write out each forecast file
-    suppressMessages({
+    pivot_target(target_vars)
+  
+  ## read, format, and score and write out each forecast file
+  suppressMessages({
     furrr::future_walk(forecast_files,
-      function(forecast_file, target){
-        forecast_file %>%
-          read_forecast() %>%
-          mutate(filename = forecast_file) %>%
-          select_forecasts() %>%
-          pivot_forecast() %>%
-          crps_logs_score(target) %>% 
-          include_horizon() %>%
-          write_scores(dir)
-      }, 
-      target = target
+                       function(forecast_file, target, target_vars, only_forecasts){
+                         forecast_file %>%
+                           read_forecast() %>%
+                           mutate(filename = forecast_file) %>%
+                           select_forecasts(only_forecasts) %>%
+                           pivot_forecast(target_vars) %>%
+                           crps_logs_score(target) %>% 
+                           include_horizon() %>%
+                           write_scores(dir)
+                       }, 
+                       target = target,
+                       target_vars = target_vars,
+                       only_forecasts = only_forecasts
     )
-    })
+  })
 }
 
 
@@ -345,28 +373,28 @@ write_scores <- function(scores, dir = "scores"){
 score_schema  <- function() {
   
   arrow::schema(
-  theme      = arrow::string(),
-  team       = arrow::string(),
-  issue_date = arrow::date32(),
-  site       = arrow::string(),
-  x          = arrow::float64(),
-  y          = arrow::float64(),
-  z          = arrow::float64(),
-  time       = arrow::timestamp("s", timezone="UTC"),
-  target     = arrow::string(),
-  mean       = arrow::float64(),
-  sd         = arrow::float64(),
-  observed   = arrow::float64(),
-  crps       = arrow::float64(),
-  logs       = arrow::float64(),
-  quantile02.5 = arrow::float64(),
-  quantile10 =arrow::float64(),
-  quantile90 = arrow::float64(),
-  quantile97.5 = arrow::float64(),
-  interval   = arrow::int64(),
-  forecast_start_time = arrow::timestamp("s", timezone="UTC"),
-  horizon    = arrow::float64()
-)
+    theme      = arrow::string(),
+    team       = arrow::string(),
+    issue_date = arrow::date32(),
+    site       = arrow::string(),
+    x          = arrow::float64(),
+    y          = arrow::float64(),
+    z          = arrow::float64(),
+    time       = arrow::timestamp("s", timezone="UTC"),
+    target     = arrow::string(),
+    mean       = arrow::float64(),
+    sd         = arrow::float64(),
+    observed   = arrow::float64(),
+    crps       = arrow::float64(),
+    logs       = arrow::float64(),
+    quantile02.5 = arrow::float64(),
+    quantile10 =arrow::float64(),
+    quantile90 = arrow::float64(),
+    quantile97.5 = arrow::float64(),
+    interval   = arrow::int64(),
+    forecast_start_time = arrow::timestamp("s", timezone="UTC"),
+    horizon    = arrow::float64()
+  )
 }
 
 score_spec <- function() {
@@ -394,7 +422,7 @@ score_spec <- function() {
   )
 }
 
-utils::globalVariables(c("observed", "predicted", "value",
-                         "variable", "statistic", "sd", 
-                         "filename"),
-                       "neon4cast")
+#utils::globalVariables(c("observed", "predicted", "value",
+#                         "variable", "statistic", "sd", 
+#                         "filename"),
+#                       "neon4cast")
