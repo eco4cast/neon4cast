@@ -35,7 +35,8 @@ Imports:
     tidyr,
     furrr,
     vctrs,
-    arrow
+    arrow,
+    tidync
 RoxygenNote: 7.1.2
 Language: en-US
 Suggests: 
