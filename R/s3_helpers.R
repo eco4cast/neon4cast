@@ -1,15 +1,15 @@
 #' Download target data from s3
 #'
 #' @param dir full path to working directory
-#' @param config flare configuration object
+#' @param theme forecast theme
 #'
 #' @return
 #' @export
 #'
-get_target <- function(dir, site, s3_region = Sys.getenv("AWS_DEFAULT_REGION")){
+get_target <- function(dir, theme, s3_region = Sys.getenv("AWS_DEFAULT_REGION")){
   download_s3_objects(dir,
                       bucket = "targets",
-                      prefix = site)
+                      prefix = theme)
 }
 
 ####
