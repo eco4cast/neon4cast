@@ -4,7 +4,13 @@
 \alias{download_forecast}
 \title{Download forecasts for NEON sites from the EFI server}
 \usage{
-download_forecast(theme, date = Sys.Date() - 2, dir = tempdir())
+download_forecast(
+  theme,
+  date = Sys.Date() - 2,
+  dir = tempdir(),
+  s3_region = "data",
+  s3_endpoint = "ecoforecast.org"
+)
 }
 \arguments{
 \item{theme}{string of the theme}

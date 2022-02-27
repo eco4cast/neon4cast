@@ -329,24 +329,38 @@ score_it <- function(targets_file,
     mutate(theme = theme) %>%
     pivot_target(target_vars)
   
-  ## read, format, and score and write out each forecast file
-  suppressMessages({
-    furrr::future_walk(forecast_files,
-                       function(forecast_file, target, target_vars, only_forecasts){
-                         forecast_file %>%
-                           read_forecast() %>%
-                           mutate(filename = forecast_file) %>%
-                           select_forecasts(only_forecasts) %>%
-                           pivot_forecast(target_vars) %>%
-                           crps_logs_score(target) %>% 
-                           include_horizon() %>%
-                           write_scores(dir)
-                       }, 
-                       target = target,
-                       target_vars = target_vars,
-                       only_forecasts = only_forecasts
-    )
-  })
+  for(jj in 1:length(forecast_files)){
+    message(paste0(jj, "of", length(forecast_files), " ", forecast_files[jj]))
+    forecast_file <- forecast_files[jj]
+    forecast_file %>%
+      read_forecast() %>%
+      mutate(filename = forecast_file) %>%
+      select_forecasts(only_forecasts) %>%
+      pivot_forecast(target_vars) %>%
+      crps_logs_score(target) %>% 
+      include_horizon() %>%
+      write_scores(dir)
+    
+  }
+  
+  # ## read, format, and score and write out each forecast file
+  # suppressMessages({
+  #  furrr::future_walk(forecast_files,
+  #                      function(forecast_file, target, target_vars, only_forecasts){
+  #                        forecast_file %>%
+  #                          read_forecast() %>%
+  #                          mutate(filename = forecast_file) %>%
+  #                          select_forecasts(only_forecasts) %>%
+  #                          pivot_forecast(target_vars) %>%
+  #                          crps_logs_score(target) %>% 
+  #                          include_horizon() %>%
+  #                          write_scores(dir)
+  #                      }, 
+  #                      target = target,
+  #                      target_vars = target_vars,
+  #                      only_forecasts = only_forecasts
+  #   )
+  # })
 }
 
 

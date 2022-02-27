@@ -4,7 +4,11 @@
 \alias{check_submission}
 \title{Check that submission was successfully processed}
 \usage{
-check_submission(forecast_file)
+check_submission(
+  forecast_file,
+  s3_region = "data",
+  s3_endpoint = "ecoforecast.org"
+)
 }
 \arguments{
 \item{forecast_file}{Your forecast csv or nc file}

@@ -7,7 +7,10 @@
 score(
   forecast,
   theme = c("aquatics", "beetles", "phenology", "terrestrial_30min",
-    "terrestrial_daily", "ticks")
+    "terrestrial_daily", "ticks"),
+  target_url = NA,
+  target_vars = c("oxygen", "temperature", "richness", "abundance", "nee", "le",
+    "vswc", "gcc_90", "rcc_90", "ixodes_scapularis", "amblyomma_americanum")
 )
 }
 \arguments{

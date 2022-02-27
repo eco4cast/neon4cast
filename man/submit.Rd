@@ -4,7 +4,13 @@
 \alias{submit}
 \title{submit forecast to EFI}
 \usage{
-submit(forecast_file, metadata = NULL, ask = interactive())
+submit(
+  forecast_file,
+  metadata = NULL,
+  ask = interactive(),
+  s3_region = "data",
+  s3_endpoint = "ecoforecast.org"
+)
 }
 \arguments{
 \item{forecast_file}{Your forecast csv or nc file}

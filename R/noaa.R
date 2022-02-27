@@ -64,7 +64,6 @@ stack_noaa <- function(dir = tempdir(), forecast_date = NULL) {
     files <- files[stringr::str_detect(files, forecast_date)]
   }
   
-  
   out <- purrr::map_dfr(files, function(x){
     tidync::hyper_tibble(tidync::tidync(x))
   }, .id = "file")
@@ -82,6 +81,43 @@ stack_noaa <- function(dir = tempdir(), forecast_date = NULL) {
   
   return(out)
 }
+
+#' Download stacked NOAA data from s3 bucket
+#'
+#' @param dir full path to working directory
+#' @param config flare configuration object
+#' @param averaged logistical; TRUE = download averaged stacked forecast
+#'
+#' @return
+#' @export
+#'
+get_stacked_noaa_s3 <- function(dir, site, averaged = TRUE, s3_region = Sys.getenv("AWS_DEFAULT_REGION")){
+  
+  if(averaged){
+    download_s3_objects(dir, bucket = "drivers", prefix = file.path("noaa/NOAAGEFS_1hr_stacked_average",site), s3_region)
+  }else{
+    download_s3_objects(dir, bucket = "drivers", prefix = file.path("noaa/NOAAGEFS_1hr_stacked",site), s3_region)
+  }
+}
+
+#' Download driver forecasts from s3 bucket
+#'
+#' @param dir full path to working directory
+#' @param forecast_path relative path of the driver forecast (relative to driver directory or bucket)
+#'
+#' @return
+#' @export
+#'
+get_noaa_forecast_s3 <- function(dir, model, site, date, cycle, s3_region = Sys.getenv("AWS_DEFAULT_REGION")){
+  
+  download_s3_objects(dir,
+                      bucket = "drivers",
+                      prefix = file.path("noaa",model, site, date, cycle),
+                      s3_region = s3_region)
+}
+
+
+
 ############ and we're ready to go:
 
 
