@@ -149,9 +149,13 @@ generate_metadata <- function(
   
   model_metadata$forecast$metadata_standard_version <- 0.3
   
+  model_metadata$forecast$forecast_horizon <- paste0(as.numeric(model_metadata$forecast$forecast_horizon), " seconds")
+  
+
+  
   my_eml <- EML::eml$eml(dataset = dataset,
                          additionalMetadata = EML::eml$additionalMetadata(metadata = model_metadata),
-                         packageId = forecast_iteration_id , 
+                         packageId = model_metadata$forecast$forecast_iteration_id , 
                          system = "datetime"  ## system used to generate packageId
   )
   

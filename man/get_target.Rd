@@ -4,12 +4,12 @@
 \alias{get_target}
 \title{Download target data from s3}
 \usage{
-get_target(dir, site, s3_region = Sys.getenv("AWS_DEFAULT_REGION"))
+get_target(dir, theme, s3_region = Sys.getenv("AWS_DEFAULT_REGION"))
 }
 \arguments{
 \item{dir}{full path to working directory}
 
-\item{config}{flare configuration object}
+\item{theme}{forecast theme}
 }
 \value{
 
