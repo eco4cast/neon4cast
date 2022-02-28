@@ -18,7 +18,7 @@ download_s3_objects <- function(dir, bucket, prefix, s3_region = Sys.getenv("AWS
   
   files <- aws.s3::get_bucket(bucket = bucket,
                               prefix = prefix,
-                              region = region,
+                              region = s3_region,
                               use_https = as.logical(Sys.getenv("USE_HTTPS")))
   keys <- vapply(files, `[[`, "", "Key", USE.NAMES = FALSE)
   empty <- grepl("/$", keys)
@@ -28,7 +28,7 @@ download_s3_objects <- function(dir, bucket, prefix, s3_region = Sys.getenv("AWS
       aws.s3::save_object(object = keys[i],
                           bucket = bucket,
                           file = file.path(dir, bucket, keys[i]),
-                          region = region,
+                          region = s3_region,
                           use_https = as.logical(Sys.getenv("USE_HTTPS")))
     }
   }
