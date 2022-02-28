@@ -1,91 +1,89 @@
-#' Write model metadata from template
-#' 
-#' @param forecast_file full path of forecast file
-#' @export
-#' 
-create_model_metadata <- function(forecast_file){
-  
-  dir <- dirname(forecast_file)
-  filename <- tools::file_path_sans_ext(basename(forecast_file),
-                                        compression = TRUE)
-  
-  theme <- stringr::str_split(filename, "-")[[1]][1]
-  team  <- stringr::str_split(filename, "-")[[1]][5]
-  
-  template_name <- paste0(theme, "-", team, ".yml")
-  
-  message("You only need to run this function once to generate the model metadata template.")  
-  message("If you model does not change between submittions you will not need change the yml.")
-  message("In this case, use a previously generated yaml in the write_metadata_eml() call")
-  message("If your model does change, save your old yaml under a new name and modify")
-  
-  
-  file.copy(system.file("extdata/metadata_template.yml", package="neon4cast"),
-            file.path(dir, template_name))
-  template <- file.path(dir, template_name)
-  usethis::edit_file(template)
-  
-}
-
 #' Generate metadata from forecast and template files
 #' 
 #' @param forecast_file full path to forecast file
-#' @param metadata_yaml full path to meta data template fill
-#' @param forecast_issue_time time that forecast was generated
+#' @param list of team members
+#' @param model_metadata list of model metadata
 #' @param forecast_iteration_id unique ID for forecast
+#' @param title ,
+#' @param team_name,
+#' @param intellectualRights,
+#' @param abstract
+#' @param methods
+#' @param attributes
+#' @param forecast_issue_time
 #' @export
 #' 
-write_metadata_eml <- function(forecast_file, 
-                              metadata_yaml, 
-                              forecast_issue_time, 
-                              forecast_iteration_id){
+generate_metadata <- function(
+  forecast_file,
+  team_list,
+  model_metadata,
+  forecast_iteration_id = NULL,
+  title = NULL,
+  team_name = NULL,
+  intellectualRights = "https://creativecommons.org/licenses/by/4.0/",
+  abstract = NULL,
+  methods = NULL,
+  attributes = NULL,
+  forecast_issue_time = NULL){
   
   dir <- dirname(forecast_file)
   
   forecast_file_name_base <- tools::file_path_sans_ext(tools::file_path_sans_ext(basename(forecast_file)))
-  metadata <- yaml::read_yaml(metadata_yaml)
   
-  forecast <- read_forecast(file_in = forecast_file)
- 
+  forecast <- neon4cast:::read_forecast(file_in = forecast_file)
+  
   theme <- unlist(stringr::str_split(stringr::str_split(forecast_file_name_base, "-")[[1]][1], "_")[[1]][1])
-  team_name <- unlist(stringr::str_split(forecast_file_name_base, "-"))[5]
   
-  attribute_file <- system.file(paste0("extdata/",theme, "_metadata_attributes.csv"), package="neon4cast")
-  if(file.exists(attribute_file)){
-    attributes <- readr::read_csv(attribute_file)
-  }else{
-    warning("Error in file name.  Please check the submission guidelines for file name conventions", call. = FALSE)
+  if(is.null(team_name)){
+    team_name <- unlist(stringr::str_split(forecast_file_name_base, "-"))[5]
   }
   
-  if("ensemble" %in% names(forecast)){
-    attributes <- dplyr::filter(attributes, attributeName != "statistic")
-    num_variables <- length(which(stringr::str_detect(attributes$attributeDefinition,"variable")))
-    # use EML package to build the attribute list
-    attrList <- EML::set_attributes(attributes, 
-                                    col_classes = c("Date", "numeric", "character","numeric","numeric", 
-                                                    rep("numeric", num_variables)))
-  }else if("statistic" %in% names(forecast)){
-    attributes <- dplyr::filter(attributes, attributeName != "ensemble")
-    num_variables <- length(which(stringr::str_detect(attributes$attributeDefinition,"variable")))
-    # use EML package to build the attribute list
-    attrList <- EML::set_attributes(attributes, 
-                                    col_classes = c("Date", "character", "character","numeric","numeric", 
-                                                    rep("numeric", num_variables)))
-  }else{
-    message("Column names in file does not have ensemble or statistic column")
+  if(is.null(attributes)){
+    attribute_file <- system.file(paste0("extdata/",theme, "_metadata_attributes.csv"), package="neon4cast")
+    if(file.exists(attribute_file)){
+      attributes <- readr::read_csv(attribute_file)
+    }else{
+      warning("Error in file name.  Please check the submission guidelines for file name conventions", call. = FALSE)
+    }
+    
+    if("data_assimilation" %in% names(forecast)){
+      attributes <- dplyr::filter(attributes, attributeName != "data_assimilation")
+    }
+    
+    #NEED TO CHECK THAT COLUMNS IN FORECAST FILE MATCH THE COLUMNS IN THE ATTRIBUTE FILE
+    
+    if("ensemble" %in% names(forecast)){
+      attributes <- dplyr::filter(attributes, attributeName != "statistic")
+      num_variables <- length(which(stringr::str_detect(attributes$attributeDefinition,"variable")))
+      # use EML package to build the attribute list
+    }else if("statistic" %in% names(forecast)){
+      attributes <- dplyr::filter(attributes, attributeName != "ensemble")
+      num_variables <- length(which(stringr::str_detect(attributes$attributeDefinition,"variable")))
+      # use EML package to build the attribute list
+      
+    }else{
+      message("Column names in file does not have ensemble or statistic column")
+    }
   }
+  
+  col_classes <- attributes$numberType
+  col_classes[which(col_classes == "datetime")] <- "Date"
+  col_classes[which(col_classes == "integer")] <- "numeric"
+  col_classes[which(col_classes == "real")] <- "numeric"
+  
+  
+  attrList <- EML::set_attributes(attributes, 
+                                  col_classes = col_classes)
   
   entityDescription_text <- switch(theme,
-         terrestrial = "Forecast of NEE and LE for four NEON sites",
-         aquatics = "Forecasts of water temperature and oxygen",
-         beetles = "Forecasts of beetles abundance and richness",
-         tick =  "Forecasts of tick abundance",
-         phenology =  "Forecasts of GCC"
+                                   terrestrial = "forecast of ecosystem carbon and water exchange with the atmosphere",
+                                   aquatics = "forecast of temperature, oxygen, and chlorophyll-a in lakes and streams",
+                                   beetles = "forecast of beetle community abundance and richness",
+                                   tick =  "forecast of tick abundance",
+                                   phenology =  "forecast of canopy greeness and redness indexes"
   )
-
-  # use EML package to build the attribute list
-
   
+  # use EML package to build the attribute list
   
   # use EML package to build the physical list
   physical <- EML::set_physical(forecast_file)
@@ -108,31 +106,53 @@ write_metadata_eml <- function(forecast_file,
                              list(beginDate = list(calendarDate = start_date),
                                   endDate = list(calendarDate = stop_date)))
   
+  if(is.null(forecast_issue_time)){
+    forecast_issue_time <- Sys.Date()
+  }
+  
   # Create the coverage EML
   coverage <- list(geographicCoverage = geographicCoverage,
                    temporalCoverage = temporalCoverage)
   
+  if(is.null(title)){
+    title <- paste0(team_name," ",entityDescription_text)
+  }
   # Create the dataset EML
   dataset <- EML::eml$dataset(
-    title = "Daily persistence null forecast for nee and lee",
-    creator = metadata$team_list,
-    contact = metadata$team_list[[1]],
+    title = title,
+    creator = team_list,
+    contact = team_list[[1]],
     pubDate = lubridate::as_date(forecast_issue_time),
-    intellectualRights = "https://creativecommons.org/licenses/by/4.0/",
+    intellectualRights = intellectualRights,
+    abstract = abstract,
+    methods = methods,
     dataTable = dataTable,
     coverage = coverage
   )
   
-  metadata$metadata$forecast$forecast_issue_time <- lubridate::as_date(forecast_issue_time)
-  metadata$metadata$forecast$forecast_iteration_id <- forecast_iteration_id
-  metadata$metadata$forecast$forecast_project_id <- team_name
+  model_metadata$forecast$forecast_issue_time <- lubridate::as_date(forecast_issue_time)
+  if(is.null(forecast_iteration_id)){
+    model_metadata$forecast$forecast_iteration_id <- Sys.time()
+  }
+  model_metadata$forecast$forecast_project_id <- team_name
   
-  metadata$metadata$forecast$metadata_standard_version <- 0.3
+  if("forecasted" %in% names(forecast)){
+    time_vector <- unique(forecast$time[which(forecast$forecast == 1)])
+  }else{
+    time_vector <- unique(forecast$time)
+  }
+  
+  model_metadata$forecast$timestep <- as.numeric(lubridate::as.duration(time_vector[2] - time_vector[1]))
+  model_metadata$forecast$forecast_horizon <- lubridate::as.duration(max(time_vector) - 
+                                                           min(time_vector)) + 
+    model_metadata$forecast$timestep
+  
+  model_metadata$forecast$metadata_standard_version <- 0.3
   
   my_eml <- EML::eml$eml(dataset = dataset,
-                    additionalMetadata = EML::eml$additionalMetadata(metadata = metadata$metadata),
-                    packageId = forecast_iteration_id , 
-                    system = "datetime"  ## system used to generate packageId
+                         additionalMetadata = EML::eml$additionalMetadata(metadata = model_metadata),
+                         packageId = forecast_iteration_id , 
+                         system = "datetime"  ## system used to generate packageId
   )
   
   # Check that EML matches EFI Standards
@@ -154,25 +174,10 @@ write_metadata_eml <- function(forecast_file,
 # 
 # neon_geographic_coverage(c("BART", "KONZ", "SRER", "OSBS"))
 neon_geographic_coverage <- function(sites){
-  geo <- jsonlite::read_json(system.file("extdata/geo.json", package="neon4cast"))
+  geo <- jsonlite::read_json(system.file("extdata/neon_geo.json", package="neon4cast"))
   site_ids <- purrr::map_chr(purrr::map(geo, "geographicDescription"), 1)
   site_ids <- purrr::map_chr(strsplit(site_ids, ","), 1)
-  geo[sites]
-}
-
-theme_sites <- function(theme){
-  switch(theme,
-         terrestrial = c("BART", "KONZ", "SRER", "OSBS"),
-         aquatic = c("BARC", "POSE"),
-         beetles = c("BART", "HARV", "BLAN", "SCBI", "SERC", "DSNY", "JERC", "OSBS",
-                     "GUAN", "LAJA", "STEI", "TREE", "UNDE", "KONA", "KONZ","UKFS",
-                     "GRSM", "MLBS", "ORNL", "DELA", "LENO", "TALL", "DCFS", "NOGP",
-                     "WOOD", "CPER", "RMNP", "STER", "CLBJ", "OAES","YELL", "MOAB",
-                     "NIWO", "JORN", "SRER", "ONAQ", "ABBY", "WREF", "SJER", "SOAP",
-                     "TEAK", "BARR", "TOOL", "BONA", "DEJU", "HEAL", "PUUM"),
-         tick =  c("BLAN", "ORNL", "SCBI", "SERC", "KONZ", "TALL", "UKFS"),
-         phenology = c("HARV", "BART","SCBI","STEI","UKFS","GRSM","DELA","CLBJ")
-  )
+  geo[which(site_ids %in% sites)]
 }
 
 utils::globalVariables("attributeName", "neon4cast")

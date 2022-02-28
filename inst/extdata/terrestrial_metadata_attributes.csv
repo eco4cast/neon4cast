@@ -1,10 +1,9 @@
 attributeName, attributeDefinition, unit, formatString, definition, numberType
 "time",              "[dimension]{time}",                          "year",                 "YYYY-MM-DD",   NA,          "datetime"
+"siteID",            "[dimension]{neon site}",                     NA,                     NA,           "NEON site ID",  "character"
 "ensemble",          "[dimension]{index of ensemble member}",      "dimensionless",         NA,            NA,          "integer"
 "statistic",         "[dimension]{index of ensemble member}",      NA,         NA,          "statistical moment",          "character"
-"siteID",            "[dimension]{neon site}",                     NA,                     NA,           "NEON site ID",  "character"
 "forecast",          "[flag]{whether represents forecast}",        "dimensionless",         NA,           NA,          "integer"
 "data_assimilation", "[flag]{whether time step assimilated data}", "dimensionless",         NA,           NA,          "integer"
 "nee",               "[variable]{net ecosystem exchange}",         "dimensionless",         NA,           NA,           "real"
 "le",                "[variable]{latent heat}",                    "dimensionless",         NA,           NA,          "real"
-"vswc",              "[variable]{volumetric soil water content}",  "dimensionless",         NA,           NA,           "real"

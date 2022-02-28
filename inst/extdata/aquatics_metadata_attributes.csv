@@ -1,9 +1,10 @@
 attributeName, attributeDefinition, unit, formatString, definition, numberType
 "time",              "[dimension]{time}",                          "year",                 "YYYY-MM-DD",   NA,          "datetime"
+"siteID",            "[dimension]{neon site}",                     dimensionless,                      NA,           "NEON site ID",  "character"
 "ensemble",          "[dimension]{index of ensemble member}",      "dimensionless",         NA,            NA,          "integer"
-"statistic",         "[dimension]{index of ensemble member}",      NA,         NA,          "statistical moment",          "character"
-"siteID",            "[dimension]{neon site}",                     NA,                      NA,           "NEON site ID",  "character"
+"statistic",         "[dimension]{index of ensemble member}",      dimensionless,         NA,          "statistical moment",          "character"
 "forecast",          "[flag]{whether represents forecast}",        "dimensionless",         NA,           NA,          "integer"
 "data_assimilation", "[flag]{whether time step assimilated data}", "dimensionless",         NA,           NA,          "integer"
+"temperature",        "[variable]{water temperature}",     "dimensionless",         NA,           NA,           "real"
 "oxygen",            "[variable]{disolved oxygen}",     "dimensionless",         NA,           NA,           "real"
-"temp",            "[variable]{water temperature}",     "dimensionless",         NA,           NA,           "real"
+"chla", "[variable]{chlorophyll-a}",     "dimensionless",         NA,           NA,           "real"
