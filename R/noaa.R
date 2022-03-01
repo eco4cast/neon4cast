@@ -154,10 +154,12 @@ get_stacked_noaa_s3 <- function(dir, site, averaged = TRUE, s3_region = Sys.gete
 #'
 get_noaa_forecast_s3 <- function(dir, model, site, date, cycle, s3_region = Sys.getenv("AWS_DEFAULT_REGION")){
   
-  download_s3_objects(dir,
+  files_present <- download_s3_objects(dir,
                       bucket = "drivers",
                       prefix = file.path("noaa",model, site, date, cycle),
                       s3_region = s3_region)
+  
+  invisible(files_present)
 }
 
 
