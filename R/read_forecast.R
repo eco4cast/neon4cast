@@ -75,7 +75,7 @@ read_forecast_nc <- function(file_in,
   if("site" %in% names(df)){
     nc <- ncdf4::nc_open(file_in)
     #GENERALIZATION:  Hack because ticks didn't make siteID unique in Round 1
-    if(("ixodes_scapularis" %in% nc$var | "amblyomma_americanum" %in% nc$var) & plotID %in% nc$var){
+    if(("ixodes_scapularis" %in% nc$var | "amblyomma_americanum" %in% nc$var) & "plotID" %in% nc$var){
       siteID <- ncdf4::ncvar_get(nc, "plotID")
     }else{
       siteID <- ncdf4::ncvar_get(nc, "siteID")  
