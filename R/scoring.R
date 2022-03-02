@@ -320,7 +320,7 @@ score_it <- function(targets_file,
 ){
   
   dir.create(dir, FALSE, TRUE)
-  theme <- strsplit(basename(targets_file), "[-_]")[[1]][[1]]
+  theme <- strsplit(basename(targets_file), "[-]")[[1]][[1]]
   
   ## Target is processed only once
   target <- 
@@ -332,7 +332,7 @@ score_it <- function(targets_file,
   for(jj in 1:length(forecast_files)){
     message(paste0(jj, "of", length(forecast_files), " ", forecast_files[jj]))
     forecast_file <- forecast_files[jj]
-    forecast_file %>%
+    d <- forecast_file %>%
       read_forecast() %>%
       mutate(filename = forecast_file) %>%
       select_forecasts(only_forecasts) %>%
