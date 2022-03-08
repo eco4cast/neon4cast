@@ -39,7 +39,15 @@ read_forecast_nc <- function(file_in,
                                                   "ixodes_scapularis",
                                                   "amblyomma_americanum"),
                              reps_col = "ensemble")
-{    
+{
+  
+  if(!file.exists(file_in)) {
+    ## If URL is passed instead
+    path <- tempfile(basename(file_in), fileext = tools::file_ext(file_in))
+    download.file(file_in, path)
+    file_in <- path
+  }
+  
   nc <- ncdf4::nc_open(file_in)
   time_nc <- as.integer(ncdf4::ncvar_get(nc, "time"))
   t_string <- strsplit(ncdf4::ncatt_get(nc, varid = "time", "units")$value, " ")[[1]]

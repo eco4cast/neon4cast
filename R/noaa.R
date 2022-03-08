@@ -57,7 +57,7 @@ download_noaa_ <- function(siteID,
 #' @examples 
 #' stack_noaa()
 #' @export
-stack_noaa <- function(dir = tempdir(), model, forecast_date = NULL) {
+stack_noaa <- function(dir = tempdir(), model = "NOAAGEFS_1hr", forecast_date = NULL) {
   
   if(!stringr::str_detect(model,"averaged")){
     

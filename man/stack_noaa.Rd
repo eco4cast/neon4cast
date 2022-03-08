@@ -4,7 +4,7 @@
 \alias{stack_noaa}
 \title{Stack downloaded NOAA files}
 \usage{
-stack_noaa(dir = tempdir(), model, forecast_date = NULL)
+stack_noaa(dir = tempdir(), model = "NOAAGEFS_1hr", forecast_date = NULL)
 }
 \arguments{
 \item{dir}{storage location.  Use tempdir unless you want to keep this

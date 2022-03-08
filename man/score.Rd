@@ -6,9 +6,9 @@
 \usage{
 score(
   forecast,
+  target,
   theme = c("aquatics", "beetles", "phenology", "terrestrial_30min",
     "terrestrial_daily", "ticks"),
-  target_url = NA,
   target_vars = c("oxygen", "temperature", "richness", "abundance", "nee", "le",
     "vswc", "gcc_90", "rcc_90", "ixodes_scapularis", "amblyomma_americanum")
 )
@@ -16,7 +16,7 @@ score(
 \arguments{
 \item{forecast}{forecast data frame or file}
 
-\item{theme}{theme name. Note: terrestrial must specify the interval.}
+\item{target}{target path or URL (csv file)}
 }
 \description{
 Compute the CRPS score of your forecast

@@ -36,7 +36,8 @@ Imports:
     furrr,
     vctrs,
     arrow,
-    tidync
+    utils,
+    tibble
 RoxygenNote: 7.1.2
 Language: en-US
 Suggests: 

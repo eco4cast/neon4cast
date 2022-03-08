@@ -1,7 +1,7 @@
 #' Compute the CRPS score of your forecast
 #' 
 #' @param forecast forecast data frame or file
-#' @param theme theme name. Note: terrestrial must specify the interval.
+#' @param target target path or URL (csv file)
 #' @importFrom dplyr `%>%`
 #' 
 #' @export
@@ -10,10 +10,10 @@
 #'                               package = "neon4cast")
 #' score(forecast_file, "aquatics")                          
 score <- function(forecast,
+                  target,
                   theme = c("aquatics", "beetles",
-                            "phenology", "terrestrial_30min",
-                            "terrestrial_daily","ticks"),
-                  target_url = NA,
+                           "phenology", "terrestrial_30min",
+                           "terrestrial_daily","ticks"),
                   target_vars = c("oxygen", 
                                   "temperature", 
                                   "richness",
@@ -35,12 +35,12 @@ score <- function(forecast,
       mutate(filename = filename)
   }
   ## tables must declare theme and be in "long" form:
-  target <- download_target(theme, target_url) %>% 
-    mutate(theme = theme) %>%
+  target <- readr::read_csv(target) %>% 
+    dplyr::mutate(theme = theme) %>%
     pivot_target(target_vars)
   
   forecast <- forecast %>% 
-    mutate(theme=theme) %>%
+    dplyr::mutate(theme=theme) %>%
     pivot_forecast(target_vars)
   
   
