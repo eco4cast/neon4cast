@@ -24,7 +24,8 @@ score <- function(forecast,
                                   "gcc_90",
                                   "rcc_90",
                                   "ixodes_scapularis",
-                                  "amblyomma_americanum")){
+                                  "amblyomma_americanum",
+                                  "Amblyomma americanum")){
   
   theme = match.arg(theme)
   
@@ -286,7 +287,7 @@ enforce_schema <- function(df) {
                   .fns = as.POSIXct))
 }
 
-include_horizon <- function(df){
+include_horizon <- function(df, allow_difftime = getOption("neon4cast.allow_difftime", FALSE)){
   
   interval <- df %>%
     group_by(across(any_of(c("theme", "team", "issue_date", "target", "site", "x", "y", "z")))) %>% 
@@ -295,9 +296,14 @@ include_horizon <- function(df){
               .groups = "drop")
   
   ## add columns for start_time and horizon
-  df %>% 
+  df <- df %>% 
     left_join(interval, by = c("theme", "team", "issue_date", "site", "x", "y", "z", "target")) %>% 
     mutate(horizon = time - forecast_start_time)
+  
+  if(!allow_difftime){
+    df %>% mutate(horizon = as.integer(horizon))
+  }
+  df
 }
 
 
