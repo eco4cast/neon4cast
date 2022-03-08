@@ -86,9 +86,12 @@ standardize_format <- function(df, target_vars) {
   ## (arguably should be applied to beetles if not already done too)
   if ("theme" %in% colnames(df) && all(pull(df,theme) == "ticks")) {
     df <- df %>% 
-      mutate(time = isoweek(time)) %>%
-      select(-siteID) %>%
-      rename(siteID = plotID)
+      mutate(time = isoweek(time))
+    if("plotID" %in% names(df)) {
+      df <- df %>% 
+        select(-siteID) %>%
+        rename(siteID = plotID)
+    }
   }
   
   if(("siteID" %in% colnames(df))){
