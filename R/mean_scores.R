@@ -60,7 +60,7 @@ fill_scores <- function(df, null_team = "EFInull"){
   raw_scores <- db_import(df)
   
   ## Turn implicit NAs to explicit ones:
-  na_filled <- na_fill(raw_scores, null_team = null_team)
+  na_filled <- na_fill(raw_scores)
   ## Fill missing values with older forecasts of same observations made by same team
   self_filled <- self_fill(na_filled)
   
@@ -71,19 +71,22 @@ fill_scores <- function(df, null_team = "EFInull"){
 }  
   
   
-na_fill <- function(df, null_team = "EFInull"){
+na_fill <- function(df, null = "EFInull"){
   
   ## expand a table to all possible observations (target, site, time)
   ## for each team, for each forecast_start_time:
-  pool <- df %>% 
-    filter(team == {{null_team}}, !is.na(observed)) %>%
-    select(target, time, forecast_start_time, site, x, y, z) 
+  predicted_by_null <- df %>% 
+    filter(team == null) %>% 
+    select(theme, target, site, time, forecast_start_time) %>%
+    distinct() %>% collect()
+  team <- df %>% select(team) %>% distinct() %>% pull(team)
   
-  focal <- phenology %>% 
-    filter(team != {{null_team}}, !is.na(observed))
+  all <- tidyr::expand_grid(predicted_by_null, team)
   
-  ## NA expand based on the NULL
-  left_join(pool, focal)
+  ## Use this list to make explicit NA for any observation for which a forecast was not provided
+  na_filled <- df %>% right_join(all, copy=TRUE)
+  
+  na_filled
 }
 
 self_fill <- function(na_filled){
@@ -94,6 +97,7 @@ self_fill <- function(na_filled){
   
   ## Fill in any missing observation with the most recent forecast made prior to the start_time
   self_filled <- na_filled %>%
+   # dbplyr::window_order(theme, team, target, site, time, forecast_start_time) %>%
     arrange(theme, team, target, site, time, forecast_start_time) %>%
     group_by(theme, team, target, site, time) %>% 
     fill(crps, logs, .direction="up") %>%       ## not duckdb-compatible!
