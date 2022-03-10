@@ -75,18 +75,15 @@ na_fill <- function(df, null = "EFInull"){
   
   ## expand a table to all possible observations (target, siteID, time)
   ## for each team, for each forecast_start_time:
-  predicted_by_null <- df %>% 
-    filter(team == null) %>% 
-    select(theme, target, siteID, time, forecast_start_time) %>%
-    distinct() %>% collect()
-  team <- df %>% select(team) %>% distinct() %>% pull(team)
+  pool <- df %>% 
+    filter(team == {{null_team}}, !is.na(observed)) %>%
+    select(target, time, forecast_start_time, site, x, y, z) 
   
-  all <- tidyr::expand_grid(predicted_by_null, team)
+  focal <- phenology %>% 
+    filter(team != {{null_team}}, !is.na(observed))
   
-  ## Use this list to make explicit NA for any observation for which a forecast was not provided
-  na_filled <- df %>% right_join(all, copy=TRUE)
-  
-  na_filled
+  ## NA expand based on the NULL
+  left_join(pool, focal)
 }
 
 self_fill <- function(na_filled){
@@ -97,9 +94,8 @@ self_fill <- function(na_filled){
   
   ## Fill in any missing observation with the most recent forecast made prior to the start_time
   self_filled <- na_filled %>%
-   # dbplyr::window_order(theme, team, target, siteID, time, forecast_start_time) %>%
-    arrange(theme, team, target, siteID, time, forecast_start_time) %>%
-    group_by(theme, team, target, siteID, time) %>% 
+    arrange(theme, team, target, site, time, forecast_start_time) %>%
+    group_by(theme, team, target, site, time) %>% 
     fill(crps, logs, .direction="up") %>%       ## not duckdb-compatible!
     ungroup() %>%
     rename(crps_self = crps, logs_self = logs)
