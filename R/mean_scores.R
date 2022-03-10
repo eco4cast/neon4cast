@@ -2,7 +2,7 @@
 db_import <- function(data, dir = tempfile(), use_db = getOption("neon4cast_usedb", FALSE)){
   
   df <- data %>% 
-    dplyr::select(theme, siteID, target, time, team, forecast_start_time, crps, logs)
+    dplyr::select(theme, site, target, time, team, forecast_start_time, crps, logs)
   
   ## Hmm, SQLite doesn't have date format, might be better as character than as double...
   df <- df %>% dplyr::mutate(time = as.character(time), 
@@ -38,7 +38,7 @@ sql_db <- function(dir){
 #' certain observations at a given forecast horizon when another team does not.
 #' For instance, teams may use different horizon lengths (forecast different
 #' number of days into the future).  Alternately, two teams may both predict
-#' the same observation (target, time, siteID) but the one team does so 
+#' the same observation (target, time, site) but the one team does so 
 #' much farther in advance than the other.  These miss-matches create
 #' "implicit" missing observations relative to other scores.  If we simply omit
 #' missing values, teams have little incentive to make a full set of predictions 
@@ -53,7 +53,7 @@ sql_db <- function(dir){
 #' forecast.
 #' @param null_team name of the null team
 #' @param df data.frame of raw scores.  Must have columns:
-#' `theme`, `siteID`, `target`, `time`, `team`, `forecast_start_time`,
+#' `theme`, `site`, `target`, `time`, `team`, `forecast_start_time`,
 #'  `crps` & `logs`.
 #' @export
 fill_scores <- function(df, null_team = "EFInull"){
@@ -73,7 +73,7 @@ fill_scores <- function(df, null_team = "EFInull"){
   
 na_fill <- function(df, null_team = "EFInull"){
   
-  ## expand a table to all possible observations (target, siteID, time)
+  ## expand a table to all possible observations (target, site, time)
   ## for each team, for each forecast_start_time:
   pool <- df %>% 
     filter(team == {{null_team}}, !is.na(observed)) %>%
@@ -111,7 +111,7 @@ null_fill <- function(self_filled, null_team = "EFInull"){
   null_score <- self_filled %>% ungroup() %>%
     filter(team == null_team) %>% 
     rename(crps_null = crps, logs_null = logs) %>%  
-    select("theme", "target", "siteID", "forecast_start_time",
+    select("theme", "target", "site", "forecast_start_time",
            "time", "crps_null", "logs_null")
   
   null_filled <- self_filled %>%
