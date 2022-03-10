@@ -60,7 +60,7 @@ fill_scores <- function(df, null_team = "EFInull"){
   raw_scores <- db_import(df)
   
   ## Turn implicit NAs to explicit ones:
-  na_filled <- na_fill(raw_scores)
+  na_filled <- na_fill(raw_scores, null_team = null_team)
   ## Fill missing values with older forecasts of same observations made by same team
   self_filled <- self_fill(na_filled)
   
@@ -71,7 +71,7 @@ fill_scores <- function(df, null_team = "EFInull"){
 }  
   
   
-na_fill <- function(df, null = "EFInull"){
+na_fill <- function(df, null_team = "EFInull"){
   
   ## expand a table to all possible observations (target, siteID, time)
   ## for each team, for each forecast_start_time:
