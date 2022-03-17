@@ -10,8 +10,8 @@
 #' data around on your computer, in which case, `neonstore::neon_dir()` might
 #' be a convenient choice.
 #' @export
-#' @examples 
-#' download_noaa("ABBY")
+# @examples 
+# download_noaa("ABBY")
 download_noaa <- function(siteID, 
                           interval = "6hr",
                           date = Sys.Date()-2, 
@@ -54,8 +54,8 @@ download_noaa_ <- function(siteID,
 #' @inheritParams download_noaa
 #' @param model NOAA model: NOAAGEFS_1hr, NOAAGEFS_1hr_stacked, NOAAGEFS_1hr_stacked_average
 #' @param forecast_date Include only forecasts issued on this date
-#' @examples 
-#' stack_noaa()
+# @examples 
+# stack_noaa()
 #' @export
 stack_noaa <- function(dir = tempdir(), model = "NOAAGEFS_1hr", forecast_date = NULL) {
   
