@@ -301,8 +301,8 @@ include_horizon <- function(df, allow_difftime = getOption("neon4cast.allow_diff
     mutate(horizon = time - forecast_start_time)
   
   if(!allow_difftime){
-    df <- df %>% mutate(horizon = as.integer(horizon),
-                        interval = as.integer(interval))
+    df <- df %>% mutate(horizon = as.numeric(horizon, units="seconds"),
+                        interval = as.numeric(interval, units="seconds"))
   }
   df
 }
