@@ -25,7 +25,19 @@ generate_metadata(
 
 \item{forecast_iteration_id}{unique ID for forecast}
 
-\item{title}{,}
+\item{title}{title,}
+
+\item{team_name}{team name,}
+
+\item{intellectualRights}{intellectual rights,}
+
+\item{abstract}{abstract}
+
+\item{methods}{methods}
+
+\item{attributes}{attributes}
+
+\item{forecast_issue_time}{forecast issue time}
 
 \item{list}{of team members}
 }
