@@ -1,12 +1,15 @@
+# DEPRECATE, mark for removal
 
 #GENERALIZATION: SPECIFC THEMES, TARGET FILES, AND TARGET FILE URL
+
+
 
 download_target <- function(theme = c("aquatics", "beetles",
                                       "phenology", "terrestrial_30min",
                                       "terrestrial_daily","ticks"),
                             download_url = NA){  
   
-  if(is.na(target_url)){
+  if(is.na(download_url)){
     theme <- match.arg(theme)
     
     target_file <- switch(theme,

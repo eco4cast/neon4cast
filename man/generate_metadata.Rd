@@ -21,6 +21,8 @@ generate_metadata(
 \arguments{
 \item{forecast_file}{full path to forecast file}
 
+\item{team_list}{list of team members}
+
 \item{model_metadata}{list of model metadata}
 
 \item{forecast_iteration_id}{unique ID for forecast}
@@ -38,8 +40,6 @@ generate_metadata(
 \item{attributes}{attributes}
 
 \item{forecast_issue_time}{forecast issue time}
-
-\item{list}{of team members}
 }
 \description{
 Generate metadata from forecast and template files

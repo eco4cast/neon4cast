@@ -18,6 +18,10 @@ submit(
 \item{metadata}{path to metadata file}
 
 \item{ask}{should we prompt for a go before submission?}
+
+\item{s3_region}{subdomain (leave as is for EFI challenge)}
+
+\item{s3_endpoint}{root domain (leave as is for EFI challenge)}
 }
 \description{
 submit forecast to EFI

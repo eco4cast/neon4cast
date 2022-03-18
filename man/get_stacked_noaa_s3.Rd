@@ -14,12 +14,11 @@ get_stacked_noaa_s3(
 \arguments{
 \item{dir}{full path to working directory}
 
+\item{site}{site}
+
 \item{averaged}{logistical; TRUE = download averaged stacked forecast}
 
-\item{config}{flare configuration object}
-}
-\value{
-
+\item{s3_region}{AWS_DEFAULT_REGION}
 }
 \description{
 Download stacked NOAA data from s3 bucket

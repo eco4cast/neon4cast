@@ -1,11 +1,10 @@
 #' Combining scores from a theme together
 #'
-#' @param x theme name
+#' @param x theme name (optional)
 #' @param collect TRUE/FALSE to download results
-#'
-#' @return
+#' @return a data.frame of scores
 #' @export
-combined_scores <- function(x, collect = TRUE){
+combined_scores <- function(x = NA, collect = TRUE){
   Sys.setenv("AWS_EC2_METADATA_DISABLED"="TRUE")
   Sys.unsetenv("AWS_ACCESS_KEY_ID")
   Sys.unsetenv("AWS_SECRET_ACCESS_KEY")
@@ -16,9 +15,13 @@ combined_scores <- function(x, collect = TRUE){
   s3 <- arrow::s3_bucket(bucket = "scores",
                          endpoint_override = "data.ecoforecast.org")
   ds <- arrow::open_dataset(s3, partitions=c("theme", "year"))
-  df <- ds %>% dplyr::filter(theme == {{x}})
-  if(collect) {
-    df <- df %>% dplyr::collect()
+  if (!is.na(x)) {
+  ds <- dplyr::filter(ds, theme == {{x}})
   }
-  df
+  if (collect) {
+    ds <- dplyr::collect(ds)
+  }
+  ds
 }
+globalVariables("theme", "neon4cast")
+

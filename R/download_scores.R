@@ -1,3 +1,6 @@
+# DEPRECATE, mark for removal
+
+
 ## grab data 
 #project = "phenology"
 #dir = "~/efi_neon_challenge/forecasts/"

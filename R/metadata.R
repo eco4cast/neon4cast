@@ -1,7 +1,7 @@
 #' Generate metadata from forecast and template files
 #' 
 #' @param forecast_file full path to forecast file
-#' @param list of team members
+#' @param team_list list of team members
 #' @param model_metadata list of model metadata
 #' @param forecast_iteration_id unique ID for forecast
 #' @param title title,
