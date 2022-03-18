@@ -30,6 +30,3 @@ be a convenient choice.}
 \description{
 Download NOAA Weather forecasts for NEON sites from the EFI server
 }
-\examples{
-download_noaa("ABBY")
-}

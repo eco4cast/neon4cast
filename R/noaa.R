@@ -10,8 +10,8 @@
 #' data around on your computer, in which case, `neonstore::neon_dir()` might
 #' be a convenient choice.
 #' @export
-#' @examples 
-#' download_noaa("ABBY")
+# @examples 
+# download_noaa("ABBY")
 download_noaa <- function(siteID, 
                           interval = "6hr",
                           date = Sys.Date()-2, 
@@ -54,8 +54,8 @@ download_noaa_ <- function(siteID,
 #' @inheritParams download_noaa
 #' @param model NOAA model: NOAAGEFS_1hr, NOAAGEFS_1hr_stacked, NOAAGEFS_1hr_stacked_average
 #' @param forecast_date Include only forecasts issued on this date
-#' @examples 
-#' stack_noaa()
+# @examples 
+# stack_noaa()
 #' @export
 stack_noaa <- function(dir = tempdir(), model = "NOAAGEFS_1hr", forecast_date = NULL) {
   
@@ -129,13 +129,15 @@ stack_noaa <- function(dir = tempdir(), model = "NOAAGEFS_1hr", forecast_date = 
 #' Download stacked NOAA data from s3 bucket
 #'
 #' @param dir full path to working directory
-#' @param config flare configuration object
 #' @param averaged logistical; TRUE = download averaged stacked forecast
-#'
-#' @return
+#' @param site site
+#' @param s3_region AWS_DEFAULT_REGION
 #' @export
 #'
-get_stacked_noaa_s3 <- function(dir, site, averaged = TRUE, s3_region = Sys.getenv("AWS_DEFAULT_REGION")){
+get_stacked_noaa_s3 <- function(dir,
+                                site,
+                                averaged = TRUE,
+                                s3_region = Sys.getenv("AWS_DEFAULT_REGION")){
   
   if(averaged){
     download_s3_objects(dir, bucket = "drivers", prefix = file.path("noaa/NOAAGEFS_1hr_stacked_average",site), s3_region)
@@ -147,9 +149,11 @@ get_stacked_noaa_s3 <- function(dir, site, averaged = TRUE, s3_region = Sys.gete
 #' Download driver forecasts from s3 bucket
 #'
 #' @param dir full path to working directory
-#' @param forecast_path relative path of the driver forecast (relative to driver directory or bucket)
-#'
-#' @return
+#' @param model model
+#' @param site site
+#' @param date date
+#' @param cycle cycle
+#' @param s3_region s3 region
 #' @export
 #'
 get_noaa_forecast_s3 <- function(dir, model, site, date, cycle, s3_region = Sys.getenv("AWS_DEFAULT_REGION")){

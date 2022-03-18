@@ -1,16 +1,16 @@
 #' Generate metadata from forecast and template files
 #' 
 #' @param forecast_file full path to forecast file
-#' @param list of team members
+#' @param team_list list of team members
 #' @param model_metadata list of model metadata
 #' @param forecast_iteration_id unique ID for forecast
-#' @param title ,
-#' @param team_name,
-#' @param intellectualRights,
-#' @param abstract
-#' @param methods
-#' @param attributes
-#' @param forecast_issue_time
+#' @param title title,
+#' @param team_name team name,
+#' @param intellectualRights intellectual rights,
+#' @param abstract abstract
+#' @param methods methods
+#' @param attributes attributes 
+#' @param forecast_issue_time forecast issue time
 #' @export
 #' 
 generate_metadata <- function(
@@ -30,7 +30,7 @@ generate_metadata <- function(
   
   forecast_file_name_base <- tools::file_path_sans_ext(tools::file_path_sans_ext(basename(forecast_file)))
   
-  forecast <- neon4cast:::read_forecast(file_in = forecast_file)
+  forecast <- read4cast::read_forecast(file_in = forecast_file)
   
   theme <- unlist(stringr::str_split(stringr::str_split(forecast_file_name_base, "-")[[1]][1], "_")[[1]][1])
   

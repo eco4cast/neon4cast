@@ -10,9 +10,8 @@ get_target(dir, theme, s3_region = Sys.getenv("AWS_DEFAULT_REGION"))
 \item{dir}{full path to working directory}
 
 \item{theme}{forecast theme}
-}
-\value{
 
+\item{s3_region}{s3 region}
 }
 \description{
 Download target data from s3

@@ -23,6 +23,7 @@
 #' 
 #' @export
 #' @importFrom rlang .data `:=`
+#' @importFrom dplyr `%>%`
 efi_format <- function(df, times = 100){
   
   var <- attributes(df)$dist

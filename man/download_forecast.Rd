@@ -20,6 +20,10 @@ download_forecast(
 \item{dir}{storage location.  Use tempdir unless you want to keep this
 data around on your computer, in which case, \code{neonstore::neon_dir()} might
 be a convenient choice.}
+
+\item{s3_region}{data}
+
+\item{s3_endpoint}{ecoforecast.org}
 }
 \description{
 Download forecasts for NEON sites from the EFI server

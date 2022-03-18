@@ -16,28 +16,21 @@ Encoding: UTF-8
 Roxygen: list(markdown = TRUE)
 Imports: 
     aws.s3,
-    neonstore,
     EML,
     tidync,
     usethis,
     ncdf4,
-    scoringRules,
-    stats,
     distributional,
     rlang,
     yaml,
     ISOweek,
     tidyverse,
-    dbplyr,
-    DBI,
-    RSQLite,
     dplyr,
     tidyr,
-    furrr,
-    vctrs,
     arrow,
-    utils,
-    tibble
+    tibble,
+    read4cast (>= 0.0.0.9000),
+    score4cast (>= 0.0.0.9000)
 RoxygenNote: 7.1.2
 Language: en-US
 Suggests: 
@@ -55,3 +48,6 @@ Suggests:
     readr
 Additional_repositories: https://cboettig.github.io/drat
 Config/testthat/edition: 3
+Remotes:  
+    github::eco4cast/read4cast,
+    github::eco4cast/score4cast

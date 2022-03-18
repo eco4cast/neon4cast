@@ -21,13 +21,25 @@ generate_metadata(
 \arguments{
 \item{forecast_file}{full path to forecast file}
 
+\item{team_list}{list of team members}
+
 \item{model_metadata}{list of model metadata}
 
 \item{forecast_iteration_id}{unique ID for forecast}
 
-\item{title}{,}
+\item{title}{title,}
 
-\item{list}{of team members}
+\item{team_name}{team name,}
+
+\item{intellectualRights}{intellectual rights,}
+
+\item{abstract}{abstract}
+
+\item{methods}{methods}
+
+\item{attributes}{attributes}
+
+\item{forecast_issue_time}{forecast issue time}
 }
 \description{
 Generate metadata from forecast and template files

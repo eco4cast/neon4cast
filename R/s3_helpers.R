@@ -1,9 +1,10 @@
+# DEPRECATE and mark for removal
+
 #' Download target data from s3
 #'
 #' @param dir full path to working directory
 #' @param theme forecast theme
-#'
-#' @return
+#' @param s3_region s3 region
 #' @export
 #'
 get_target <- function(dir, theme, s3_region = Sys.getenv("AWS_DEFAULT_REGION")){

@@ -1,10 +1,12 @@
-
+## Technically this could become arrow-based
 
 #' submit forecast to EFI
 #' 
 #' @inheritParams forecast_output_validator
 #' @param metadata path to metadata file
 #' @param ask should we prompt for a go before submission?
+#' @param s3_region subdomain (leave as is for EFI challenge)
+#' @param s3_endpoint root domain (leave as is for EFI challenge)
 #' @export
 submit <- function(forecast_file, 
                    metadata = NULL, 
@@ -44,8 +46,9 @@ submit <- function(forecast_file,
 #' Check that submission was successfully processed
 #' 
 #' @param forecast_file Your forecast csv or nc file
+#' @param s3_region subdomain (leave as is for EFI challenge)
+#' @param s3_endpoint root domain (leave as is for EFI challenge)
 #' @export
-
 check_submission <- function(forecast_file,
                              s3_region = "data",
                              s3_endpoint = "ecoforecast.org"){

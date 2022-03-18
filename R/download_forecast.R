@@ -1,3 +1,7 @@
+# DEPRECATE, mark for removal
+
+
+
 ## grab data 
 #project = "phenology"
 #dir = "~/efi_neon_challenge/forecasts/"
@@ -9,6 +13,8 @@
 #' @param dir storage location.  Use tempdir unless you want to keep this 
 #' data around on your computer, in which case, `neonstore::neon_dir()` might
 #' be a convenient choice.
+#' @param s3_region data
+#' @param s3_endpoint ecoforecast.org
 #' @export
 #' @examples 
 #' download_forecast("phenology")

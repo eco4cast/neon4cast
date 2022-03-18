@@ -16,10 +16,15 @@ get_noaa_forecast_s3(
 \arguments{
 \item{dir}{full path to working directory}
 
-\item{forecast_path}{relative path of the driver forecast (relative to driver directory or bucket)}
-}
-\value{
+\item{model}{model}
 
+\item{site}{site}
+
+\item{date}{date}
+
+\item{cycle}{cycle}
+
+\item{s3_region}{s3 region}
 }
 \description{
 Download driver forecasts from s3 bucket

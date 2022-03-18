@@ -12,6 +12,10 @@ check_submission(
 }
 \arguments{
 \item{forecast_file}{Your forecast csv or nc file}
+
+\item{s3_region}{subdomain (leave as is for EFI challenge)}
+
+\item{s3_endpoint}{root domain (leave as is for EFI challenge)}
 }
 \description{
 Check that submission was successfully processed
