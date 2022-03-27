@@ -26,7 +26,7 @@ forecast_output_validator <- function(forecast_file,
                                                     "gcc_90",
                                                     "rcc_90",
                                                     "ixodes_scapularis", 
-                                                    "ambloyomma_americanum"),
+                                                    "amblyomma_americanum"),
                               #GENERALIZATION:  Specific themes
                                theme_names = c("aquatics", "beetles",
                                                "phenology", "terrestrial_30min",
