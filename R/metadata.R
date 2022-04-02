@@ -26,8 +26,6 @@ generate_metadata <- function(
   attributes = NULL,
   forecast_issue_time = NULL){
   
-  dir <- dirname(forecast_file)
-  
   forecast_file_name_base <- tools::file_path_sans_ext(tools::file_path_sans_ext(basename(forecast_file)))
   
   forecast <- read4cast::read_forecast(file_in = forecast_file)
@@ -164,7 +162,11 @@ generate_metadata <- function(
     warning("Error in EFI metadata", call. = FALSE)
   }
   # Write metadata
-  meta_data_filename <-  paste0(dir, "/", forecast_file_name_base,".xml")
+  if(forecast_file != basename(forecast_file)){
+    meta_data_filename <-  paste0(dirname(forecast_file), "/", forecast_file_name_base,".xml")
+  else{
+    meta_data_filename <- paste0(forecast_file_name_base,".xml")
+  }
   EML::write_eml(my_eml, meta_data_filename)
   return(meta_data_filename)
 }
