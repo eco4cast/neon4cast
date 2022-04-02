@@ -164,7 +164,7 @@ generate_metadata <- function(
   # Write metadata
   if(forecast_file != basename(forecast_file)){
     meta_data_filename <-  paste0(dirname(forecast_file), "/", forecast_file_name_base,".xml")
-  else{
+  }else{
     meta_data_filename <- paste0(forecast_file_name_base,".xml")
   }
   EML::write_eml(my_eml, meta_data_filename)
