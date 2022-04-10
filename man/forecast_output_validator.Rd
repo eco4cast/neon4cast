@@ -6,17 +6,15 @@
 \usage{
 forecast_output_validator(
   forecast_file,
-  grouping_variables = c("siteID", "time"),
   target_variables = c("oxygen", "temperature", "richness", "abundance", "nee", "le",
-    "vswc", "gcc_90", "rcc_90", "ixodes_scapularis", "amblyomma_americanum"),
+    "vswc", "gcc_90", "rcc_90", "ixodes_scapularis", "amblyomma_americanum", "predicted",
+    "observed"),
   theme_names = c("aquatics", "beetles", "phenology", "terrestrial_30min",
     "terrestrial_daily", "ticks")
 )
 }
 \arguments{
 \item{forecast_file}{Your forecast csv or nc file}
-
-\item{grouping_variables}{Grouping variables}
 
 \item{target_variables}{Possible target variables}
 
