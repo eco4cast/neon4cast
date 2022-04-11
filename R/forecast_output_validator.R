@@ -1,7 +1,6 @@
 #' forecast_output_validator
 #'
 #' @param forecast_file Your forecast csv or nc file
-#' @param grouping_variables Grouping variables
 #' @param target_variables  Possible target variables
 #' @param theme_names valid EFI theme names
 #' @export
@@ -14,7 +13,7 @@
 #' 
 forecast_output_validator <- function(forecast_file, 
                               #GENERALIZATION: Missing spatial dimension
-                               grouping_variables = c("siteID", "time"),
+                              #  grouping_variables = c("siteID", "time"), # NOT USED?
                               #GENERALIZATION: Specific target variables
                                target_variables = c("oxygen", 
                                                     "temperature", 
@@ -26,15 +25,15 @@ forecast_output_validator <- function(forecast_file,
                                                     "gcc_90",
                                                     "rcc_90",
                                                     "ixodes_scapularis", 
-                                                    "amblyomma_americanum"),
+                                                    "amblyomma_americanum",
+                                                    "predicted",
+                                                    "observed"),
                               #GENERALIZATION:  Specific themes
                                theme_names = c("aquatics", "beetles",
                                                "phenology", "terrestrial_30min",
                                                "terrestrial_daily","ticks")){
   file_in <- forecast_file
-  lexists <- function(list,name){
-    sum(name %in% names(list))
-  }
+
   
   valid <- TRUE
   
@@ -103,7 +102,7 @@ forecast_output_validator <- function(forecast_file,
     }
     
      #usethis::ui_todo("Checking that file contains siteID column...")
-    if(lexists(out, "siteID")){
+    if(lexists(out, c("siteID", "site_id"))){
       usethis::ui_done("file has siteID column")
     }else{
       usethis::ui_warn("file missing siteID column")
@@ -182,8 +181,8 @@ forecast_output_validator <- function(forecast_file,
     }
     
     #usethis::ui_todo("Checking that siteID variable exists...")
-    #GENERALIZATION: using siteID here - should be site
-    if(lexists(nc$var, "siteID")){
+    #GENERALIZATION: using siteID here - should be site_id
+    if(lexists(nc$var, c("siteID", "site_id"))){
       usethis::ui_done("file has siteID variable")
     }else{
       usethis::ui_warn("file missing siteID variable")
@@ -263,3 +262,9 @@ forecast_output_validator <- function(forecast_file,
   return(valid)
   
 }
+
+
+lexists <- function(list,name){
+  any(!is.na(match(name, names(list))))
+}
+
