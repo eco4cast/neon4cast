@@ -12,7 +12,7 @@ combined_scores <- function(x = NA, collect = TRUE){
   Sys.unsetenv("AWS_S3_ENDPOINT")
   
   #GENERALIZATION: THIS IS A SPECIFIC ENDPOINT
-  s3 <- arrow::s3_bucket(bucket = "scores",
+  s3 <- arrow::s3_bucket(bucket = "scores/parquet",
                          endpoint_override = "data.ecoforecast.org")
   ds <- arrow::open_dataset(s3, partitioning=c("theme", "year"))
   if (!is.na(x)) {
