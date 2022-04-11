@@ -14,7 +14,7 @@ combined_scores <- function(x = NA, collect = TRUE){
   #GENERALIZATION: THIS IS A SPECIFIC ENDPOINT
   s3 <- arrow::s3_bucket(bucket = "scores",
                          endpoint_override = "data.ecoforecast.org")
-  ds <- arrow::open_dataset(s3, partitions=c("theme", "year"))
+  ds <- arrow::open_dataset(s3, partitioning=c("theme", "year"))
   if (!is.na(x)) {
   ds <- dplyr::filter(ds, theme == {{x}})
   }
