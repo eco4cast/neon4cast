@@ -50,4 +50,5 @@ Additional_repositories: https://cboettig.github.io/drat
 Config/testthat/edition: 3
 Remotes:  
     github::eco4cast/read4cast,
-    github::eco4cast/score4cast
+    github::eco4cast/score4cast,
+    github::cboettig/aws.s3
