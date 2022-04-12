@@ -20,7 +20,8 @@ download_s3_objects <- function(dir, bucket, prefix, s3_region = Sys.getenv("AWS
   files <- aws.s3::get_bucket(bucket = bucket,
                               prefix = prefix,
                               region = s3_region,
-                              use_https = as.logical(Sys.getenv("USE_HTTPS")))
+                              use_https = as.logical(Sys.getenv("USE_HTTPS")),
+                              max = Inf)
   keys <- vapply(files, `[[`, "", "Key", USE.NAMES = FALSE)
   empty <- grepl("/$", keys)
   keys <- keys[!empty]
