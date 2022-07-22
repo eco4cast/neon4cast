@@ -25,7 +25,7 @@ submit <- function(forecast_file,
   if(!go) return(NULL)
   #GENERALIZATION:  Here are specific AWS INFO
   aws.s3::put_object(file = forecast_file, 
-                     bucket = "submissions",
+                     bucket = "neon4cast-submissions",
                      region= s3_region,
                      base_url = s3_endpoint)
   
@@ -33,7 +33,7 @@ submit <- function(forecast_file,
     if(tools::file_ext(metadata) == "xml"){
       EFIstandards::forecast_validator(metadata)
       aws.s3::put_object(file = metadata, 
-                         bucket = "submissions",
+                         bucket = "neon4cast-submissions",
                          region= s3_region,
                          base_url = s3_endpoint)
     }else{
@@ -57,21 +57,21 @@ check_submission <- function(forecast_file,
   
   
   exists <- aws.s3::object_exists(object = file.path(theme[,1], forecast_file), 
-                        bucket = "forecasts",
+                        bucket = "neon4cast-forecasts",
                         region= s3_region,
                         base_url = s3_endpoint)
   if(exists){
     message("Submission was successfully processed")
   }else{
     not_in_standard <- aws.s3::object_exists(object = file.path("not_in_standard", forecast_file), 
-                                    bucket = "forecasts",
+                                    bucket = "neon4cast-forecasts",
                                     region= s3_region,
                                     base_url = s3_endpoint)
     if(not_in_standard){
       message("Submission is not in required format. Try running neon4cast::forecast_output_validator on your file to see what the issue may be")
     }else{
       in_submissions <- aws.s3::object_exists(object = file.path(forecast_file), 
-                                               bucket = "submissions",
+                                               bucket = "neon4cast-submissions",
                                               region= s3_region,
                                               base_url = s3_endpoint)
       
