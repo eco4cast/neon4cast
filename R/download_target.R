@@ -20,7 +20,7 @@ download_target <- function(theme = c("aquatics", "beetles",
                           terrestrial_30min = "terrestrial_30min-targets.csv.gz",
                           ticks = "ticks-targets.csv.gz"
     )
-    download_url <- paste0("https://data.ecoforecast.org/targets/",
+    download_url <- paste0("https://data.ecoforecast.org/neon4cast-targets/",
                            theme, "/", target_file)
   }
   
