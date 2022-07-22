@@ -9,7 +9,7 @@
 #'
 get_target <- function(dir, theme, s3_region = Sys.getenv("AWS_DEFAULT_REGION")){
   download_s3_objects(dir,
-                      bucket = "targets",
+                      bucket = "neon4cast-targets",
                       prefix = theme)
 }
 
