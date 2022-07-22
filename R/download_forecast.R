@@ -36,7 +36,7 @@ download_forecast_ <- function(theme,
   parent_theme <- unlist(stringr::str_split(theme, "_"))[1]
   prefix <- paste(parent_theme, paste0(theme,"-", date), sep="/")
   #GENERALIZATION:  Specific AWS info
-  object <- aws.s3::get_bucket("forecasts",
+  object <- aws.s3::get_bucket("neon4cast-forecasts",
                                prefix = prefix,
                                region = s3_region,
                                base_url = s3_endpoint)
@@ -44,7 +44,7 @@ download_forecast_ <- function(theme,
   #GENERALIZATION:  Specific AWS info
   for(i in seq_along(object)){
     aws.s3::save_object(object[[i]], 
-                        bucket = "forecasts", 
+                        bucket = "neon4cast-forecasts", 
                         file = file.path(dir, object[[i]]$Key),
                         region = s3_region,
                         base_url = s3_endpoint)
