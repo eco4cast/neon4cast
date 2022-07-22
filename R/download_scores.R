@@ -28,14 +28,14 @@ download_scores_ <- function(theme,
   dir.create(dir, FALSE, TRUE)
   parent_theme <- unlist(stringr::str_split(theme, "_"))[1]
   prefix <- paste(parent_theme, paste0("scores-",theme,"-", date), sep="/")
-  object <- aws.s3::get_bucket("scores",
+  object <- aws.s3::get_bucket("neon4cast-scores",
                                prefix = prefix,
                                region = "data",
                                base_url = "ecoforecast.org")
   
   for(i in seq_along(object)){
     aws.s3::save_object(object[[i]], 
-                        bucket = "scores", 
+                        bucket = "neon4cast-scores", 
                         file = file.path(dir, object[[i]]$Key),
                         region = "data",
                         base_url = "ecoforecast.org")
