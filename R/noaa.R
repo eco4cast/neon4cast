@@ -32,7 +32,7 @@ download_noaa_ <- function(siteID,
                   siteID, date, cycle, sep="/")
   
   #GENERALIZATION:  Specific AWS info
-  object <- aws.s3::get_bucket("drivers",
+  object <- aws.s3::get_bucket("neon4cast-drivers",
                                prefix = prefix,
                                region = "data",
                                base_url = "ecoforecast.org")
@@ -42,7 +42,7 @@ download_noaa_ <- function(siteID,
   for(i in seq_along(object)){
     #GENERALIZATION:  Specific AWS info
     aws.s3::save_object(object[[i]], 
-                        bucket = "drivers", 
+                        bucket = "neon4cast-drivers", 
                         file = file.path(noaadir, object[[i]]$Key),
                         region = "data",
                         base_url = "ecoforecast.org")
@@ -140,9 +140,9 @@ get_stacked_noaa_s3 <- function(dir,
                                 s3_region = Sys.getenv("AWS_DEFAULT_REGION")){
   
   if(averaged){
-    download_s3_objects(dir, bucket = "drivers", prefix = file.path("noaa/NOAAGEFS_1hr_stacked_average",site), s3_region)
+    download_s3_objects(dir, bucket = "neon4cast-drivers", prefix = file.path("noaa/NOAAGEFS_1hr_stacked_average",site), s3_region)
   }else{
-    download_s3_objects(dir, bucket = "drivers", prefix = file.path("noaa/NOAAGEFS_1hr_stacked",site), s3_region)
+    download_s3_objects(dir, bucket = "neon4cast-drivers", prefix = file.path("noaa/NOAAGEFS_1hr_stacked",site), s3_region)
   }
 }
 
@@ -159,7 +159,7 @@ get_stacked_noaa_s3 <- function(dir,
 get_noaa_forecast_s3 <- function(dir, model, site, date, cycle, s3_region = Sys.getenv("AWS_DEFAULT_REGION")){
   
   files_present <- download_s3_objects(dir,
-                      bucket = "drivers",
+                      bucket = "neon4cast-drivers",
                       prefix = file.path("noaa",model, site, date, cycle),
                       s3_region = s3_region)
   
