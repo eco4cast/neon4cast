@@ -107,10 +107,10 @@ forecast_output_validator <- function(forecast_file,
         }else{
           usethis::ui_warn("file does not have parameter column is not a normal distribution")
           valid <- FALSE
-        }else{
-          usethis::ui_warn("file does not have parameter and family column ")
-          valid <- FALSE
         }
+      }else{
+        usethis::ui_warn("file does not have parameter and family column ")
+        valid <- FALSE
       }
       
     }else{
