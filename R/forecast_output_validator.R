@@ -12,28 +12,25 @@
 #' forecast_output_validator(forecast_file)
 #' 
 forecast_output_validator <- function(forecast_file, 
-                              #GENERALIZATION: Missing spatial dimension
-                              #  grouping_variables = c("siteID", "time"), # NOT USED?
-                              #GENERALIZATION: Specific target variables
-                               target_variables = c("oxygen", 
-                                                    "temperature", 
-                                                    "richness",
-                                                    "abundance", 
-                                                    "nee",
-                                                    "le", 
-                                                    "vswc",
-                                                    "gcc_90",
-                                                    "rcc_90",
-                                                    "ixodes_scapularis", 
-                                                    "amblyomma_americanum",
-                                                    "predicted",
-                                                    "observed"),
-                              #GENERALIZATION:  Specific themes
-                               theme_names = c("aquatics", "beetles",
-                                               "phenology", "terrestrial_30min",
-                                               "terrestrial_daily","ticks")){
+                                      target_variables = c("oxygen", 
+                                                           "temperature", 
+                                                           "richness",
+                                                           "abundance", 
+                                                           "nee",
+                                                           "le", 
+                                                           "vswc",
+                                                           "gcc_90",
+                                                           "rcc_90",
+                                                           "ixodes_scapularis", 
+                                                           "amblyomma_americanum",
+                                                           "predicted",
+                                                           "observed"),
+                                      #GENERALIZATION:  Specific themes
+                                      theme_names = c("aquatics", "beetles",
+                                                      "phenology", "terrestrial_30min",
+                                                      "terrestrial_daily","ticks")){
   file_in <- forecast_file
-
+  
   
   valid <- TRUE
   
@@ -63,22 +60,21 @@ forecast_output_validator <- function(forecast_file,
     usethis::ui_done("file name is correct")
   }
   
-  
   if(any(vapply(c("[.]csv", "[.]csv\\.gz"), grepl, logical(1), file_in))){ 
     
     # if file is csv zip file
-     out <- readr::read_csv(file_in, guess_max = 1e6, show_col_types = FALSE)
-     
-     #usethis::ui_todo("Checking that file contains correct variables...")
-
-    if(lexists(out, target_variables) > 0){
-      usethis::ui_done("target variables found")
+    out <- readr::read_csv(file_in, guess_max = 1e6, show_col_types = FALSE)
+    
+    if("variable" %in% names(out) & "predicted" %in% names(out)){
+      usethis::ui_done("target variables found in long format")
+    }else if(lexists(out, target_variables) > 0){
+      usethis::ui_done("target variables found in wide format")
     }else{
-      usethis::ui_warn(paste0("no target variables in found in possible list: ", paste(target_variables, collapse = " ")))
+      usethis::ui_warn("no target variables found in either wide or long format")
       valid <- FALSE
     }
-     
-     #usethis::ui_todo("Checking that file contains either ensemble or statistic column...")
+    
+    #usethis::ui_todo("Checking that file contains either ensemble or statistic column...")
     
     if(lexists(out, "ensemble")){
       usethis::ui_done("file has ensemble members")
@@ -96,37 +92,58 @@ forecast_output_validator <- function(forecast_file,
         usethis::ui_warn("files does not have sd in the statistic column")
         valid <- FALSE
       }
+    }else if(lexists(out, "family"){
+      
+      if("normal" %in% unique(out$family)){
+        usethis::ui_done("file has normal distribution in family column")
+      }else{
+        usethis::ui_warn("only normal distributions in family columns are supported currently")
+        valid <- FALSE
+      }
+      
+      if(lexists(out, "parameter"){
+        if("mean" %in% unique(out$parameter) & "sd" %in% unique(out$parameter)){
+          usethis::ui_done("file has parameter and family column with normal distribution")
+        }else{
+          usethis::ui_warn("file does not have parameter column is not a normal distribution")
+          valid <- FALSE
+        }else{
+          usethis::ui_warn("file does not have parameter and family column ")
+          valid <- FALSE
+        }
+      }
+      
     }else{
-      usethis::ui_warn("files does not have ensemble or statistic column")
+      usethis::ui_warn("file does not have ensemble or family + parameter column")
       valid <- FALSE
     }
     
-     #usethis::ui_todo("Checking that file contains siteID column...")
+    #usethis::ui_todo("Checking that file contains siteID column...")
     if(lexists(out, c("siteID", "site_id"))){
       usethis::ui_done("file has siteID column")
     }else{
       usethis::ui_warn("file missing siteID column")
     }
     
-     #usethis::ui_todo("Checking that file contains parsable time column...")
+    #usethis::ui_todo("Checking that file contains parsable time column...")
     if(lexists(out, "time")){
-       usethis::ui_done("file has time column")
-       out2  <- readr::read_csv(file_in, show_col_types = FALSE)
-       if(!stringr::str_detect(out2$time[1], "-")){
-         usethis::ui_done("time column format is not in the correct YYYY-MM-DD format")
-         valid <- FALSE
-       }else{
-          if(sum(class(out$time) %in% c("Date","POSIXct")) > 0){
-            usethis::ui_done("file has correct time column")
-          }else{
-            usethis::ui_done("time column format is not in the correct YYYY-MM-DD format")
-            valid <- FALSE
-          }
+      usethis::ui_done("file has time column")
+      out2  <- readr::read_csv(file_in, show_col_types = FALSE)
+      if(!stringr::str_detect(out2$time[1], "-")){
+        usethis::ui_done("time column format is not in the correct YYYY-MM-DD format")
+        valid <- FALSE
+      }else{
+        if(sum(class(out$time) %in% c("Date","POSIXct")) > 0){
+          usethis::ui_done("file has correct time column")
+        }else{
+          usethis::ui_done("time column format is not in the correct YYYY-MM-DD format")
+          valid <- FALSE
+        }
       }
-     }else{
-       usethis::ui_warn("file missing time column")
-       valid <- FALSE
-     }
+    }else{
+      usethis::ui_warn("file missing time column")
+      valid <- FALSE
+    }
     
     #usethis::ui_todo("Checking that file contains data assimilation column...")
     #if(lexists(out, "data_assimilation")){
@@ -137,14 +154,14 @@ forecast_output_validator <- function(forecast_file,
     #}
     
     # usethis::ui_todo("Checking that file contains forecast column...")
-     
+    
     #if(lexists(out, "forecast")){
     #  usethis::ui_done("file has forecast column")
     #}else{
     #  usethis::ui_warn("file missing forecast column")
     #  valid <- FALSE
     #}
-  
+    
     
   } else if(grepl("[.]nc", file_in)){ #if file is nc
     
@@ -194,7 +211,7 @@ forecast_output_validator <- function(forecast_file,
     if(lexists(nc$dim, c("site")) > 0){
       usethis::ui_done("file has site dimension")
       site_dim <- length(ncdf4::ncvar_get(nc, "site"))
-
+      
     }else{
       usethis::ui_warn("file missing site dimension")
       valid <- FALSE
@@ -246,8 +263,8 @@ forecast_output_validator <- function(forecast_file,
     valid_metadata <- tryCatch(EFIstandards::forecast_validator(out),error = function(e){
       message(e)
       return(FALSE)
-      }, 
-      finally = NULL)
+    }, 
+    finally = NULL)
     
     if(!valid_metadata){
       usethis::ui_warn("metadata is not correct")
