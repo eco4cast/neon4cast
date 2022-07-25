@@ -92,7 +92,7 @@ forecast_output_validator <- function(forecast_file,
         usethis::ui_warn("files does not have sd in the statistic column")
         valid <- FALSE
       }
-    }else if(lexists(out, "family"){
+    }else if(lexists(out, "family")){
       
       if("normal" %in% unique(out$family)){
         usethis::ui_done("file has normal distribution in family column")
@@ -101,7 +101,7 @@ forecast_output_validator <- function(forecast_file,
         valid <- FALSE
       }
       
-      if(lexists(out, "parameter"){
+      if(lexists(out, "parameter")){
         if("mean" %in% unique(out$parameter) & "sd" %in% unique(out$parameter)){
           usethis::ui_done("file has parameter and family column with normal distribution")
         }else{
