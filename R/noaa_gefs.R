@@ -7,6 +7,11 @@
 #' provides efficient access to archives of these forecasts in a simple tabular
 #' format for a subset of variables of interest. 
 #' 
+#' WARNING: This combined dataset contains billions of rows. Filtering
+#' to a forecast issued on specific `start_date`s or other subsets before
+#' `collect()`ing data into R is essential. Be patient, especially on slow
+#' network connections, and handle this data with care. See examples.
+#' 
 #' At each site, 31 ensemble member forecasts are provided
 #' at 3 hr intervals for the first 10 days, and 6 hr intervals for up to 30 days
 #' (840 hr) horizon. Forecasts include the following variables:
@@ -32,19 +37,33 @@
 #' GEFS variables and intervals.
 #' 
 #' @references https://www.nco.ncep.noaa.gov/pmb/products/gens/
+#' @param cycle Hour at which forecast was made, as character string 
+#' (`"00"`, `"06"`, `"12"` or `"18"`). Only `"00"` (default) has 30 days horizon.
 #' @param version GEFS forecast version. Prior versions correspond to forecasts
 #' issued before 2020-09-25 which have different ensemble number and horizon,
 #' among other changes, and are not made available here. Leave as default.
 #' @param endpoint the EFI host address (leave as default)
 #' @param verbose logical, displays or hides messages
 #' @export
-noaa_stage1 <- function(version = "v12",
+#' @examplesIf interactive()
+#' 
+#' weather <- noaa_stage1()
+#' # 5.7M rows of data:
+#' weather |> 
+#'   dplyr::filter(start_date == "2022-04-01") |>
+#'   dplyr::collect()
+#' 
+#' 
+#' 
+noaa_stage1 <- function(cycle = "00",
+                        version = "v12",
                         endpoint = "data.ecoforecast.org",
                         verbose = TRUE) {
   noaa_gefs_stage("stage1", 
                   version = version, 
                   endpoint = endpoint,
-                  verbose = verbose)
+                  verbose = verbose) |> 
+    dplyr::filter(cycle == {cycle})
 }
 
 #' NOAA GEFS forecasts with EFI stage 2 processing
@@ -54,13 +73,16 @@ noaa_stage1 <- function(version = "v12",
 #' 
 #' @inheritParams noaa_stage1
 #' @export
-noaa_stage2 <- function(version = "v12",
+noaa_stage2 <- function(cycle = "00",
+                        version = "v12",
                         endpoint = "data.ecoforecast.org",
-                        verbose = getOption("verbose", TRUE)) {
+                        verbose = TRUE) {
   noaa_gefs_stage("stage2/parquet", 
                   version = version, 
                   endpoint = endpoint,
-                  verbose = verbose)
+                  verbose = verbose) |> 
+    dplyr::filter(cycle == {cycle})
+  
 }
 
 
@@ -72,7 +94,7 @@ noaa_stage2 <- function(version = "v12",
 #' @export
 noaa_stage3 <- function(version = "v12",
                         endpoint = "data.ecoforecast.org",
-                        verbose = getOption("verbose", TRUE)) {
+                        verbose = TRUE) {
   noaa_gefs_stage("stage3/parquet", 
                   partitioning = "site_id", 
                   version = version, 
@@ -93,8 +115,7 @@ noaa_gefs_stage <- function(stage = "stage1",
   if(verbose)
     message(paste0("connected! Use dplyr functions to filter and summarise.\n",
                   "Then, use collect() to read result into R\n"))
-  ds |> dplyr::filter(cycle == {cycle})
-  
+  ds  
 }
 
 noaa_gefs <- function(version = "v12",

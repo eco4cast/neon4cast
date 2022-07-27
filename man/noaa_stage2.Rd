@@ -10,12 +10,16 @@ Stage2 processing involves the following transforms of the data:
 }}
 \usage{
 noaa_stage2(
+  cycle = "00",
   version = "v12",
   endpoint = "data.ecoforecast.org",
-  verbose = getOption("verbose", TRUE)
+  verbose = TRUE
 )
 }
 \arguments{
+\item{cycle}{Hour at which forecast was made, as character string
+(\code{"00"}, \code{"06"}, \code{"12"} or \code{"18"}). Only \code{"00"} (default) has 30 days horizon.}
+
 \item{version}{GEFS forecast version. Prior versions correspond to forecasts
 issued before 2020-09-25 which have different ensemble number and horizon,
 among other changes, and are not made available here. Leave as default.}

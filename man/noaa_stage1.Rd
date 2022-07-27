@@ -4,9 +4,17 @@
 \alias{noaa_stage1}
 \title{NOAA GEFS tables}
 \usage{
-noaa_stage1(version = "v12", endpoint = "data.ecoforecast.org", verbose = TRUE)
+noaa_stage1(
+  cycle = "00",
+  version = "v12",
+  endpoint = "data.ecoforecast.org",
+  verbose = TRUE
+)
 }
 \arguments{
+\item{cycle}{Hour at which forecast was made, as character string
+(\code{"00"}, \code{"06"}, \code{"12"} or \code{"18"}). Only \code{"00"} (default) has 30 days horizon.}
+
 \item{version}{GEFS forecast version. Prior versions correspond to forecasts
 issued before 2020-09-25 which have different ensemble number and horizon,
 among other changes, and are not made available here. Leave as default.}
@@ -24,6 +32,11 @@ provides efficient access to archives of these forecasts in a simple tabular
 format for a subset of variables of interest.
 }
 \details{
+WARNING: This combined dataset contains billions of rows. Filtering
+to a forecast issued on specific \code{start_date}s or other subsets before
+\code{collect()}ing data into R is essential. Be patient, especially on slow
+network connections, and handle this data with care. See examples.
+
 At each site, 31 ensemble member forecasts are provided
 at 3 hr intervals for the first 10 days, and 6 hr intervals for up to 30 days
 (840 hr) horizon. Forecasts include the following variables:
@@ -48,6 +61,18 @@ resolution short term forecasts than GEFS.)
 All variables are given at height 2m above ground, as indicated in height.
 See https://www.nco.ncep.noaa.gov/pmb/products/gens/ for more details on
 GEFS variables and intervals.
+}
+\examples{
+\dontshow{if (interactive()) (if (getRversion() >= "3.4") withAutoprint else force)(\{ # examplesIf}
+
+weather <- noaa_stage1()
+# 5.7M rows of data:
+weather |> 
+  dplyr::filter(start_date == "2022-04-01") |>
+  dplyr::collect()
+
+
+\dontshow{\}) # examplesIf}
 }
 \references{
 https://www.nco.ncep.noaa.gov/pmb/products/gens/

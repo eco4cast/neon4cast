@@ -4,11 +4,7 @@
 \alias{noaa_stage3}
 \title{NOAA GEFS forecasts with EFI stage 3 processing}
 \usage{
-noaa_stage3(
-  version = "v12",
-  endpoint = "data.ecoforecast.org",
-  verbose = getOption("verbose", TRUE)
-)
+noaa_stage3(version = "v12", endpoint = "data.ecoforecast.org", verbose = TRUE)
 }
 \arguments{
 \item{version}{GEFS forecast version. Prior versions correspond to forecasts
