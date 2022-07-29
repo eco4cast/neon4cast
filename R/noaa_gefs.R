@@ -22,7 +22,7 @@
 #' - VGRD - V-component of wind speed (m/s)
 #' - APCP - Total precipitation in interval (kg/m^2)
 #' - DSWRF - Downward shortwave radiation flux in interval
-#' - DLWRF - Downward shortwave radiation flux in interval
+#' - DLWRF - Downward longwave radiation flux in interval
 #' 
 #' GEFS forecasts are issued four times a day, as indicated by the `start_date`
 #' and `cycle`. Only forecasts at midnight, `cycle = "00"` extend for the full
