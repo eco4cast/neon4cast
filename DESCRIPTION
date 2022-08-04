@@ -31,7 +31,7 @@ Imports:
     tibble,
     read4cast (>= 0.0.0.9000),
     score4cast (>= 0.0.0.9000)
-RoxygenNote: 7.1.2
+RoxygenNote: 7.2.0
 Language: en-US
 Suggests: 
     EFIstandards,
@@ -48,7 +48,7 @@ Suggests:
     readr
 Additional_repositories: https://cboettig.github.io/drat
 Config/testthat/edition: 3
-Remotes:  
+Remotes: 
     github::eco4cast/read4cast,
     github::eco4cast/score4cast,
     github::cboettig/aws.s3
