@@ -68,8 +68,9 @@ noaa_stage1 <- function(cycle = "00",
 
 #' NOAA GEFS forecasts with EFI stage 2 processing
 #' Stage2 processing involves the following transforms of the data:
-#' - Fluxes are standardized to rates
-#' - ...
+#' - Fluxes are standardized to per second rates
+#' - Variables are renamed to match CF conventions 
+#' - Fluxes and states are interpolated to 1 hour intervals
 #' 
 #' @inheritParams noaa_stage1
 #' @export
@@ -89,7 +90,8 @@ noaa_stage2 <- function(cycle = "00",
 #' NOAA GEFS forecasts with EFI stage 3 processing
 #' 
 #' Stage 3 processing presents a 'nowcast' product by combining the most
-#' recent predictions from each available cycle. 
+#' recent predictions from each available cycle. Product uses CF variable
+#' names and 1 hr interval
 #' @inheritParams noaa_stage1
 #' @export
 noaa_stage3 <- function(version = "v12",
