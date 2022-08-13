@@ -93,7 +93,7 @@ generate_metadata <- function(
     physical = physical,
     attributeList = attrList)
   
-  sites <- unique(forecast$siteID)
+  sites <- unique(forecast$site_id)
   
   geographicCoverage <- neon_geographic_coverage(sites)
   
