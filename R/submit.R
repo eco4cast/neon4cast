@@ -25,6 +25,7 @@ submit <- function(forecast_file,
   if(!go) return(NULL)
   #GENERALIZATION:  Here are specific AWS INFO
   aws.s3::put_object(file = forecast_file, 
+                     object = basename(forecast_file),
                      bucket = "neon4cast-submissions",
                      region= s3_region,
                      base_url = s3_endpoint)
@@ -33,6 +34,7 @@ submit <- function(forecast_file,
     if(tools::file_ext(metadata) == "xml"){
       EFIstandards::forecast_validator(metadata)
       aws.s3::put_object(file = metadata, 
+                         object = basename(metadata),
                          bucket = "neon4cast-submissions",
                          region= s3_region,
                          base_url = s3_endpoint)
