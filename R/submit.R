@@ -62,7 +62,7 @@ check_submission <- function(forecast_file,
     base_name <- paste0(tools::file_path_sans_ext(basename(forecast_file)),".csv.gz")
   }else if(grepl("[.]csv", forecast_file)){ 
      base_name <- paste0(tools::file_path_sans_ext(basename(forecast_file)),".csv.gz")
-  }else if(grepl("[.]csv\\.gz"), forecast_file)){ 
+  }else if(grepl("[.]csv\\.gz", forecast_file)){ 
      base_name <- basename(forecast_file)
   }else{
      message("File is not a .nc, .cvs, or .csv.gz file")
