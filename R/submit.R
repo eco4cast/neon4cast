@@ -73,7 +73,7 @@ check_submission <- function(forecast_file,
     if(not_in_standard){
       message("Submission is not in required format. Try running neon4cast::forecast_output_validator on your file to see what the issue may be")
     }else{
-      in_submissions <- aws.s3::object_exists(object = file.path(forecast_file), 
+      in_submissions <- aws.s3::object_exists(object = forecast_file, 
                                                bucket = "neon4cast-submissions",
                                               region= s3_region,
                                               base_url = s3_endpoint)
