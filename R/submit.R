@@ -56,7 +56,7 @@ check_submission <- function(forecast_file,
   theme <- stringr::str_split_fixed(forecast_file, "-", n = 2)
   
   
-  exists <- aws.s3::object_exists(object = file.path(theme[,1], forecast_file), 
+  exists <- aws.s3::object_exists(object = paste0(file.path(theme[,1], forecast_file),".gz"), 
                         bucket = "neon4cast-forecasts",
                         region= s3_region,
                         base_url = s3_endpoint)
