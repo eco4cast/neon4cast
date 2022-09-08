@@ -65,6 +65,11 @@ forecast_output_validator <- function(forecast_file,
     # if file is csv zip file
     out <- readr::read_csv(file_in, guess_max = 1e6, show_col_types = FALSE)
     
+    if("time" %in% names(out2)){
+      out <- out |> 
+        mutate(datetime = time)
+    }
+    
     if("variable" %in% names(out) & "predicted" %in% names(out)){
       usethis::ui_done("target variables found in long format")
     }else if(lexists(out, target_variables) > 0){
@@ -96,6 +101,8 @@ forecast_output_validator <- function(forecast_file,
       
       if("normal" %in% unique(out$family)){
         usethis::ui_done("file has normal distribution in family column")
+      }else if("ensemble" %in% unique(out$family)){
+        usethis::ui_done("file has ensemble distribution in family column")
       }else{
         usethis::ui_warn("only normal distributions in family columns are supported currently")
         valid <- FALSE
@@ -104,6 +111,10 @@ forecast_output_validator <- function(forecast_file,
       if(lexists(out, "parameter")){
         if("mean" %in% unique(out$parameter) & "sd" %in% unique(out$parameter)){
           usethis::ui_done("file has parameter and family column with normal distribution")
+        }else if("mu" %in% unique(out$parameter) & "sigma" %in% unique(out$parameter)){
+          usethis::ui_done("file has parameter and family column with normal distribution")
+        }else if("ensemble" %in% unique(out$family)){
+          
         }else{
           usethis::ui_warn("file does not have parameter column is not a normal distribution")
           valid <- FALSE
@@ -126,14 +137,18 @@ forecast_output_validator <- function(forecast_file,
     }
     
     #usethis::ui_todo("Checking that file contains parsable time column...")
-    if(lexists(out, "time")){
+    if(lexists(out, c("time","datetime"))){
       usethis::ui_done("file has time column")
       out2  <- readr::read_csv(file_in, show_col_types = FALSE)
-      if(!stringr::str_detect(out2$time[1], "-")){
+      if("time" %in% names(out2)){
+        out2 <- out2 |> 
+          mutate(datetime = time)
+      }
+      if(!stringr::str_detect(out2$datetime[1], "-")){
         usethis::ui_done("time column format is not in the correct YYYY-MM-DD format")
         valid <- FALSE
       }else{
-        if(sum(class(out$time) %in% c("Date","POSIXct")) > 0){
+        if(sum(class(out$datetime) %in% c("Date","POSIXct")) > 0){
           usethis::ui_done("file has correct time column")
         }else{
           usethis::ui_done("time column format is not in the correct YYYY-MM-DD format")
@@ -179,13 +194,21 @@ forecast_output_validator <- function(forecast_file,
     
     #usethis::ui_todo("Checking that time variable exist and is parseable...")
     
-    if(lexists(nc$dim, "time")){
+    if(lexists(nc$dim, c("time", "datetime"))){
       usethis::ui_done("file has time dimension")
+      if("time" %in% nc$dim){
       time <- ncdf4::ncvar_get(nc, "time")
-      time_dim <- length(time)
       tustr<-strsplit(ncdf4::ncatt_get(nc, varid = "time", "units")$value, " ")
-      time <-lubridate::as_date(time,origin=unlist(tustr)[3])
       t_string <- strsplit(ncdf4::ncatt_get(nc, varid = "time", "units")$value, " ")[[1]][1]
+      
+      }else{
+        time <- ncdf4::ncvar_get(nc, "datetime")
+        tustr<-strsplit(ncdf4::ncatt_get(nc, varid = "datetime", "units")$value, " ")
+        t_string <- strsplit(ncdf4::ncatt_get(nc, varid = "datetime", "units")$value, " ")[[1]][1]
+        
+      }
+      time_dim <- length(time)
+      time <-lubridate::as_date(time,origin=unlist(tustr)[3])
       if(t_string %in% c("days","seconds")){
         usethis::ui_done("file has correct time dimension")
       }else{
@@ -275,9 +298,7 @@ forecast_output_validator <- function(forecast_file,
   }else{
     valid <- FALSE
   }
-  
   return(valid)
-  
 }
 
 
