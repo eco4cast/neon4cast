@@ -31,7 +31,6 @@ forecast_output_validator <- function(forecast_file,
                                                       "terrestrial_daily","ticks")){
   file_in <- forecast_file
   
-  
   valid <- TRUE
   
   message(file_in)
@@ -83,20 +82,6 @@ forecast_output_validator <- function(forecast_file,
     
     if(lexists(out, "ensemble")){
       usethis::ui_done("file has ensemble members")
-    }else if(lexists(out, "statistic")){
-      usethis::ui_done("file has summary statistics column")
-      if("mean" %in% unique(out$statistic)){
-        usethis::ui_done("file has summary statistic: mean")
-      }else{
-        usethis::ui_warn("files does not have mean in the statistic column")
-        valid <- FALSE
-      }
-      if("sd" %in% unique(out$statistic)){
-        usethis::ui_done("file has summary statistic: sd")
-      }else{
-        usethis::ui_warn("files does not have sd in the statistic column")
-        valid <- FALSE
-      }
     }else if(lexists(out, "family")){
       
       if("normal" %in% unique(out$family)){
@@ -196,24 +181,24 @@ forecast_output_validator <- function(forecast_file,
     
     if(lexists(nc$dim, c("time", "datetime"))){
       usethis::ui_done("file has time dimension")
-      if("time" %in% nc$dim){
-      time <- ncdf4::ncvar_get(nc, "time")
-      tustr<-strsplit(ncdf4::ncatt_get(nc, varid = "time", "units")$value, " ")
-      t_string <- strsplit(ncdf4::ncatt_get(nc, varid = "time", "units")$value, " ")[[1]][1]
-      
+      if("time" %in% names(nc$dim)){
+        usethis::ui_warn("time dimension should be named datetime")
+        time <- ncdf4::ncvar_get(nc, "time")
+        time_dim <- length(time)
+        
+        valid <- FALSE
       }else{
         time <- ncdf4::ncvar_get(nc, "datetime")
         tustr<-strsplit(ncdf4::ncatt_get(nc, varid = "datetime", "units")$value, " ")
         t_string <- strsplit(ncdf4::ncatt_get(nc, varid = "datetime", "units")$value, " ")[[1]][1]
-        
-      }
-      time_dim <- length(time)
-      time <-lubridate::as_date(time,origin=unlist(tustr)[3])
-      if(t_string %in% c("days","seconds")){
-        usethis::ui_done("file has correct time dimension")
-      }else{
-        usethis::ui_warn("time dimension is in correct format")
-        valid <- FALSE
+        time_dim <- length(time)
+        time <-lubridate::as_date(time,origin=unlist(tustr)[3])
+        if(t_string %in% c("days","seconds")){
+          usethis::ui_done("file has correct time dimension")
+        }else{
+          usethis::ui_warn("time dimension is in correct format")
+          valid <- FALSE
+        }
       }
     }else{
       usethis::ui_warn("file missing time dimension")
@@ -243,10 +228,14 @@ forecast_output_validator <- function(forecast_file,
     #usethis::ui_todo("Checking that netcdf contains ensemble dimension...")
     
     if(lexists(nc$dim, "ensemble")){
-      usethis::ui_done("file has ensemble dimension")
+      usethis::ui_warn("ensemble dimension should be named parameter")
       ensemble_dim <- length(ncdf4::ncvar_get(nc, "ensemble"))
+      valid <- FALSE
+    }else if(lexists(nc$dim, "parameter")){
+      usethis::ui_done("file has parameter dimension")
+      ensemble_dim <- length(ncdf4::ncvar_get(nc, "parameter"))
     }else{
-      usethis::ui_warn("file missing ensemble dimension")
+      usethis::ui_warn("file missing parameter dimension")
       valid <- FALSE
     }
     
@@ -281,28 +270,23 @@ forecast_output_validator <- function(forecast_file,
     
     #usethis::ui_todo("Checking validity of metdata...")
     
-    out <- EML::read_eml(file_in)
+    #out <- EML::read_eml(file_in)
     
-    valid_metadata <- tryCatch(EFIstandards::forecast_validator(out),error = function(e){
-      message(e)
-      return(FALSE)
-    }, 
-    finally = NULL)
+    #valid_metadata <- tryCatch(EFIstandards::forecast_validator(out),error = function(e){
+    #  message(e)
+    #  return(FALSE)
+    #}, 
+    #finally = NULL)
     
-    if(!valid_metadata){
-      usethis::ui_warn("metadata is not correct")
-      valid <- FALSE
-    }else{
-      usethis::ui_done("metadata is correct")
-    }
+    #if(!valid_metadata){
+    #  usethis::ui_warn("metadata is not correct")
+    #  valid <- FALSE
+    #}else{
+    #  usethis::ui_done("metadata is correct")
+    #}
+    valid <- TRUE
   }else{
     valid <- FALSE
   }
   return(valid)
 }
-
-
-lexists <- function(list,name){
-  any(!is.na(match(name, names(list))))
-}
-

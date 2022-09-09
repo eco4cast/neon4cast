@@ -22,7 +22,13 @@ submit <- function(forecast_file,
   if(go & ask){
     go <- utils::askYesNo("Forecast file is valid, ready to submit?")
   }
-  if(!go) return(NULL)
+  if(!go){
+    
+    warning(paste0("forecasts was not in a valid format and was not submitted\n",
+                   "First, try read reinstalling neon4cast (remotes::install_github('eco4cast\\neon4cast'), restarting R, and trying again\n",
+                   "Second, see https://projects.ecoforecast.org/neon4cast-docs/Submission-Instructions.html for more information on the file format"))
+    return(NULL)
+  }
   #GENERALIZATION:  Here are specific AWS INFO
   aws.s3::put_object(file = forecast_file, 
                      object = basename(forecast_file),
