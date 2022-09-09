@@ -39,6 +39,8 @@ submit <- function(forecast_file,
                      region= s3_region,
                      base_url = s3_endpoint)
   
+  Sys.sleep(3)
+  
   exists <- suppressMessages(aws.s3::object_exists(object = basename(forecast_file), 
                                                    bucket = "neon4cast-submissions",
                                                    region= s3_region,
