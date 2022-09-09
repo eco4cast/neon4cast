@@ -33,18 +33,11 @@ submit <- function(forecast_file,
   }
 
   #GENERALIZATION:  Here are specific AWS INFO
-  aws.s3::put_object(file = forecast_file, 
+  exists <- aws.s3::put_object(file = forecast_file, 
                      object = basename(forecast_file),
                      bucket = "neon4cast-submissions",
                      region= s3_region,
                      base_url = s3_endpoint)
-  
-  Sys.sleep(3)
-  
-  exists <- suppressMessages(aws.s3::object_exists(object = basename(forecast_file), 
-                                                   bucket = "neon4cast-submissions",
-                                                   region= s3_region,
-                                                   base_url = s3_endpoint))
   
   if(exists){
     message("Successfully submitted forecast to server")
@@ -112,18 +105,8 @@ check_submission <- function(forecast_file,
     if(not_in_standard){
       message("Submission is not in required format. Try running neon4cast::forecast_output_validator on your file to see what the issue may be")
     }else{
-      in_submissions <- suppressMessages(aws.s3::object_exists(object = basename(forecast_file), 
-                                                               bucket = "neon4cast-submissions",
-                                                               region= s3_region,
-                                                               base_url = s3_endpoint))
-      
-      if(in_submissions){
         message("Your forecast is still in queue to be processed by the server. Please check again in a few hours")
-      }else{
-        message("Submissions is not present on server.  Try uploading again.") 
-      }
     }
-    
   }
   invisible(exists)
 }
