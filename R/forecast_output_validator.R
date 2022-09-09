@@ -64,24 +64,18 @@ forecast_output_validator <- function(forecast_file,
     # if file is csv zip file
     out <- readr::read_csv(file_in, guess_max = 1e6, show_col_types = FALSE)
     
-    if("time" %in% names(out2)){
-      out <- out |> 
-        mutate(datetime = time)
-    }
-    
     if("variable" %in% names(out) & "predicted" %in% names(out)){
-      usethis::ui_done("target variables found in long format")
-    }else if(lexists(out, target_variables) > 0){
-      usethis::ui_done("target variables found in wide format")
+      usethis::ui_done("forecasted variables found correct variable + preducted column")
     }else{
-      usethis::ui_warn("no target variables found in either wide or long format")
+      usethis::ui_warn("missing the variable and predicted columns")
       valid <- FALSE
     }
     
     #usethis::ui_todo("Checking that file contains either ensemble or statistic column...")
     
     if(lexists(out, "ensemble")){
-      usethis::ui_done("file has ensemble members")
+      usethis::ui_warn("ensemble dimension should be named parameter")
+      valid <- FALSE
     }else if(lexists(out, "family")){
       
       if("normal" %in% unique(out$family)){
@@ -89,19 +83,17 @@ forecast_output_validator <- function(forecast_file,
       }else if("ensemble" %in% unique(out$family)){
         usethis::ui_done("file has ensemble distribution in family column")
       }else{
-        usethis::ui_warn("only normal distributions in family columns are supported currently")
+        usethis::ui_warn("only normal or ensemble distributions in family columns are currently supported")
         valid <- FALSE
       }
       
       if(lexists(out, "parameter")){
-        if("mean" %in% unique(out$parameter) & "sd" %in% unique(out$parameter)){
-          usethis::ui_done("file has parameter and family column with normal distribution")
-        }else if("mu" %in% unique(out$parameter) & "sigma" %in% unique(out$parameter)){
+        if("mu" %in% unique(out$parameter) & "sigma" %in% unique(out$parameter)){
           usethis::ui_done("file has parameter and family column with normal distribution")
         }else if("ensemble" %in% unique(out$family)){
-          
+          usethis::ui_done("file has parameter and family column with ensemble generated distribution")
         }else{
-          usethis::ui_warn("file does not have parameter column is not a normal distribution")
+          usethis::ui_warn("file does not have parameter column is not a normal or ensemble distribution")
           valid <- FALSE
         }
       }else{
@@ -115,21 +107,18 @@ forecast_output_validator <- function(forecast_file,
     }
     
     #usethis::ui_todo("Checking that file contains siteID column...")
-    if(lexists(out, c("siteID", "site_id"))){
-      usethis::ui_done("file has siteID column")
+    if(lexists(out, c("site_id"))){
+      usethis::ui_done("file has site_id column")
+    }else if(lexists(out, c("siteID"))){
+      usethis::ui_warn("file siteID column should be named site_id")
     }else{
-      usethis::ui_warn("file missing siteID column")
+      usethis::ui_warn("file missing site_id column")
     }
     
     #usethis::ui_todo("Checking that file contains parsable time column...")
-    if(lexists(out, c("time","datetime"))){
+    if(lexists(out, c("datetime"))){
       usethis::ui_done("file has time column")
-      out2  <- readr::read_csv(file_in, show_col_types = FALSE)
-      if("time" %in% names(out2)){
-        out2 <- out2 |> 
-          mutate(datetime = time)
-      }
-      if(!stringr::str_detect(out2$datetime[1], "-")){
+      if(!stringr::str_detect(out$datetime[1], "-")){
         usethis::ui_done("time column format is not in the correct YYYY-MM-DD format")
         valid <- FALSE
       }else{
@@ -140,28 +129,21 @@ forecast_output_validator <- function(forecast_file,
           valid <- FALSE
         }
       }
+    }else if(lexists(out, c("time"))){
+      usethis::ui_warn("file time column should be named datetime")
+      valid <- FALSE
     }else{
       usethis::ui_warn("file missing time column")
       valid <- FALSE
     }
     
-    #usethis::ui_todo("Checking that file contains data assimilation column...")
-    #if(lexists(out, "data_assimilation")){
-    #  usethis::ui_done("file has data_assimilation column")
-    #}else{
-    #  usethis::ui_warn("file missing data_assimilation column")
-    #  valid <- FALSE
-    #}
-    
-    # usethis::ui_todo("Checking that file contains forecast column...")
-    
-    #if(lexists(out, "forecast")){
-    #  usethis::ui_done("file has forecast column")
-    #}else{
-    #  usethis::ui_warn("file missing forecast column")
-    #  valid <- FALSE
-    #}
-    
+    if(lexists(out, c("reference_datetime"))){
+      usethis::ui_done("file has reference_datetime column")
+    }else if(lexists(out, c("start_time"))){
+      usethis::ui_warn("file start_time column should be named reference_datetime")
+    }else{
+      usethis::ui_warn("file missing reference_datetime column")
+    }
     
   } else if(grepl("[.]nc", file_in)){ #if file is nc
     
@@ -288,5 +270,14 @@ forecast_output_validator <- function(forecast_file,
   }else{
     valid <- FALSE
   }
+  if(!valid){
+    message("Forecast file is not valid. The following link provides information about the format:\nhttps://projects.ecoforecast.org/neon4cast-docs/Submission-Instructions.html")
+  }
   return(valid)
 }
+
+
+lexists <- function(list,name){
+  any(!is.na(match(name, names(list))))
+}
+

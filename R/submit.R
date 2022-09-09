@@ -18,10 +18,8 @@ submit <- function(forecast_file,
     warning(paste("Detected existing AWS credentials file in ~/.aws,",
                   "Consider renaming these so that automated upload will work"))
   }
+  message("validating that file matches required standard")
   go <- forecast_output_validator(forecast_file)
-  if(go & ask){
-    go <- utils::askYesNo("Forecast file is valid, ready to submit?")
-  }
   if(!go){
     
     warning(paste0("forecasts was not in a valid format and was not submitted\n",
@@ -29,12 +27,31 @@ submit <- function(forecast_file,
                    "Second, see https://projects.ecoforecast.org/neon4cast-docs/Submission-Instructions.html for more information on the file format"))
     return(NULL)
   }
+  
+  if(go & ask){
+    go <- utils::askYesNo("Forecast file is valid, ready to submit?")
+  }
+
   #GENERALIZATION:  Here are specific AWS INFO
   aws.s3::put_object(file = forecast_file, 
                      object = basename(forecast_file),
                      bucket = "neon4cast-submissions",
                      region= s3_region,
                      base_url = s3_endpoint)
+  
+  exists <- suppressMessages(aws.s3::object_exists(object = basename(forecast_file), 
+                                                   bucket = "neon4cast-submissions",
+                                                   region= s3_region,
+                                                   base_url = s3_endpoint))
+  
+  if(exists){
+    message("Successfully submitted forecast to server")
+  }else{
+    warning("Forecasts was not sucessfully submitted to server")
+  }
+  
+  
+  
   
   if(!is.null(metadata)){
     if(tools::file_ext(metadata) == "xml"){
