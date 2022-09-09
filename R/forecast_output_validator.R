@@ -272,6 +272,8 @@ forecast_output_validator <- function(forecast_file,
   }
   if(!valid){
     message("Forecast file is not valid. The following link provides information about the format:\nhttps://projects.ecoforecast.org/neon4cast-docs/Submission-Instructions.html")
+  }else{
+    message("Forecast format is valid")
   }
   return(valid)
 }
