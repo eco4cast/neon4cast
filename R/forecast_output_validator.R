@@ -164,11 +164,10 @@ forecast_output_validator <- function(forecast_file,
     if(lexists(nc$dim, c("time", "datetime"))){
       usethis::ui_done("file has time dimension")
       if("time" %in% names(nc$dim)){
-        usethis::ui_warn("time dimension should be named datetime")
+        usethis::ui_warn("time dimension should be named datetime we are converting it during processing but please update your submission format")
         time <- ncdf4::ncvar_get(nc, "time")
         time_dim <- length(time)
-        
-        valid <- FALSE
+        valid <- TRUE
       }else{
         time <- ncdf4::ncvar_get(nc, "datetime")
         tustr<-strsplit(ncdf4::ncatt_get(nc, varid = "datetime", "units")$value, " ")
