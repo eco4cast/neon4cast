@@ -130,8 +130,8 @@ forecast_output_validator <- function(forecast_file,
         }
       }
     }else if(lexists(out, c("time"))){
-      usethis::ui_warn("file time column should be named datetime")
-      valid <- FALSE
+      usethis::ui_warn("time dimension should be named datetime. We are converting it during processing but please update your submission format")
+      valid <- TRUE
     }else{
       usethis::ui_warn("file missing time column")
       valid <- FALSE
@@ -140,7 +140,7 @@ forecast_output_validator <- function(forecast_file,
     if(lexists(out, c("reference_datetime"))){
       usethis::ui_done("file has reference_datetime column")
     }else if(lexists(out, c("start_time"))){
-      usethis::ui_warn("file start_time column should be named reference_datetime")
+      usethis::ui_warn("file start_time column should be named reference_datetime. We are converting it during processing but please update your submission format")
     }else{
       usethis::ui_warn("file missing reference_datetime column")
     }
