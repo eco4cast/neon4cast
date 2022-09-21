@@ -4,12 +4,12 @@
 #' @param collect TRUE/FALSE to download results
 #' @return a data.frame of scores
 #' @export
-combined_scores <- function(x, collect = TRUE){
+combined_scores <- function(theme, collect = TRUE){
 
   vars <- neon4cast:::arrow_env_vars()
   
   #GENERALIZATION: THIS IS A SPECIFIC ENDPOINT
-  s3 <- arrow::s3_bucket(bucket = paste0("neon4cast-scores/parquet/",x),
+  s3 <- arrow::s3_bucket(bucket = paste0("neon4cast-scores/parquet/", theme),
                          endpoint_override = "data.ecoforecast.org")
   ds <- arrow::open_dataset(s3)
   if (collect) {
