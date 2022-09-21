@@ -4,23 +4,18 @@
 #' @param collect TRUE/FALSE to download results
 #' @return a data.frame of scores
 #' @export
-combined_scores <- function(x = NA, collect = TRUE){
-  Sys.setenv("AWS_EC2_METADATA_DISABLED"="TRUE")
-  Sys.unsetenv("AWS_ACCESS_KEY_ID")
-  Sys.unsetenv("AWS_SECRET_ACCESS_KEY")
-  Sys.unsetenv("AWS_DEFAULT_REGION")
-  Sys.unsetenv("AWS_S3_ENDPOINT")
+combined_scores <- function(x, collect = TRUE){
+
+  vars <- neon4cast:::arrow_env_vars()
   
   #GENERALIZATION: THIS IS A SPECIFIC ENDPOINT
-  s3 <- arrow::s3_bucket(bucket = "neon4cast-scores/parquet",
+  s3 <- arrow::s3_bucket(bucket = paste0("neon4cast-scores/parquet/",x),
                          endpoint_override = "data.ecoforecast.org")
-  ds <- arrow::open_dataset(s3, partitioning=c("theme", "year"))
-  if (!is.na(x)) {
-  ds <- dplyr::filter(ds, theme == {{x}})
-  }
+  ds <- arrow::open_dataset(s3)
   if (collect) {
     ds <- dplyr::collect(ds)
   }
+  on.exit(neon4cast:::unset_arrow_vars(vars))
   ds
 }
 globalVariables("theme", "neon4cast")
