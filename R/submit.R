@@ -76,20 +76,22 @@ check_submission <- function(forecast_file,
   theme <- stringr::str_split_fixed(basename(forecast_file), "-", n = 2)
   
   #All forecats are converted into a common file format when they are processed.  This generates that name.
-  if (grepl("[.]nc$", forecast_file)) {
-    base_name <- paste0(tools::file_path_sans_ext(basename(forecast_file)), 
-                        ".csv.gz")
-  }else if (grepl("[.]csv$", forecast_file)) {
-    base_name <- paste0(tools::file_path_sans_ext(basename(forecast_file)), 
-                        ".csv.gz")
-  }else if (grepl("[.]csv\\.gz$", forecast_file)) {
-    base_name <- basename(forecast_file)
-  }else {
-    message("File is not a .nc, .cvs, or .csv.gz file")
-    base_name <- forecast_file
-  }
+  #if (grepl("[.]nc$", forecast_file)) {
+  #  base_name <- paste0(tools::file_path_sans_ext(basename(forecast_file)), 
+  #                      ".csv.gz")
+  #}else if (grepl("[.]csv$", forecast_file)) {
+  #  base_name <- paste0(tools::file_path_sans_ext(basename(forecast_file)), 
+  #                      ".csv.gz")
+  #}else if (grepl("[.]csv\\.gz$", forecast_file)) {
+  #  base_name <- basename(forecast_file)
+  #}else {
+  #  message("File is not a .nc, .cvs, or .csv.gz file")
+  #  base_name <- forecast_file
+  #}
   
-  exists <- suppressMessages(aws.s3::object_exists(object = file.path(theme[,1], base_name), 
+  base_name <- forecast_file
+  
+  exists <- suppressMessages(aws.s3::object_exists(object = file.path("raw", theme[,1], base_name), 
                                                    bucket = "neon4cast-forecasts",
                                                    region= s3_region,
                                                    base_url = s3_endpoint))
