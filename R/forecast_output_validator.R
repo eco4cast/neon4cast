@@ -65,7 +65,7 @@ forecast_output_validator <- function(forecast_file,
     out <- readr::read_csv(file_in, guess_max = 1e6, show_col_types = FALSE)
     
     if("variable" %in% names(out) & "predicted" %in% names(out)){
-      usethis::ui_done("forecasted variables found correct variable + preducted column")
+      usethis::ui_done("forecasted variables found correct variable + predicted column")
     }else{
       usethis::ui_warn("missing the variable and predicted columns")
       valid <- FALSE
