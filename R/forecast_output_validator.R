@@ -23,7 +23,7 @@ forecast_output_validator <- function(forecast_file,
                                                            "rcc_90",
                                                            "ixodes_scapularis", 
                                                            "amblyomma_americanum",
-                                                           "predicted",
+                                                           "prediction",
                                                            "observed"),
                                       #GENERALIZATION:  Specific themes
                                       theme_names = c("aquatics", "beetles",
@@ -64,10 +64,10 @@ forecast_output_validator <- function(forecast_file,
     # if file is csv zip file
     out <- readr::read_csv(file_in, guess_max = 1e6, show_col_types = FALSE)
     
-    if("variable" %in% names(out) & "predicted" %in% names(out)){
-      usethis::ui_done("forecasted variables found correct variable + predicted column")
+    if("variable" %in% names(out) & "prediction" %in% names(out)){
+      usethis::ui_done("forecasted variables found correct variable + prediction column")
     }else{
-      usethis::ui_warn("missing the variable and predicted columns")
+      usethis::ui_warn("missing the variable and prediction columns")
       valid <- FALSE
     }
     
