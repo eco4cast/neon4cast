@@ -66,6 +66,9 @@ forecast_output_validator <- function(forecast_file,
     
     if("variable" %in% names(out) & "prediction" %in% names(out)){
       usethis::ui_done("forecasted variables found correct variable + prediction column")
+    }else if("variable" %in% names(out) & "predicted" %in% names(out)){
+      usethis::ui_warn("file as predicted column.  change column name to prediction")
+      valid <- FALSE
     }else{
       usethis::ui_warn("missing the variable and prediction columns")
       valid <- FALSE
