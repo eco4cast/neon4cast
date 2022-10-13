@@ -23,7 +23,7 @@ forecast_output_validator <- function(forecast_file,
                                                            "rcc_90",
                                                            "ixodes_scapularis", 
                                                            "amblyomma_americanum",
-                                                           "predicted",
+                                                           "prediction",
                                                            "observed"),
                                       #GENERALIZATION:  Specific themes
                                       theme_names = c("aquatics", "beetles",
@@ -64,10 +64,13 @@ forecast_output_validator <- function(forecast_file,
     # if file is csv zip file
     out <- readr::read_csv(file_in, guess_max = 1e6, show_col_types = FALSE)
     
-    if("variable" %in% names(out) & "predicted" %in% names(out)){
-      usethis::ui_done("forecasted variables found correct variable + preducted column")
+    if("variable" %in% names(out) & "prediction" %in% names(out)){
+      usethis::ui_done("forecasted variables found correct variable + prediction column")
+    }else if("variable" %in% names(out) & "predicted" %in% names(out)){
+      usethis::ui_warn("file as predicted column.  change column name to prediction")
+      valid <- FALSE
     }else{
-      usethis::ui_warn("missing the variable and predicted columns")
+      usethis::ui_warn("missing the variable and prediction columns")
       valid <- FALSE
     }
     
@@ -130,8 +133,8 @@ forecast_output_validator <- function(forecast_file,
         }
       }
     }else if(lexists(out, c("time"))){
-      usethis::ui_warn("file time column should be named datetime")
-      valid <- FALSE
+      usethis::ui_warn("time dimension should be named datetime. We are converting it during processing but please update your submission format")
+      valid <- TRUE
     }else{
       usethis::ui_warn("file missing time column")
       valid <- FALSE
@@ -140,7 +143,7 @@ forecast_output_validator <- function(forecast_file,
     if(lexists(out, c("reference_datetime"))){
       usethis::ui_done("file has reference_datetime column")
     }else if(lexists(out, c("start_time"))){
-      usethis::ui_warn("file start_time column should be named reference_datetime")
+      usethis::ui_warn("file start_time column should be named reference_datetime. We are converting it during processing but please update your submission format")
     }else{
       usethis::ui_warn("file missing reference_datetime column")
     }
@@ -164,11 +167,10 @@ forecast_output_validator <- function(forecast_file,
     if(lexists(nc$dim, c("time", "datetime"))){
       usethis::ui_done("file has time dimension")
       if("time" %in% names(nc$dim)){
-        usethis::ui_warn("time dimension should be named datetime")
+        usethis::ui_warn("time dimension should be named datetime we are converting it during processing but please update your submission format")
         time <- ncdf4::ncvar_get(nc, "time")
         time_dim <- length(time)
-        
-        valid <- FALSE
+        valid <- TRUE
       }else{
         time <- ncdf4::ncvar_get(nc, "datetime")
         tustr<-strsplit(ncdf4::ncatt_get(nc, varid = "datetime", "units")$value, " ")
