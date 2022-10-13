@@ -55,15 +55,15 @@
 #' 
 #' 
 #' 
-noaa_stage1 <- function(cycle = "00",
+noaa_stage1 <- function(cycle = 0,
                         version = "v12",
                         endpoint = "data.ecoforecast.org",
                         verbose = TRUE) {
-  noaa_gefs_stage("stage1", 
+  noaa_gefs_stage(file.path("stage1",cycle), 
+                  partitioning = "start_date",
                   version = version, 
                   endpoint = endpoint,
-                  verbose = verbose) |> 
-    dplyr::filter(cycle == {cycle})
+                  verbose = verbose)
 }
 
 #' NOAA GEFS forecasts with EFI stage 2 processing
@@ -74,15 +74,15 @@ noaa_stage1 <- function(cycle = "00",
 #' 
 #' @inheritParams noaa_stage1
 #' @export
-noaa_stage2 <- function(cycle = "00",
+noaa_stage2 <- function(cycle = 0,
                         version = "v12",
                         endpoint = "data.ecoforecast.org",
                         verbose = TRUE) {
-  noaa_gefs_stage("stage2/parquet", 
+  noaa_gefs_stage(file.path("stage2/parquet",cycle), 
+                  partitioning = "start_date",
                   version = version, 
                   endpoint = endpoint,
-                  verbose = verbose) |> 
-    dplyr::filter(cycle == {cycle})
+                  verbose = verbose)
   
 }
 
@@ -105,8 +105,8 @@ noaa_stage3 <- function(version = "v12",
 }
 
 noaa_gefs_stage <- function(stage = "stage1",
-                            partitioning = c("start_date", "cycle"),
-                            cycle = "00",
+                            partitioning = c("cycle","start_date"),
+                            cycle = 0,
                             version = "v12",
                             endpoint = "data.ecoforecast.org",
                             verbose = getOption("verbose", TRUE)) {
