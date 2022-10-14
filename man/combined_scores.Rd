@@ -4,12 +4,12 @@
 \alias{combined_scores}
 \title{Combining scores from a theme together}
 \usage{
-combined_scores(x = NA, collect = TRUE)
+combined_scores(theme, collect = TRUE)
 }
 \arguments{
-\item{x}{theme name (optional)}
-
 \item{collect}{TRUE/FALSE to download results}
+
+\item{x}{theme name (optional)}
 }
 \value{
 a data.frame of scores

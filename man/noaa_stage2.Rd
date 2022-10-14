@@ -5,12 +5,13 @@
 \title{NOAA GEFS forecasts with EFI stage 2 processing
 Stage2 processing involves the following transforms of the data:
 \itemize{
-\item Fluxes are standardized to rates
-\item ...
+\item Fluxes are standardized to per second rates
+\item Variables are renamed to match CF conventions
+\item Fluxes and states are interpolated to 1 hour intervals
 }}
 \usage{
 noaa_stage2(
-  cycle = "00",
+  cycle = 0,
   version = "v12",
   endpoint = "data.ecoforecast.org",
   verbose = TRUE
@@ -32,7 +33,8 @@ among other changes, and are not made available here. Leave as default.}
 NOAA GEFS forecasts with EFI stage 2 processing
 Stage2 processing involves the following transforms of the data:
 \itemize{
-\item Fluxes are standardized to rates
-\item ...
+\item Fluxes are standardized to per second rates
+\item Variables are renamed to match CF conventions
+\item Fluxes and states are interpolated to 1 hour intervals
 }
 }

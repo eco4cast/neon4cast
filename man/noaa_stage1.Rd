@@ -5,7 +5,7 @@
 \title{NOAA GEFS tables}
 \usage{
 noaa_stage1(
-  cycle = "00",
+  cycle = 0,
   version = "v12",
   endpoint = "data.ecoforecast.org",
   verbose = TRUE
@@ -48,7 +48,7 @@ at 3 hr intervals for the first 10 days, and 6 hr intervals for up to 30 days
 \item VGRD - V-component of wind speed (m/s)
 \item APCP - Total precipitation in interval (kg/m^2)
 \item DSWRF - Downward shortwave radiation flux in interval
-\item DLWRF - Downward shortwave radiation flux in interval
+\item DLWRF - Downward longwave radiation flux in interval
 }
 
 GEFS forecasts are issued four times a day, as indicated by the \code{start_date}

@@ -7,8 +7,8 @@
 forecast_output_validator(
   forecast_file,
   target_variables = c("oxygen", "temperature", "richness", "abundance", "nee", "le",
-    "vswc", "gcc_90", "rcc_90", "ixodes_scapularis", "amblyomma_americanum", "predicted",
-    "observed"),
+    "vswc", "gcc_90", "rcc_90", "ixodes_scapularis", "amblyomma_americanum",
+    "prediction", "observed"),
   theme_names = c("aquatics", "beetles", "phenology", "terrestrial_30min",
     "terrestrial_daily", "ticks")
 )

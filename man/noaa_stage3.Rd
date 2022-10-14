@@ -17,5 +17,6 @@ among other changes, and are not made available here. Leave as default.}
 }
 \description{
 Stage 3 processing presents a 'nowcast' product by combining the most
-recent predictions from each available cycle.
+recent predictions from each available cycle. Product uses CF variable
+names and 1 hr interval
 }
