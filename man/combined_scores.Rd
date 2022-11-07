@@ -7,9 +7,9 @@
 combined_scores(theme, collect = TRUE)
 }
 \arguments{
-\item{collect}{TRUE/FALSE to download results}
+\item{theme}{theme name}
 
-\item{x}{theme name (optional)}
+\item{collect}{TRUE/FALSE to download results}
 }
 \value{
 a data.frame of scores
