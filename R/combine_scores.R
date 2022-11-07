@@ -10,7 +10,8 @@ combined_scores <- function(theme, collect = TRUE){
   
   #GENERALIZATION: THIS IS A SPECIFIC ENDPOINT
   s3 <- arrow::s3_bucket(bucket = paste0("neon4cast-scores/parquet/", theme),
-                         endpoint_override = "data.ecoforecast.org")
+                         endpoint_override = "data.ecoforecast.org", 
+                         anonymous = TRUE)
   ds <- arrow::open_dataset(s3)
   if (collect) {
     ds <- dplyr::collect(ds)
