@@ -12,13 +12,44 @@ combined_scores <- function(theme, collect = TRUE){
   s3 <- arrow::s3_bucket(bucket = paste0("neon4cast-scores/parquet/", theme),
                          endpoint_override = "data.ecoforecast.org", 
                          anonymous = TRUE)
-  ds <- arrow::open_dataset(s3)
+  ds <- arrow::open_dataset(s3, schema=score_schema())
   if (collect) {
     ds <- dplyr::collect(ds)
   }
   on.exit(neon4cast:::unset_arrow_vars(vars))
   ds
 }
+
+
+score_schema <- function() {
+  arrow::schema(
+  datetime = arrow::timestamp("us", timezone="UTC"), 
+  family=arrow::string(),
+  variable = arrow::string(), 
+  prediction=arrow::float64(), 
+  reference_datetime=arrow::string(),
+  site_id=arrow::string(),
+  model_id = arrow::string(),
+  observation=arrow::float64(),
+  crps = arrow::float64(),
+  logs = arrow::float64(),
+  mean = arrow::float64(),
+  median = arrow::float64(),
+  sd = arrow::float64(),
+  quantile97.5 = arrow::float64(),
+  quantile02.5 = arrow::float64(),
+  quantile90 = arrow::float64(),
+  quantile10= arrow::float64()
+)
+}
+
+
+
+
+
+
+
+
 
 #' Calculating forecast challenge submission statistics
 #'
