@@ -27,7 +27,7 @@ score_schema <- function() {
   family=arrow::string(),
   variable = arrow::string(), 
   prediction=arrow::float64(), 
-  reference_datetime=arrow::string(),
+  reference_datetime=  arrow::timestamp("s"), # arrow::string(),
   site_id=arrow::string(),
   model_id = arrow::string(),
   observation=arrow::float64(),
@@ -42,9 +42,6 @@ score_schema <- function() {
   quantile10= arrow::float64()
 )
 }
-
-
-
 
 
 
