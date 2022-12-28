@@ -13,57 +13,87 @@
 #' library(dplyr)
 #' library(readr)
 #' library(fable)
-#' aquatic <- read_csv("https://data.ecoforecast.org/targets/aquatics/aquatics-targets.csv.gz") %>% 
-#' as_tsibble(index=time, key=siteID)
+#' aquatic <-
+#'   read_csv("https://data.ecoforecast.org/neon4cast-targets/aquatics/aquatics-targets.csv.gz") %>%
+#'   pivot_wider(names_from = "variable", values_from = "observation") %>%
+#'   as_tsibble(index = datetime, key = site_id)
 #' oxygen_fc <- aquatic %>%
 #'   model(null = MEAN(oxygen)) %>%
 #'   forecast(h = "35 days") %>%
 #'   efi_format()
-#'   }
-#' 
+#'  }
 #' @export
 #' @importFrom rlang .data `:=`
 #' @importFrom dplyr `%>%`
-efi_format <- function(df, times = 100){
+efi_format <- function(df, times = 10){
   
+  df <- drop_degenerate(df)
   var <- attributes(df)$dist
-  is_normal <- vapply(df[[var]], inherits, logical(1L), "dist_normal")
-  if(all(is_normal))
-    efi_statistic_format(df)  
+  family <- unique(stats::family(df[[var]]))
+  
+  if(length(unique(family)) > 1)
+    stop("Multiple distributions detected. Please provide only one distribution type at a time.")
+  
+  if(family %in% c("normal"))
+    efi_format_statistic(df, family)  
   else
-    efi_ensemble_format(df, times)
+    efi_format_ensemble(df, times)
   
 }
 
 ## Helper functions to turn a fable timeseries, which uses a special "distribution" column,
 ## into a flat-file format.  efi_statistic_format uses a 'statistic' column (indicating either mean or sd),
 ## while efi_ensemble_format uses an 'ensemble' column, drawing `n` times from the distribution. 
-efi_statistic_format <- function(df){
+efi_format_statistic <- function(df, family = NULL){
   
   stopifnot(inherits(df, "fbl_ts"))
-  
-  
   ## determine variable name
   var <- attributes(df)$dist
-  ## Normal distribution: use distribution mean and variance
+  
+  if(is.null(family))
+    family <- unique(stats::family(df[[var]]))
+  
+  
   df %>% 
-    dplyr::mutate(sd = sqrt( distributional::variance( .data[[var]] ) ) ) %>%
-    dplyr::rename(mean = .mean) %>%
-    dplyr::select(time, siteID, .model, mean, sd) %>%
-    tidyr::pivot_longer(c(mean, sd), names_to = "statistic", values_to = var) %>%
+    dplyr::mutate(family = family) %>%
+    dplyr::rename(model_id = .model) %>%
+    dplyr::select(-.mean) %>%
+    tidyr::pivot_longer(-dplyr::starts_with(standard_vars),
+                        names_to = "variable", 
+                        values_to = "dist") %>% 
+    dplyr::mutate(pars = distributional::parameters(dist)) %>%
+    tidyr::unnest(pars) %>%
+    dplyr::select(-dist) %>%
+    tidyr::pivot_longer(-dplyr::starts_with(standard_vars),
+                        names_to = "parameter", values_to = "prediction") %>%
     dplyr::as_tibble()
+
 }
 
-utils::globalVariables(c("siteID", "time", "sd", ".model",
-                         ".mean", "ensemble"), "neon4cast")
 
-efi_ensemble_format <- function(df, times = 10) {
+standard_vars <- c("site_id", "datetime", "parameter", "family",
+                   "reference_datetime", "prediction", "observation",
+                   "model_id", "model_name", "latitude", "longitude",
+                   "variable")
+
+utils::globalVariables(c("sd", ".model", "n", "dist", "pars",
+                         ".mean", "ensemble", standard_vars),
+                       "neon4cast")
+
+
+#' Format as EFI using ensemble draws
+#' @inheritParams efi_format
+#' @param times number of ensemble members to draw
+#' Supports unrecognized distributions by drawing samples
+#' @export
+efi_format_ensemble <- function(df, times = 10) {
   
   stopifnot(inherits(df, "fbl_ts"))
   
-  
-  ## determine variable name
   var <- attributes(df)$dist
+  df <- drop_degenerate(df)
+
+  ## determine variable name
   n_groups <- nrow(df)
   ## Draw `times` samples from distribution using 
   suppressWarnings({
@@ -72,9 +102,23 @@ efi_ensemble_format <- function(df, times = 10) {
   })
   expand %>%
     tidyr::unnest(sample) %>%
-    dplyr::mutate(ensemble = rep(1:times, n_groups)) %>%
-    dplyr::select(time, siteID, ensemble, {{var}} := sample) %>%
-    dplyr::as_tibble()
+    dplyr::mutate(parameter = as.character( rep(1:times, n_groups))) %>%
+    dplyr::select(datetime, site_id, parameter,
+                  {{var}} := sample, model_id = .model) %>%
+    dplyr::as_tibble() %>%
+    dplyr::mutate(family = "sample") %>% 
+    tidyr::pivot_longer(-dplyr::starts_with(standard_vars),
+                        names_to = "variable", values_to = "prediction")
 }
 
-
+drop_degenerate <- function(df) { 
+  var <- attributes(df)$dist
+  family <- family(df[[var]])
+  if("degenerate" %in% family) {
+    warning("dropping degenerate distributions")
+    df <- df %>% dplyr::filter(family != "degenerate") 
+    
+    family <- family(df[[var]])
+  }
+  df
+}

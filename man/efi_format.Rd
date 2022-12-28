@@ -4,7 +4,7 @@
 \alias{efi_format}
 \title{Format a fable fbl_ts forecast in EFI standard}
 \usage{
-efi_format(df, times = 100)
+efi_format(df, times = 10)
 }
 \arguments{
 \item{df}{a fbl_ts forecast}
@@ -24,12 +24,13 @@ Format a fable fbl_ts forecast in EFI standard
 library(dplyr)
 library(readr)
 library(fable)
-aquatic <- read_csv("https://data.ecoforecast.org/targets/aquatics/aquatics-targets.csv.gz") \%>\% 
-as_tsibble(index=time, key=siteID)
+aquatic <-
+  read_csv("https://data.ecoforecast.org/neon4cast-targets/aquatics/aquatics-targets.csv.gz") \%>\%
+  pivot_wider(names_from = "variable", values_from = "observation") \%>\%
+  as_tsibble(index = datetime, key = site_id)
 oxygen_fc <- aquatic \%>\%
   model(null = MEAN(oxygen)) \%>\%
   forecast(h = "35 days") \%>\%
   efi_format()
-  }
-
+ }
 }

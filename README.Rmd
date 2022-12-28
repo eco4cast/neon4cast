@@ -9,6 +9,8 @@ output:
 ```{r, include = FALSE}
 knitr::opts_chunk$set(
   collapse = TRUE,
+  warning = FALSE,
+  message = FALSE,
   comment = "#>",
   fig.path = "man/figures/README-",
   out.width = "100%"
@@ -45,8 +47,11 @@ Download and read in the current target file for the Aquatics theme.  For conven
 a timeseries object, noting that the time is in the 'time' column, and timeseries are replicated over sites.
 
 ```{r, message=FALSE}
-aquatic <- read_csv("https://data.ecoforecast.org/targets/aquatics/aquatics-targets.csv.gz") %>% 
-  as_tsibble(index=time, key=siteID)
+target <- read_csv("https://data.ecoforecast.org/neon4cast-targets/aquatics/aquatics-targets.csv.gz")
+
+aquatic <- target %>% 
+    pivot_wider(names_from = "variable", values_from = "observation") %>%
+    as_tsibble(index = datetime, key = site_id)
 ```
 
 Create a 35 day forecast for each variable, `oxygen`, and `temperature`.  For illustrative purposes, we'll use the `fable` package because it is concise and well documented.  We make separate forecasts for each of the two variables before reformatting them and combining them.  Note the use of `efi_format` helper function from the `neon4cast` package, which merely replaces the special `<S3:distribution>` column used by fable with something we can write to text: either columns with a mean/sd (for normal distributions) or otherwise random draws from the distributions. 
@@ -55,28 +60,30 @@ So that we can score our forecast right away instead of waiting for next month's
 
 ```{r, message = FALSE}
 # drop last 35 days and use explicit NAs for gaps in timeseries
-blinded_aquatic <- aquatic %>% filter(time < max(time) - 35) %>% fill_gaps()
+blinded_aquatic <- aquatic %>%
+  filter(datetime < max(datetime) - 35) %>% 
+  fill_gaps()
 
 # A simple random walk forecast, see ?fable::RW
 oxygen_fc <- blinded_aquatic %>%
-  model(null = RW(oxygen)) %>%
+  model(benchmark_rw = RW(oxygen)) %>%
   forecast(h = "35 days") %>%
   efi_format()
 
 ## also use random walk for temperature
-temperature_fc <- blinded_aquatic  %>%
-  model(null = RW(temperature)) %>%
+temperature_fc <- blinded_aquatic  %>% 
+  model(benchmark_rw = RW(temperature)) %>%
   forecast(h = "35 days") %>%
-  efi_format()
+  efi_format_ensemble()
 
-# combine into single table, drop the .model column
-forecast <- inner_join(oxygen_fc, temperature_fc) %>% select(-.model)
+# stack into single table
+forecast <- bind_rows(oxygen_fc, temperature_fc) 
 
 ## Write the forecast to a file following EFI naming conventions:
 forecast_file <- glue::glue("{theme}-{date}-{team}.csv.gz",
                             theme = "aquatics", 
                             date=Sys.Date(),
-                            team = "example_null")
+                            team = "benchmark_rw")
 write_csv(forecast, forecast_file)
 
 ```
@@ -90,12 +97,11 @@ Note that scores are only possible once the data becomes available in the corres
 
 ```{r message=FALSE}
 
-forecast$theme <- "aquatics"
-scores <- score(forecast)
+scores <- score(forecast, target)
 
 # The resulting data.frame scores each day for each site, but is also easy to summarize:
 scores %>% 
-  group_by(siteID, target) %>% 
+  group_by(variable) %>% 
   summarise(mean_crps = mean(crps, na.rm=TRUE),
             mean_logs =  mean(logs, na.rm=TRUE))
 ```
@@ -112,28 +118,40 @@ compressed as `.csv.gz`) or netcdf.
 forecast_output_validator(forecast_file)
 ```
 
-### Generate forecast metadata in EML
 
-```{r}
-create_model_metadata(forecast_file)
-```
 
 ### Access EFI snapshots of NOAA forecasts at NEON sites
 
 Many forecasts will want to make use of weather forecasts as potential drivers. EFI downscales NOAA GEFS 35-day forecast products at each NEON site and makes this data available. These helper functions provide convenient access for downloading and stacking the individual forecast files. 
 
 ```{r}
-aq_sites <- unique(aquatic$siteID)
-download_noaa(aq_sites)
-noaa_fc <- stack_noaa()
-noaa_fc
+aq_sites <- unique(aquatic$site_id)
+
+noaa <- noaa_stage1() 
+
+ref_date <- Sys.Date()-1
+# Average temperature forecast across ensembles by site_id, next 240 hours
+noaa_temp <- noaa |>
+  filter(site_id %in% aq_sites,
+         reference_datetime == ref_date,
+         variable == "TMP", 
+         horizon < 240) |>
+  group_by(site_id, reference_datetime, datetime, variable) |>
+  summarise(prediction = mean(prediction, na.rm=TRUE)) |>
+  collect()
+
+noaa_temp
 ```
+
+Additional NOAA products are available. `stage2` product includes downscaling to hourly increments with fluxes corrected for solar geometries.
+The stage3 product is assembled from all the 0-hour horizons, which may be more useful for calibrating models than reliance on direct measurements of meterological data, as the latter may differ systematically from the long-term forecast at any given site.
+
 
 ### Submit a forecast
 
 When you are ready to submit your forecast to EFI:
 
-```{r}
+```{r eval=FALSE}
 submit(forecast_file)
 ```
 

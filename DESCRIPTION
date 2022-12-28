@@ -26,7 +26,7 @@ Imports:
     tibble,
     read4cast (>= 0.0.0.9000),
     score4cast (>= 0.0.0.9000)
-RoxygenNote: 7.2.0
+RoxygenNote: 7.2.3
 Language: en-US
 Suggests: 
     EFIstandards,
@@ -45,7 +45,8 @@ Suggests:
     readr,
     EML,
     tidync,
-    tidyverse
+    tidyverse,
+    tsibble
 Additional_repositories: https://cboettig.github.io/drat
 Config/testthat/edition: 3
 Remotes: 

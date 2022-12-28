@@ -6,7 +6,7 @@
 #' @export
 combined_scores <- function(theme, collect = TRUE){
 
-  vars <- neon4cast:::arrow_env_vars()
+  vars <- arrow_env_vars()
   
   #GENERALIZATION: THIS IS A SPECIFIC ENDPOINT
   s3 <- arrow::s3_bucket(bucket = paste0("neon4cast-scores/parquet/", theme),
@@ -16,7 +16,7 @@ combined_scores <- function(theme, collect = TRUE){
   if (collect) {
     ds <- dplyr::collect(ds)
   }
-  on.exit(neon4cast:::unset_arrow_vars(vars))
+  on.exit(unset_arrow_vars(vars))
   ds
 }
 
@@ -60,7 +60,7 @@ theme_stats <- purrr::map_dfr(themes, function(theme){
   
   message(theme)
   
-  theme_scores <- neon4cast::combined_scores(theme = theme, collect = FALSE)
+  theme_scores <- combined_scores(theme = theme, collect = FALSE)
   
   teams <- theme_scores |> 
     dplyr::summarise(n = dplyr::n_distinct(model_id)) |> 
@@ -82,7 +82,10 @@ theme_stats <- purrr::map_dfr(themes, function(theme){
     dplyr::collect() |> 
     dplyr::pull(total)
   
-  output <- tibble::tibble(theme = theme, n_teams = teams, n_submissions = forecasts, n_obs_forecasts_pairs = forecast_obs)
+  output <- tibble::tibble(theme = theme, 
+                           n_teams = teams,
+                           n_submissions = forecasts, 
+                           n_obs_forecasts_pairs = forecast_obs)
   
   return(output)
   })
@@ -90,5 +93,5 @@ theme_stats <- purrr::map_dfr(themes, function(theme){
 return(theme_stats)
 
 }
-globalVariables("theme", "neon4cast")
+globalVariables(c("theme", "n", "crps", "total"), "neon4cast")
 

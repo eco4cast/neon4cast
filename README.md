@@ -35,8 +35,11 @@ convenience, we read this in as a timeseries object, noting that the
 time is in the ‘time’ column, and timeseries are replicated over sites.
 
 ``` r
-aquatic <- read_csv("https://data.ecoforecast.org/targets/aquatics/aquatics-targets.csv.gz") %>% 
-  as_tsibble(index=time, key=siteID)
+target <- read_csv("https://data.ecoforecast.org/neon4cast-targets/aquatics/aquatics-targets.csv.gz")
+
+aquatic <- target %>% 
+    pivot_wider(names_from = "variable", values_from = "observation") %>%
+    as_tsibble(index = datetime, key = site_id)
 ```
 
 Create a 35 day forecast for each variable, `oxygen`, and `temperature`.
@@ -53,28 +56,30 @@ month’s data, we will filter out the most recent data available first.
 
 ``` r
 # drop last 35 days and use explicit NAs for gaps in timeseries
-blinded_aquatic <- aquatic %>% filter(time < max(time) - 35) %>% fill_gaps()
+blinded_aquatic <- aquatic %>%
+  filter(datetime < max(datetime) - 35) %>% 
+  fill_gaps()
 
 # A simple random walk forecast, see ?fable::RW
 oxygen_fc <- blinded_aquatic %>%
-  model(null = RW(oxygen)) %>%
+  model(benchmark_rw = RW(oxygen)) %>%
   forecast(h = "35 days") %>%
   efi_format()
 
 ## also use random walk for temperature
-temperature_fc <- blinded_aquatic  %>%
-  model(null = RW(temperature)) %>%
+temperature_fc <- blinded_aquatic  %>% 
+  model(benchmark_rw = RW(temperature)) %>%
   forecast(h = "35 days") %>%
-  efi_format()
+  efi_format_ensemble()
 
-# combine into single table, drop the .model column
-forecast <- inner_join(oxygen_fc, temperature_fc) %>% select(-.model)
+# stack into single table
+forecast <- bind_rows(oxygen_fc, temperature_fc) 
 
 ## Write the forecast to a file following EFI naming conventions:
 forecast_file <- glue::glue("{theme}-{date}-{team}.csv.gz",
                             theme = "aquatics", 
                             date=Sys.Date(),
-                            team = "example_null")
+                            team = "benchmark_rw")
 write_csv(forecast, forecast_file)
 ```
 
@@ -92,21 +97,19 @@ Note that scores are only possible once the data becomes available in
 the corresponding targets file!
 
 ``` r
-forecast$theme <- "aquatics"
-scores <- score(forecast)
+
+scores <- score(forecast, target)
 
 # The resulting data.frame scores each day for each site, but is also easy to summarize:
 scores %>% 
-  group_by(siteID, target) %>% 
+  group_by(variable) %>% 
   summarise(mean_crps = mean(crps, na.rm=TRUE),
             mean_logs =  mean(logs, na.rm=TRUE))
-#> # A tibble: 4 × 4
-#>   siteID target      mean_crps mean_logs
-#>   <chr>  <chr>           <dbl>     <dbl>
-#> 1 BARC   oxygen          0.464      1.46
-#> 2 BARC   temperature   NaN        NaN   
-#> 3 POSE   oxygen          0.607      1.77
-#> 4 POSE   temperature     1.48       2.62
+#> # A tibble: 2 × 3
+#>   variable    mean_crps mean_logs
+#>   <chr>           <dbl>     <dbl>
+#> 1 oxygen          0.509      1.21
+#> 2 temperature     1.48       2.40
 ```
 
 ### Validate a forecast file
@@ -119,45 +122,7 @@ invalid formats. Note that the validator accepts files in `.csv`
 
 ``` r
 forecast_output_validator(forecast_file)
-#> aquatics-2021-09-27-example_null.csv.gz
-#> ✓ file name is correct
-#> Rows: 140 Columns: 5
-#> ── Column specification ────────────────────────────────────────────────────────
-#> Delimiter: ","
-#> chr  (2): siteID, statistic
-#> dbl  (2): oxygen, temperature
-#> date (1): time
-#> 
-#> ℹ Use `spec()` to retrieve the full column specification for this data.
-#> ℹ Specify the column types or set `show_col_types = FALSE` to quiet this message.
-#> ✓ target variables found
-#> ✓ file has summary statistics column
-#> ✓ file has summary statistic: mean
-#> ✓ file has summary statistic: sd
-#> ✓ file has siteID column
-#> ✓ file has time column
-#> Rows: 140 Columns: 5
-#> ── Column specification ────────────────────────────────────────────────────────
-#> Delimiter: ","
-#> chr  (2): siteID, statistic
-#> dbl  (2): oxygen, temperature
-#> date (1): time
-#> 
-#> ℹ Use `spec()` to retrieve the full column specification for this data.
-#> ℹ Specify the column types or set `show_col_types = FALSE` to quiet this message.
-#> ✓ file has correct time column
 #> [1] TRUE
-```
-
-### Generate forecast metadata in EML
-
-``` r
-create_model_metadata(forecast_file)
-#> You only need to run this function once to generate the model metadata template.
-#> If you model does not change between submittions you will not need change the yml.
-#> In this case, use a previously generated yaml in the write_metadata_eml() call
-#> If your model does change, save your old yaml under a new name and modify
-#> • Edit './aquatics-example_null.yml'
 ```
 
 ### Access EFI snapshots of NOAA forecasts at NEON sites
@@ -169,29 +134,44 @@ convenient access for downloading and stacking the individual forecast
 files.
 
 ``` r
-aq_sites <- unique(aquatic$siteID)
-download_noaa(aq_sites)
-noaa_fc <- stack_noaa()
-noaa_fc
-#> # A tibble: 8,590 × 18
-#>    model    interval siteID runStartDate  runEndDate    ensemble air_temperature
-#>    <chr>    <chr>    <chr>  <chr>         <chr>         <chr>              <dbl>
-#>  1 NOAAGEFS 6hr      BARC   2021-09-25T00 2021-10-11T00 ens00               298.
-#>  2 NOAAGEFS 6hr      BARC   2021-09-25T00 2021-10-11T00 ens00               294.
-#>  3 NOAAGEFS 6hr      BARC   2021-09-25T00 2021-10-11T00 ens00               294.
-#>  4 NOAAGEFS 6hr      BARC   2021-09-25T00 2021-10-11T00 ens00               304.
-#>  5 NOAAGEFS 6hr      BARC   2021-09-25T00 2021-10-11T00 ens00               298.
-#>  6 NOAAGEFS 6hr      BARC   2021-09-25T00 2021-10-11T00 ens00               294.
-#>  7 NOAAGEFS 6hr      BARC   2021-09-25T00 2021-10-11T00 ens00               293.
-#>  8 NOAAGEFS 6hr      BARC   2021-09-25T00 2021-10-11T00 ens00               304.
-#>  9 NOAAGEFS 6hr      BARC   2021-09-25T00 2021-10-11T00 ens00               298.
-#> 10 NOAAGEFS 6hr      BARC   2021-09-25T00 2021-10-11T00 ens00               294.
-#> # … with 8,580 more rows, and 11 more variables: air_pressure <dbl>,
-#> #   relative_humidity <dbl>, surface_downwelling_longwave_flux_in_air <dbl>,
-#> #   surface_downwelling_shortwave_flux_in_air <dbl>, precipitation_flux <dbl>,
-#> #   specific_humidity <dbl>, cloud_area_fraction <dbl>, wind_speed <dbl>,
-#> #   time <dttm>, latitude <dbl>, longitude <dbl>
+aq_sites <- unique(aquatic$site_id)
+
+noaa <- noaa_stage1() 
+
+ref_date <- Sys.Date()-1
+# Average temperature forecast across ensembles by site_id, next 240 hours
+noaa_temp <- noaa |>
+  filter(site_id %in% aq_sites,
+         reference_datetime == ref_date,
+         variable == "TMP", 
+         horizon < 240) |>
+  group_by(site_id, reference_datetime, datetime, variable) |>
+  summarise(prediction = mean(prediction, na.rm=TRUE)) |>
+  collect()
+
+noaa_temp
+#> # A tibble: 2,720 × 5
+#>    site_id reference_datetime  datetime            variable prediction
+#>    <chr>   <dttm>              <dttm>              <chr>         <dbl>
+#>  1 FLNT    2022-12-27 00:00:00 2022-12-27 00:00:00 TMP           2.49 
+#>  2 FLNT    2022-12-27 00:00:00 2022-12-27 03:00:00 TMP           1.67 
+#>  3 FLNT    2022-12-27 00:00:00 2022-12-27 06:00:00 TMP           0.919
+#>  4 FLNT    2022-12-27 00:00:00 2022-12-27 09:00:00 TMP           1.01 
+#>  5 FLNT    2022-12-27 00:00:00 2022-12-27 12:00:00 TMP           1.08 
+#>  6 FLNT    2022-12-27 00:00:00 2022-12-27 15:00:00 TMP           6.03 
+#>  7 FLNT    2022-12-27 00:00:00 2022-12-27 18:00:00 TMP          10.8  
+#>  8 FLNT    2022-12-27 00:00:00 2022-12-27 21:00:00 TMP          11.7  
+#>  9 FLNT    2022-12-27 00:00:00 2022-12-28 00:00:00 TMP           7.04 
+#> 10 FLNT    2022-12-27 00:00:00 2022-12-28 03:00:00 TMP           5.74 
+#> # … with 2,710 more rows
 ```
+
+Additional NOAA products are available. `stage2` product includes
+downscaling to hourly increments with fluxes corrected for solar
+geometries. The stage3 product is assembled from all the 0-hour
+horizons, which may be more useful for calibrating models than reliance
+on direct measurements of meterological data, as the latter may differ
+systematically from the long-term forecast at any given site.
 
 ### Submit a forecast
 
@@ -199,33 +179,6 @@ When you are ready to submit your forecast to EFI:
 
 ``` r
 submit(forecast_file)
-#> aquatics-2021-09-27-example_null.csv.gz
-#> ✓ file name is correct
-#> Rows: 140 Columns: 5
-#> ── Column specification ────────────────────────────────────────────────────────
-#> Delimiter: ","
-#> chr  (2): siteID, statistic
-#> dbl  (2): oxygen, temperature
-#> date (1): time
-#> 
-#> ℹ Use `spec()` to retrieve the full column specification for this data.
-#> ℹ Specify the column types or set `show_col_types = FALSE` to quiet this message.
-#> ✓ target variables found
-#> ✓ file has summary statistics column
-#> ✓ file has summary statistic: mean
-#> ✓ file has summary statistic: sd
-#> ✓ file has siteID column
-#> ✓ file has time column
-#> Rows: 140 Columns: 5
-#> ── Column specification ────────────────────────────────────────────────────────
-#> Delimiter: ","
-#> chr  (2): siteID, statistic
-#> dbl  (2): oxygen, temperature
-#> date (1): time
-#> 
-#> ℹ Use `spec()` to retrieve the full column specification for this data.
-#> ℹ Specify the column types or set `show_col_types = FALSE` to quiet this message.
-#> ✓ file has correct time column
 ```
 
 Ideally you should include the optional `metadata =` argument with your
