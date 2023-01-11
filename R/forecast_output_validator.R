@@ -93,7 +93,7 @@ forecast_output_validator <- function(forecast_file,
       if(lexists(out, "parameter")){
         if("mu" %in% unique(out$parameter) & "sigma" %in% unique(out$parameter)){
           usethis::ui_done("file has parameter and family column with normal distribution")
-        }else if("ensemble" %in% unique(out$family)){
+        }else if("ensemble" %in% unique(out$family) | "sample" %in% unique(out$family) ){
           usethis::ui_done("file has parameter and family column with ensemble generated distribution")
         }else{
           usethis::ui_warn("file does not have parameter column is not a normal or ensemble distribution")

@@ -7,7 +7,7 @@ library(tsibble)
 test_that("efi_format works", {
   
   target <-  
-    read_csv(paste0("https://data.ecoforecast.org/neon4cast-targets/",
+    readr::read_csv(paste0("https://data.ecoforecast.org/neon4cast-targets/",
                     "aquatics/aquatics-targets.csv.gz"),
              show_col_types = FALSE)
   
@@ -25,8 +25,13 @@ test_that("efi_format works", {
   expect_true(all(who %in% c("datetime", "site_id", "parameter", 
                       "model_id",
                       "family", "variable", "prediction")))
-  expect_equal(unique(fc_sample$family), "sample")
+  expect_equal(unique(fc_sample$family), "ensemble")
   
+  
+  tmp <- tempfile(pattern = "aquatics-2022-01-01-example.csv")
+  readr::write_csv(fc_sample, tmp)
+  expect_true(forecast_output_validator(tmp))
+  unlink(tmp)
   
   suppressWarnings({
   temp_fc <-
@@ -45,6 +50,15 @@ test_that("efi_format works", {
                              "family", "variable", "prediction")))
   
   
+  
+  
+  tmp <- tempfile(pattern = "aquatics-2022-01-01-example.csv")
+  readr::write_csv(fc_dist, tmp)
+  expect_true(forecast_output_validator(tmp))
+  unlink(tmp)
+  
+  
+  ## scoring
   forecast <- bind_rows(fc_sample, fc_dist)
   scores <- score(forecast, target)
   

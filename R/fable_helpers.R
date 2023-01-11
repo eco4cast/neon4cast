@@ -106,7 +106,7 @@ efi_format_ensemble <- function(df, times = 10) {
     dplyr::select(datetime, site_id, parameter,
                   {{var}} := sample, model_id = .model) %>%
     dplyr::as_tibble() %>%
-    dplyr::mutate(family = "sample") %>% 
+    dplyr::mutate(family = "ensemble") %>% 
     tidyr::pivot_longer(-dplyr::starts_with(standard_vars),
                         names_to = "variable", values_to = "prediction")
 }
