@@ -58,12 +58,14 @@
 noaa_stage1 <- function(cycle = 0,
                         version = "v12",
                         endpoint = "data.ecoforecast.org",
-                        verbose = TRUE) {
-  noaa_gefs_stage(file.path("stage1",cycle), 
+                        verbose = TRUE,
+                        start_date = "") {
+  noaa_gefs_stage(file.path("stage1",cycle, start_date), 
                   partitioning = "start_date",
                   version = version, 
                   endpoint = endpoint,
-                  verbose = verbose)
+                  verbose = verbose,
+                  start_date = start_date)
 }
 
 #' NOAA GEFS forecasts with EFI stage 2 processing
@@ -77,12 +79,14 @@ noaa_stage1 <- function(cycle = 0,
 noaa_stage2 <- function(cycle = 0,
                         version = "v12",
                         endpoint = "data.ecoforecast.org",
-                        verbose = TRUE) {
-  noaa_gefs_stage(file.path("stage2/parquet",cycle), 
+                        verbose = TRUE,
+                        start_date = "") {
+  noaa_gefs_stage(file.path("stage2/parquet",cycle, start_date), 
                   partitioning = "start_date",
                   version = version, 
                   endpoint = endpoint,
-                  verbose = verbose)
+                  verbose = verbose,
+                  start_date = start_date)
   
 }
 
@@ -101,7 +105,8 @@ noaa_stage3 <- function(version = "v12",
                   partitioning = "site_id", 
                   version = version, 
                   endpoint = endpoint,
-                  verbose = verbose)
+                  verbose = verbose, 
+                  start_date = NA)
 }
 
 noaa_gefs_stage <- function(stage = "stage1",
@@ -109,11 +114,16 @@ noaa_gefs_stage <- function(stage = "stage1",
                             cycle = 0,
                             version = "v12",
                             endpoint = "data.ecoforecast.org",
-                            verbose = getOption("verbose", TRUE)) {
+                            verbose = getOption("verbose", TRUE),
+                            start_date = start_date) {
   if(verbose) 
     message(paste("establishing connection to", stage, "at", endpoint, "..."))
   s3 <- noaa_gefs(version, endpoint)
-  ds <- arrow::open_dataset(s3$path(stage), partitioning = partitioning)
+  if (!is.na(as_date(start_date))) {
+    ds <- arrow::open_dataset(s3$path(stage))
+  } else {
+    ds <- arrow::open_dataset(s3$path(stage), partitioning = partitioning)
+  }
   if(verbose)
     message(paste0("connected! Use dplyr functions to filter and summarise.\n",
                   "Then, use collect() to read result into R\n"))
