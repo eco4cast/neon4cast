@@ -14,6 +14,9 @@ among other changes, and are not made available here. Leave as default.}
 \item{endpoint}{the EFI host address (leave as default)}
 
 \item{verbose}{logical, displays or hides messages}
+
+\item{cycle}{Hour at which forecast was made, as character string
+(\code{"00"}, \code{"06"}, \code{"12"} or \code{"18"}). Only \code{"00"} (default) has 30 days horizon.}
 }
 \description{
 Stage 3 processing presents a 'nowcast' product by combining the most

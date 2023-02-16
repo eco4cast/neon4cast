@@ -8,7 +8,8 @@ noaa_stage1(
   cycle = 0,
   version = "v12",
   endpoint = "data.ecoforecast.org",
-  verbose = TRUE
+  verbose = TRUE,
+  start_date = ""
 )
 }
 \arguments{
@@ -22,6 +23,8 @@ among other changes, and are not made available here. Leave as default.}
 \item{endpoint}{the EFI host address (leave as default)}
 
 \item{verbose}{logical, displays or hides messages}
+
+\item{start_date}{forecast start date yyyy-mm-dd format}
 }
 \description{
 Access NOAA Global Ensemble Forecast System (GEFS) forecast predictions
