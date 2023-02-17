@@ -44,6 +44,7 @@
 #' among other changes, and are not made available here. Leave as default.
 #' @param endpoint the EFI host address (leave as default)
 #' @param verbose logical, displays or hides messages
+#' @param start_date forecast start date yyyy-mm-dd format
 #' @export
 #' @examplesIf interactive()
 #' 
@@ -96,7 +97,13 @@ noaa_stage2 <- function(cycle = 0,
 #' Stage 3 processing presents a 'nowcast' product by combining the most
 #' recent predictions from each available cycle. Product uses CF variable
 #' names and 1 hr interval
-#' @inheritParams noaa_stage1
+#' @param cycle Hour at which forecast was made, as character string 
+#' (`"00"`, `"06"`, `"12"` or `"18"`). Only `"00"` (default) has 30 days horizon.
+#' @param version GEFS forecast version. Prior versions correspond to forecasts
+#' issued before 2020-09-25 which have different ensemble number and horizon,
+#' among other changes, and are not made available here. Leave as default.
+#' @param endpoint the EFI host address (leave as default)
+#' @param verbose logical, displays or hides messages
 #' @export
 noaa_stage3 <- function(version = "v12",
                         endpoint = "data.ecoforecast.org",
