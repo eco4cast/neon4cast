@@ -127,9 +127,9 @@ noaa_gefs_stage <- function(stage = "stage1",
     message(paste("establishing connection to", stage, "at", endpoint, "..."))
   s3 <- noaa_gefs(version, endpoint)
   if (!is.na(as.Date(start_date))) {
-    ds <- arrow::open_dataset(s3$path(stage))
+    ds <- arrow::open_dataset(s3$path(stage)) |> dplyr::filter(parameter <= 31)
   } else {
-    ds <- arrow::open_dataset(s3$path(stage), partitioning = partitioning)
+    ds <- arrow::open_dataset(s3$path(stage), partitioning = partitioning) |> dplyr::filter(parameter <= 31)
   }
   if(verbose)
     message(paste0("connected! Use dplyr functions to filter and summarise.\n",
