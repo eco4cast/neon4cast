@@ -8,7 +8,7 @@ submit(
   forecast_file,
   metadata = NULL,
   ask = interactive(),
-  s3_region = "data",
+  s3_region = "submit",
   s3_endpoint = "ecoforecast.org"
 )
 }

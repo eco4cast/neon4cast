@@ -9,7 +9,8 @@ noaa_stage1(
   version = "v12",
   endpoint = "data.ecoforecast.org",
   verbose = TRUE,
-  start_date = ""
+  start_date = "",
+  site_id = NA
 )
 }
 \arguments{
