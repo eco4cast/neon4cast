@@ -40,7 +40,7 @@ submit <- function(forecast_file,
 
   df <- read4cast::read_forecast(forecast_file)
   model_id <- df$model_id[1]
-  model_project_id <- paste("neon4cast", registered_model_id, sep = "-")
+  model_project_id <- paste("neon4cast", model_id, sep = "-")
 
   if(grepl("(example)", model_id)){
     message(paste0("You are submitting a forecast with 'example' in the model_id. As an example forecast, it will be processed but not used in future analyses.\n",
