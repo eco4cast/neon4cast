@@ -3,7 +3,7 @@ to_hourly <- function(df,
                       psuedo = FALSE){
 
   if(!psuedo){
-    reference_datetime <- lubridate::as_datetime(df$reference_datetime)
+    reference_datetime <- lubridate::as_datetime(df$reference_datetime)[1]
   }else{
     reference_datetime <- NA
   }

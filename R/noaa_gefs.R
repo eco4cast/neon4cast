@@ -79,7 +79,7 @@ noaa_stage1 <- function(cycle = 0,
   if(!is.na(site_id)){
     site_id_list <- site_id
     site_df <- site_df |>
-      filter(site_id %in% site_id_list)
+      dplyr::filter(site_id %in% site_id_list)
   }
 
   site_df <- site_df |>
@@ -120,7 +120,7 @@ noaa_stage2 <- function(cycle = 0,
   if(!is.na(site_id)){
     site_id_list <- site_id
     site_df <- site_df |>
-      filter(site_id %in% site_id_list)
+      dplyr::filter(site_id %in% site_id_list)
   }
 
   site_df <- site_df |>
@@ -128,7 +128,13 @@ noaa_stage2 <- function(cycle = 0,
     dplyr::mutate(reference_datetime = start_date)
 
   hourly_df <- to_hourly(site_df, use_solar_geom = TRUE, psuedo = FALSE)
-
+  
+  hourly_df <- hourly_df |> 
+    dplyr::mutate(ensemble = as.numeric(stringr::str_sub(ensemble, start = 4, end = 5))) |> 
+    dplyr::rename(parameter = ensemble)
+    
+  
+  
   unset_arrow_vars(vars)
 
   return(hourly_df)
