@@ -41,7 +41,8 @@ to_hourly <- function(df,
     dplyr::arrange(site_id, family, ensemble, datetime) |>
     dplyr::mutate(prediction =  imputeTS::na_interpolation(prediction, option = "linear")) |>
     dplyr::mutate(prediction = ifelse(variable == "TMP", prediction + 273, prediction)) |>
-    dplyr::mutate(prediction = ifelse(variable == "RH", prediction/100, prediction))
+    dplyr::mutate(prediction = ifelse(variable == "RH", prediction/100, prediction)) |>
+    dplyr::ungroup()
 
   fluxes <- df |>
     dplyr::select(site_id, family, horizon, ensemble, datetime, variable, prediction) |>
@@ -53,7 +54,8 @@ to_hourly <- function(df,
     dplyr::arrange(site_id, family, ensemble, datetime) |>
     tidyr::fill(prediction, .direction = "up") |>
     dplyr::mutate(prediction = ifelse(variable == "APCP", prediction / (6 * 60 * 60), prediction),
-                  variable = ifelse(variable == "APCP", "PRATE", variable))
+                  variable = ifelse(variable == "APCP", "PRATE", variable)) |>
+    dplyr::ungroup()
 
   if(use_solar_geom){
 
