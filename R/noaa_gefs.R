@@ -60,31 +60,19 @@ noaa_stage1 <- function(cycle = 0,
                         version = "v12",
                         endpoint = "data.ecoforecast.org",
                         verbose = TRUE,
-                        start_date = "",
-                        site_id = NA) {
+                        start_date = "") {
 
   vars <- arrow_env_vars()
 
   bucket <- paste0("bio230014-bucket01/neon4cast-drivers/noaa/gefs-v12/stage1/reference_datetime=",start_date)
-
 
    endpoint_override <- "https://sdsc.osn.xsede.org"
    s3 <- arrow::s3_bucket(paste0(bucket),
                          endpoint_override = endpoint_override,
                          anonymous = TRUE)
 
-  site_df <- arrow::open_dataset(s3) |>
-    dplyr::filter(variable %in% c("PRES","TMP","RH","UGRD","VGRD","APCP","DSWRF","DLWRF"))
-
-  if(!is.na(site_id)){
-    site_id_list <- site_id
-    site_df <- site_df |>
-      dplyr::filter(site_id %in% site_id_list)
-  }
-
-  site_df <- site_df |>
-    dplyr::collect() |>
-    dplyr::mutate(reference_datetime = start_date)
+  site_df <- arrow::open_dataset(s3)
+   
   unset_arrow_vars(vars)
 
   return(site_df)
@@ -102,8 +90,7 @@ noaa_stage2 <- function(cycle = 0,
                         version = "v12",
                         endpoint = NA,
                         verbose = TRUE,
-                        start_date = "",
-                        site_id = NA) {
+                        start_date = "") {
 
   vars <- arrow_env_vars()
 
@@ -114,27 +101,8 @@ noaa_stage2 <- function(cycle = 0,
                          endpoint_override = endpoint_override,
                          anonymous = TRUE)
 
-  site_df <- arrow::open_dataset(s3) |>
-    dplyr::filter(variable %in% c("PRES","TMP","RH","UGRD","VGRD","APCP","DSWRF","DLWRF"))
-
-  if(!is.na(site_id)){
-    site_id_list <- site_id
-    site_df <- site_df |>
-      dplyr::filter(site_id %in% site_id_list)
-  }
-
-  site_df <- site_df |>
-    dplyr::collect() |>
-    dplyr::mutate(reference_datetime = start_date)
-
-  hourly_df <- to_hourly(site_df, use_solar_geom = TRUE, psuedo = FALSE)
-  
-  hourly_df <- hourly_df |> 
-    dplyr::mutate(ensemble = as.numeric(stringr::str_sub(ensemble, start = 4, end = 5))) |> 
-    dplyr::rename(parameter = ensemble)
+  site_df <- arrow::open_dataset(s3) 
     
-  
-  
   unset_arrow_vars(vars)
 
   return(hourly_df)
@@ -156,17 +124,12 @@ noaa_stage2 <- function(cycle = 0,
 #' @export
 noaa_stage3 <- function(version = "v12",
                         endpoint = "data.ecoforecast.org",
-                        verbose = TRUE,
-                        site_id = NA) {
+                        verbose = TRUE) {
 
 vars <- arrow_env_vars()
 
- if(is.na(site_id)){
-    bucket <- "bio230014-bucket01/neon4cast-drivers/noaa/gefs-v12/stage3"
-  }else{
-    bucket <-paste0("bio230014-bucket01/neon4cast-drivers/noaa/gefs-v12/stage3/site_id=",site_id)
+  bucket <- "bio230014-bucket01/neon4cast-drivers/noaa/gefs-v12/stage3"
 
-  }
 
   endpoint_override <- "https://sdsc.osn.xsede.org"
   s3 <- arrow::s3_bucket(bucket,
@@ -174,12 +137,9 @@ vars <- arrow_env_vars()
                          anonymous = TRUE)
 
   site_df <- arrow::open_dataset(s3) |>
-    dplyr::collect()
-
-  if(!is.na(site_id)){
-    site_df <- site_df |> dplyr::mutate(site_id = site_id)
-  }
-
+    dplyr::mutate(ensemble = as.numeric(stringr::str_sub(ensemble, start = 4, end = 5))) |> 
+    dplyr::rename(parameter = ensemble)
+    
   unset_arrow_vars(vars)
 
   return(site_df)
