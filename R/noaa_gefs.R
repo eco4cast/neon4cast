@@ -105,7 +105,7 @@ noaa_stage2 <- function(cycle = 0,
     
   unset_arrow_vars(vars)
 
-  return(hourly_df)
+  return(site_df)
 
 }
 
