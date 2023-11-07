@@ -65,11 +65,8 @@ noaa_stage1 <- function(cycle = 0,
 
   vars <- arrow_env_vars()
 
-  if(is.na(site_id)){
-    bucket <- paste0("bio230014-bucket01/neon4cast-drivers/noaa/gefs-v12/stage1/reference_datetime=",start_date)
-  }else{
-    bucket <-paste0("bio230014-bucket01/neon4cast-drivers/noaa/gefs-v12/stage1/reference_datetime=",start_date,"/site_id=",site_id)
-  }
+  bucket <- paste0("bio230014-bucket01/neon4cast-drivers/noaa/gefs-v12/stage1/reference_datetime=",start_date)
+
 
    endpoint_override <- "https://sdsc.osn.xsede.org"
    s3 <- arrow::s3_bucket(paste0(bucket),
@@ -77,14 +74,17 @@ noaa_stage1 <- function(cycle = 0,
                          anonymous = TRUE)
 
   site_df <- arrow::open_dataset(s3) |>
-    dplyr::filter(variable %in% c("PRES","TMP","RH","UGRD","VGRD","APCP","DSWRF","DLWRF")) |>
-    dplyr::collect() |>
-    dplyr::mutate(reference_datetime = start_date)
+    dplyr::filter(variable %in% c("PRES","TMP","RH","UGRD","VGRD","APCP","DSWRF","DLWRF"))
 
   if(!is.na(site_id)){
-    site_df <- site_df |> dplyr::mutate(site_id = site_id)
+    site_id_list <- site_id
+    site_df <- site_df |>
+      filter(site_id %in% site_id_list)
   }
 
+  site_df <- site_df |>
+    dplyr::collect() |>
+    dplyr::mutate(reference_datetime = start_date)
   unset_arrow_vars(vars)
 
   return(site_df)
