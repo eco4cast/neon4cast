@@ -94,7 +94,7 @@ noaa_stage2 <- function(cycle = 0,
 
   vars <- arrow_env_vars()
 
-  bucket <- paste0("bio230014-bucket01/neon4cast-drivers/noaa/gefs-v12/stage1/reference_datetime=",start_date)
+  bucket <- paste0("bio230014-bucket01/neon4cast-drivers/noaa/gefs-v12/stage2/reference_datetime=",start_date)
 
   endpoint_override <- "https://sdsc.osn.xsede.org"
   s3 <- arrow::s3_bucket(paste0(bucket),
