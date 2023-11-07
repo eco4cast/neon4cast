@@ -8,91 +8,91 @@ to_hourly <- function(df,
     reference_datetime <- NA
   }
 
-  var_order <- names(df)
+var_order <- names(df)
 
-  ensemble_maxtime <- df |>
-    dplyr::group_by(site_id, family, ensemble) |>
-    dplyr::summarise(max_time = max(datetime), .groups = "drop")
+ensemble_maxtime <- df |>
+  dplyr::group_by(site_id, family, ensemble) |>
+  dplyr::summarise(max_time = max(datetime), .groups = "drop")
 
-  ensembles <- unique(df$ensemble)
-  datetime <- seq(min(df$datetime), max(df$datetime), by = "1 hour")
-  variables <- unique(df$variable)
-  sites <- unique(df$site_id)
+ensembles <- unique(df$ensemble)
+datetime <- seq(min(df$datetime), max(df$datetime), by = "1 hour")
+variables <- unique(df$variable)
+sites <- unique(df$site_id)
 
-  full_time <- expand.grid(sites, ensembles, datetime, variables) |>
-    dplyr::rename(site_id = Var1,
-                  ensemble = Var2,
-                  datetime = Var3,
-                  variable = Var4) |>
-    dplyr::mutate(datetime = lubridate::as_datetime(datetime)) |>
-    dplyr::arrange(site_id, ensemble, variable, datetime) |>
-    dplyr::left_join(ensemble_maxtime, by = c("site_id","ensemble")) |>
-    dplyr::filter(datetime <= max_time) |>
-    dplyr::select(-c("max_time")) |>
-    dplyr::distinct()
+full_time <- expand.grid(sites, ensembles, datetime, variables) |>
+  dplyr::rename(site_id = Var1,
+                ensemble = Var2,
+                datetime = Var3,
+                variable = Var4) |>
+  dplyr::mutate(datetime = lubridate::as_datetime(datetime)) |>
+  dplyr::arrange(site_id, ensemble, variable, datetime) |>
+  dplyr::left_join(ensemble_maxtime, by = c("site_id","ensemble")) |>
+  dplyr::filter(datetime <= max_time) |>
+  dplyr::select(-c("max_time")) |>
+  dplyr::distinct()
 
-  states <- df |>
-    dplyr::select(site_id, family, horizon, ensemble, datetime, variable, prediction) |>
-    dplyr::filter(horizon != "006") |>
-    dplyr::select(-horizon) |>
-    dplyr::group_by(site_id, family, ensemble, variable) |>
-    dplyr::right_join(full_time, by = c("site_id", "ensemble", "datetime", "family", "variable")) |>
-    dplyr::filter(variable %in% c("PRES", "RH", "TMP", "UGRD", "VGRD")) |>
-    dplyr::arrange(site_id, family, ensemble, datetime) |>
-    dplyr::mutate(prediction =  imputeTS::na_interpolation(prediction, option = "linear")) |>
-    dplyr::mutate(prediction = ifelse(variable == "TMP", prediction + 273, prediction)) |>
-    dplyr::mutate(prediction = ifelse(variable == "RH", prediction/100, prediction)) |>
-    dplyr::ungroup()
+states <- df |>
+  dplyr::select(site_id, family, horizon, ensemble, datetime, variable, prediction) |>
+  dplyr::filter((horizon != "006" & datetime < max(df$datetime)) | (horizon == "006" & datetime == max(df$datetime))) |>
+  dplyr::select(-horizon) |>
+  dplyr::group_by(site_id, family, ensemble, variable) |>
+  dplyr::right_join(full_time, by = c("site_id", "ensemble", "datetime", "family", "variable")) |>
+  dplyr::filter(variable %in% c("PRES", "RH", "TMP", "UGRD", "VGRD")) |>
+  dplyr::arrange(site_id, family, ensemble, datetime) |>
+  dplyr::mutate(prediction =  imputeTS::na_interpolation(prediction, option = "linear")) |>
+  dplyr::mutate(prediction = ifelse(variable == "TMP", prediction + 273, prediction)) |>
+  dplyr::mutate(prediction = ifelse(variable == "RH", prediction/100, prediction)) |>
+  dplyr::ungroup()
 
-  fluxes <- df |>
-    dplyr::select(site_id, family, horizon, ensemble, datetime, variable, prediction) |>
-    dplyr::filter(horizon != "003") |>
-    dplyr::select(-horizon) |>
-    dplyr::group_by(site_id, family, ensemble, variable) |>
-    dplyr::right_join(full_time, by = c("site_id", "ensemble", "datetime", "family", "variable")) |>
-    dplyr::filter(variable %in% c("APCP","DSWRF","DLWRF")) |>
-    dplyr::arrange(site_id, family, ensemble, datetime) |>
-    tidyr::fill(prediction, .direction = "up") |>
-    dplyr::mutate(prediction = ifelse(variable == "APCP", prediction / (6 * 60 * 60), prediction),
-                  variable = ifelse(variable == "APCP", "PRATE", variable)) |>
-    dplyr::ungroup()
+fluxes <- df |>
+  dplyr::select(site_id, family, horizon, ensemble, datetime, variable, prediction) |>
+  dplyr::filter(horizon != "003") |>
+  dplyr::select(-horizon) |>
+  dplyr::group_by(site_id, family, ensemble, variable) |>
+  dplyr::right_join(full_time, by = c("site_id", "ensemble", "datetime", "family", "variable")) |>
+  dplyr::filter(variable %in% c("APCP","DSWRF","DLWRF")) |>
+  dplyr::arrange(site_id, family, ensemble, datetime) |>
+  tidyr::fill(prediction, .direction = "up") |>
+  dplyr::mutate(prediction = ifelse(variable == "APCP", prediction / (6 * 60 * 60), prediction),
+                variable = ifelse(variable == "APCP", "PRATE", variable)) |>
+  dplyr::ungroup()
 
-  if(use_solar_geom){
-
-    site_list <- readr::read_csv(paste0("https://github.com/eco4cast/",
-                                        "neon4cast-noaa-download/",
-                                        "raw/master/noaa_download_site_list.csv"),
-                                 show_col_types = FALSE) |>
-      dplyr::select(-site_name)
-
-    fluxes <- fluxes |>
-      dplyr::left_join(site_list, by = "site_id") |>
-      dplyr::mutate(hour = lubridate::hour(datetime),
-                    date = lubridate::as_date(datetime),
-                    doy = lubridate::yday(datetime) + hour/24,
-                    longitude = ifelse(longitude < 0, 360 + longitude, longitude),
-                    rpot = downscale_solar_geom(doy, longitude, latitude)) |>  # hourly sw flux calculated using solar geometry
-      dplyr::group_by(site_id, family, ensemble, date, variable) |>
-      dplyr::mutate(avg.rpot = mean(rpot, na.rm = TRUE),
-                    avg.SW = mean(prediction, na.rm = TRUE))|> # daily sw mean from solar geometry
-      dplyr::ungroup() |>
-      dplyr::mutate(prediction = ifelse(variable == "DSWRF" & avg.rpot > 0.0, rpot * (avg.SW/avg.rpot),prediction)) |>
-      dplyr::select(any_of(var_order))
-  }
-
-  hourly_df <- dplyr::bind_rows(states, fluxes) |>
-    dplyr::arrange(site_id, family, ensemble, datetime) |>
-    dplyr::mutate(variable = ifelse(variable == "TMP", "air_temperature", variable),
-                  variable = ifelse(variable == "PRES", "air_pressure", variable),
-                  variable = ifelse(variable == "RH", "relative_humidity", variable),
-                  variable = ifelse(variable == "DLWRF", "surface_downwelling_longwave_flux_in_air", variable),
-                  variable = ifelse(variable == "DSWRF", "surface_downwelling_shortwave_flux_in_air", variable),
-                  variable = ifelse(variable == "PRATE", "precipitation_flux", variable),
-                  variable = ifelse(variable == "VGRD", "eastward_wind", variable),
-                  variable = ifelse(variable == "UGRD", "northward_wind", variable),
-                  variable = ifelse(variable == "APCP", "precipitation_amount", variable),
-                  reference_datetime = reference_datetime) |>
+if(use_solar_geom){
+  
+  site_list <- readr::read_csv(paste0("https://github.com/eco4cast/",
+                                      "neon4cast-noaa-download/",
+                                      "raw/master/noaa_download_site_list.csv"),
+                               show_col_types = FALSE) |>
+    dplyr::select(-site_name)
+  
+  fluxes <- fluxes |>
+    dplyr::left_join(site_list, by = "site_id") |>
+    dplyr::mutate(hour = lubridate::hour(datetime),
+                  date = lubridate::as_date(datetime),
+                  doy = lubridate::yday(datetime) + hour/24,
+                  longitude = ifelse(longitude < 0, 360 + longitude, longitude),
+                  rpot = downscale_solar_geom(doy, longitude, latitude)) |>  # hourly sw flux calculated using solar geometry
+    dplyr::group_by(site_id, family, ensemble, date, variable) |>
+    dplyr::mutate(avg.rpot = mean(rpot, na.rm = TRUE),
+                  avg.SW = mean(prediction, na.rm = TRUE))|> # daily sw mean from solar geometry
+    dplyr::ungroup() |>
+    dplyr::mutate(prediction = ifelse(variable == "DSWRF" & avg.rpot > 0.0, rpot * (avg.SW/avg.rpot),prediction)) |>
     dplyr::select(any_of(var_order))
+}
+
+hourly_df <- dplyr::bind_rows(states, fluxes) |>
+  dplyr::arrange(site_id, family, ensemble, datetime) |>
+  dplyr::mutate(variable = ifelse(variable == "TMP", "air_temperature", variable),
+                variable = ifelse(variable == "PRES", "air_pressure", variable),
+                variable = ifelse(variable == "RH", "relative_humidity", variable),
+                variable = ifelse(variable == "DLWRF", "surface_downwelling_longwave_flux_in_air", variable),
+                variable = ifelse(variable == "DSWRF", "surface_downwelling_shortwave_flux_in_air", variable),
+                variable = ifelse(variable == "PRATE", "precipitation_flux", variable),
+                variable = ifelse(variable == "VGRD", "eastward_wind", variable),
+                variable = ifelse(variable == "UGRD", "northward_wind", variable),
+                variable = ifelse(variable == "APCP", "precipitation_amount", variable),
+                reference_datetime = reference_datetime) |>
+  dplyr::select(any_of(var_order))
 
   return(hourly_df)
 
