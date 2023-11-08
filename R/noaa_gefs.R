@@ -101,7 +101,8 @@ noaa_stage2 <- function(cycle = 0,
                          endpoint_override = endpoint_override,
                          anonymous = TRUE)
 
-  site_df <- arrow::open_dataset(s3) 
+  site_df <- arrow::open_dataset(s3) |> 
+    dplyr::mutate(reference_datetime = lubridate::as_datetime(start_date))
     
   unset_arrow_vars(vars)
 
