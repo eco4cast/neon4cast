@@ -33,7 +33,7 @@ full_time <- expand.grid(sites, ensembles, datetime, variables) |>
 
 states <- df |>
   dplyr::select(site_id, family, horizon, ensemble, datetime, variable, prediction) |>
-  dplyr::filter((horizon != "006" & datetime < max(df$datetime)) | (horizon == "006" & datetime == max(df$datetime))) |>
+  dplyr::filter(!psuedo | (psuedo & horizon != "006") | (psuedo & datetime == max(df$datetime))) |> 
   dplyr::select(-horizon) |>
   dplyr::group_by(site_id, family, ensemble, variable) |>
   dplyr::right_join(full_time, by = c("site_id", "ensemble", "datetime", "family", "variable")) |>
