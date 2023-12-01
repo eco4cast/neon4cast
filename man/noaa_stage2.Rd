@@ -15,8 +15,7 @@ noaa_stage2(
   version = "v12",
   endpoint = NA,
   verbose = TRUE,
-  start_date = "",
-  site_id = NA
+  start_date = ""
 )
 }
 \arguments{

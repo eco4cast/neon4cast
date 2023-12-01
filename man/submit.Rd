@@ -13,7 +13,7 @@ submit(
 )
 }
 \arguments{
-\item{forecast_file}{Your forecast csv or nc file}
+\item{forecast_file}{forecast csv or csv.gz file}
 
 \item{metadata}{path to metadata file}
 

@@ -2,31 +2,13 @@
 % Please edit documentation in R/forecast_output_validator.R
 \name{forecast_output_validator}
 \alias{forecast_output_validator}
-\title{forecast_output_validator}
+\title{Validate forecast file}
 \usage{
-forecast_output_validator(
-  forecast_file,
-  target_variables = c("oxygen", "temperature", "richness", "abundance", "nee", "le",
-    "vswc", "gcc_90", "rcc_90", "ixodes_scapularis", "amblyomma_americanum",
-    "prediction", "observed"),
-  theme_names = c("aquatics", "beetles", "phenology", "terrestrial_30min",
-    "terrestrial_daily", "ticks")
-)
+forecast_output_validator(forecast_file)
 }
 \arguments{
-\item{forecast_file}{Your forecast csv or nc file}
-
-\item{target_variables}{Possible target variables}
-
-\item{theme_names}{valid EFI theme names}
+\item{forecast_file}{forecast csv or csv.gz file}
 }
 \description{
-forecast_output_validator
-}
-\examples{
-
-forecast_file <- system.file("extdata/aquatics-2021-02-01-EFInull.csv.gz", 
-                              package = "neon4cast")
-forecast_output_validator(forecast_file)
-
+Validate forecast file
 }
