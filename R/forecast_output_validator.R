@@ -31,8 +31,6 @@ forecast_output_validator <- function(forecast_file){
       valid <- FALSE
     }
     
-    #usethis::ui_todo("Checking that file contains either ensemble or statistic column...")
-    
     if(lexists(out, "ensemble")){
       usethis::ui_warn("ensemble dimension should be named parameter")
       valid <- FALSE
