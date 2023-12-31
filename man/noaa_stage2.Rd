@@ -13,7 +13,7 @@ Stage2 processing involves the following transforms of the data:
 noaa_stage2(
   cycle = 0,
   version = "v12",
-  endpoint = "data.ecoforecast.org",
+  endpoint = NA,
   verbose = TRUE,
   start_date = ""
 )

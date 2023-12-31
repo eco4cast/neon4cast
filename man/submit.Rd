@@ -8,12 +8,12 @@ submit(
   forecast_file,
   metadata = NULL,
   ask = interactive(),
-  s3_region = "data",
+  s3_region = "submit",
   s3_endpoint = "ecoforecast.org"
 )
 }
 \arguments{
-\item{forecast_file}{Your forecast csv or nc file}
+\item{forecast_file}{forecast csv or csv.gz file}
 
 \item{metadata}{path to metadata file}
 

@@ -61,12 +61,21 @@ noaa_stage1 <- function(cycle = 0,
                         endpoint = "data.ecoforecast.org",
                         verbose = TRUE,
                         start_date = "") {
-  noaa_gefs_stage(file.path("stage1",cycle, start_date), 
-                  partitioning = "start_date",
-                  version = version, 
-                  endpoint = endpoint,
-                  verbose = verbose,
-                  start_date = start_date)
+
+  vars <- arrow_env_vars()
+
+  bucket <- paste0("bio230014-bucket01/neon4cast-drivers/noaa/gefs-v12/stage1/reference_datetime=",start_date)
+
+   endpoint_override <- "https://sdsc.osn.xsede.org"
+   s3 <- arrow::s3_bucket(paste0(bucket),
+                         endpoint_override = endpoint_override,
+                         anonymous = TRUE)
+
+  site_df <- arrow::open_dataset(s3)
+   
+  unset_arrow_vars(vars)
+
+  return(site_df)
 }
 
 #' NOAA GEFS forecasts with EFI stage 2 processing
@@ -79,18 +88,27 @@ noaa_stage1 <- function(cycle = 0,
 #' @export
 noaa_stage2 <- function(cycle = 0,
                         version = "v12",
-                        endpoint = "data.ecoforecast.org",
+                        endpoint = NA,
                         verbose = TRUE,
                         start_date = "") {
-  noaa_gefs_stage(file.path("stage2/parquet",cycle, start_date), 
-                  partitioning = "start_date",
-                  version = version, 
-                  endpoint = endpoint,
-                  verbose = verbose,
-                  start_date = start_date)
-  
-}
 
+  vars <- arrow_env_vars()
+
+  bucket <- paste0("bio230014-bucket01/neon4cast-drivers/noaa/gefs-v12/stage2/reference_datetime=",start_date)
+
+  endpoint_override <- "https://sdsc.osn.xsede.org"
+  s3 <- arrow::s3_bucket(paste0(bucket),
+                         endpoint_override = endpoint_override,
+                         anonymous = TRUE)
+
+  site_df <- arrow::open_dataset(s3) |> 
+    dplyr::mutate(reference_datetime = lubridate::as_datetime(start_date))
+    
+  unset_arrow_vars(vars)
+
+  return(site_df)
+
+}
 
 #' NOAA GEFS forecasts with EFI stage 3 processing
 #' 
@@ -108,45 +126,25 @@ noaa_stage2 <- function(cycle = 0,
 noaa_stage3 <- function(version = "v12",
                         endpoint = "data.ecoforecast.org",
                         verbose = TRUE) {
-  noaa_gefs_stage("stage3/parquet", 
-                  partitioning = "site_id", 
-                  version = version, 
-                  endpoint = endpoint,
-                  verbose = verbose, 
-                  start_date = NA)
-}
 
-noaa_gefs_stage <- function(stage = "stage1",
-                            partitioning = c("cycle","start_date"),
-                            cycle = 0,
-                            version = "v12",
-                            endpoint = "data.ecoforecast.org",
-                            verbose = getOption("verbose", TRUE),
-                            start_date = start_date) {
-  if(verbose) 
-    message(paste("establishing connection to", stage, "at", endpoint, "..."))
-  s3 <- noaa_gefs(version, endpoint)
-  if (!is.na(as.Date(start_date))) {
-    ds <- arrow::open_dataset(s3$path(stage)) |> dplyr::filter(parameter <= 31)
-  } else {
-    ds <- arrow::open_dataset(s3$path(stage), partitioning = partitioning) |> dplyr::filter(parameter <= 31)
-  }
-  if(verbose)
-    message(paste0("connected! Use dplyr functions to filter and summarise.\n",
-                  "Then, use collect() to read result into R\n"))
-  ds  
-}
+vars <- arrow_env_vars()
 
-noaa_gefs <- function(version = "v12",
-                      endpoint = "data.ecoforecast.org") {
+  bucket <- "bio230014-bucket01/neon4cast-drivers/noaa/gefs-v12/stage3"
 
-  vars <- arrow_env_vars()
-  gefs <- arrow::s3_bucket(paste0("neon4cast-drivers/noaa/gefs-", version),
-                           endpoint_override = endpoint,
-                           anonymous = TRUE)
-  on.exit(unset_arrow_vars(vars))
-  gefs
 
+  endpoint_override <- "https://sdsc.osn.xsede.org"
+  s3 <- arrow::s3_bucket(bucket,
+                         endpoint_override = endpoint_override,
+                         anonymous = TRUE)
+
+  site_df <- arrow::open_dataset(s3) |>
+    dplyr::mutate(ensemble = as.numeric(stringr::str_sub(ensemble, start = 4, end = 5))) |> 
+    dplyr::rename(parameter = ensemble)
+    
+  unset_arrow_vars(vars)
+
+  return(site_df)
+  
 }
 
 arrow_env_vars <- function(){
