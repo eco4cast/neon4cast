@@ -137,9 +137,7 @@ vars <- arrow_env_vars()
                          endpoint_override = endpoint_override,
                          anonymous = TRUE)
 
-  site_df <- arrow::open_dataset(s3) |>
-    dplyr::mutate(ensemble = as.numeric(stringr::str_sub(ensemble, start = 4, end = 5))) |> 
-    dplyr::rename(parameter = ensemble)
+  site_df <- arrow::open_dataset(s3)
     
   unset_arrow_vars(vars)
 
