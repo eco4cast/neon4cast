@@ -77,7 +77,7 @@ forecast_output_validator <- function(forecast_file){
     if(lexists(out, c("duration"))){
       usethis::ui_done("file has duration column")
     }else{
-      usethis::ui_warn("file missing duration column (values for the column: daily = P1D, hourly = PT1H)")
+      usethis::ui_warn("file missing duration column (values for the column: daily = P1D, 30min = PT30M)")
     }
     
     if(lexists(out, c("project_id"))){
