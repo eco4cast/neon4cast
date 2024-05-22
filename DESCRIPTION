@@ -23,7 +23,8 @@ Imports:
     arrow,
     rlang,
     tibble,
-    read4cast (>= 0.0.0.9000)
+    read4cast (>= 0.0.0.9000),
+    yaml
 RoxygenNote: 7.2.3
 Language: en-US
 Suggests: 
