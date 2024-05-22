@@ -38,7 +38,6 @@ Suggests:
     lubridate,
     purrr,
     stringr,
-    yaml,
     tidyselect,
     ISOweek,
     readr,
