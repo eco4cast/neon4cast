@@ -4,15 +4,15 @@
 #' @export
 
 forecast_output_validator <- function(forecast_file){
-
+  
   config <- yaml::read_yaml("https://raw.githubusercontent.com/eco4cast/neon4cast-ci/main/challenge_configuration.yaml")
-
+  
   allowed_combinations <- NULL
   for(i in 1:length(config$variable_groups)){
-  
+    
     curr_tibble <- data.frame(variable = unlist(config$variable_groups[i][[1]]$variable),
-                                duration = unlist(config$variable_groups[i][[1]]$duration))
-  
+                              duration = unlist(config$variable_groups[i][[1]]$duration))
+    
     allowed_combinations <- rbind(allowed_combinations, curr_tibble)
   }
   
@@ -40,18 +40,18 @@ forecast_output_validator <- function(forecast_file){
       usethis::ui_warn("missing the variable and prediction columns")
       valid <- FALSE
     }
-
+    
     unique_variables <- unique(out$variable)
-  
+    
     for(i in 1:length(unique_variables)){
-     if (unique_variables[i] %in% allowed_combinations$variable) {
-       usethis::ui_done(paste0(unique_variables[i], " is a valid variable name"))
-     }
-     else {
-      usethis::ui_warn(paste0(unique_variables[i], " is not a valid variable name"))
-     }
-   }
-  
+      if (unique_variables[i] %in% allowed_combinations$variable) {
+        usethis::ui_done(paste0(unique_variables[i], " is a valid variable name"))
+      }
+      else {
+        usethis::ui_warn(paste0(unique_variables[i], " is not a valid variable name"))
+      }
+    }
+    
     if(lexists(out, "ensemble")){
       usethis::ui_warn("ensemble dimension should be named parameter")
       valid <- FALSE
@@ -96,9 +96,17 @@ forecast_output_validator <- function(forecast_file){
     
     
     if(lexists(out, c("duration"))){
-      usethis::ui_done("file has duration column")
+      
+      duration_correct <- unique(out$duration) %in% c("P1D", "PT30M", "P1W")
+      
+      if(!all(duration_correct)){
+        usethis::ui_warn("Incorrect value for duration column (values for the column: daily = P1D, 30min = PT30M, Weekly = P1W)")
+        
+      }else{
+        usethis::ui_done("file has correct duration column")
+      }
     }else{
-      usethis::ui_warn("file missing duration column (values for the column: daily = P1D, 30min = PT30M)")
+      usethis::ui_warn("file missing duration column (values for the column: daily = P1D, 30min = PT30M, Weekly = P1W)")
     }
     
     if(lexists(out, c("project_id"))){
