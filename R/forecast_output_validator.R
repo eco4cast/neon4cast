@@ -35,6 +35,10 @@ forecast_output_validator <- function(forecast_file){
       usethis::ui_done("file has model_id column")
       if(length(unique(out$model_id)) == 1){
         usethis::ui_done("only one unique value in the model_id column")
+        if(is.na(unique(out$model_id))){
+          usethis::ui_warn("model_id is correctly NA")
+          valid <- FALSE
+        }
       }else{
         usethis::ui_warn("file has more than one unique value in the model_id column.  Only one model_id per submission file is allowed")
         valid <- FALSE
