@@ -6,10 +6,6 @@
 forecast_output_validator <- function(forecast_file){
   
   config <- yaml::read_yaml("https://raw.githubusercontent.com/eco4cast/neon4cast-ci/main/challenge_configuration.yaml")
-  
-  config <- yaml::read_yaml("challenge_configuration.yaml")
-  
-  
   allowed_combinations <- NULL
   for(i in 1:length(config$variable_groups)){
     
