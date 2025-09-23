@@ -9,9 +9,9 @@ forecast_output_validator <- function(forecast_file){
   allowed_combinations <- NULL
   for(i in 1:length(config$variable_groups)){
     
-    curr_tibble <- data.frame(variable = unlist(config$variable_groups[i][[1]]$variable),
-                              duration = unlist(config$variable_groups[i][[1]]$duration),
-                              max_horizon = unlist(config$variable_groups[i][[1]]$max_horizon))
+    curr_tibble <- data.frame(variable = unlist(config$target_groups[i][[1]]$variable),
+                              duration = unlist(config$target_groups[i][[1]]$duration),
+                              max_horizon = unlist(config$target_groups[i][[1]]$max_horizon))
     
     allowed_combinations <- rbind(allowed_combinations, curr_tibble)
   }
